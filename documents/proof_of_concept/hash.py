@@ -20,10 +20,8 @@ def hash(data):
 	crc2 = hex(crc32(bits.encode()))
 
 	hex_string = hex(int(int.from_bytes(read(data, int(crc2[0:4],16)).encode(), byteorder='big')+1) // (int.from_bytes(read(data, int(crc2[4:],16)).encode(), byteorder='big')+1))[2:]
-
-	plain_text = bytes.fromhex(hex_string + '0' * ((-len(hex_string))&0xF))
+	
+	plain_text = bytes.fromhex(hex_string + '0' * ((-len(hex_string))&0x1F))
 
 	return(encrypt(bits, plain_text))
-
-print(hash("hello-world"))
 
