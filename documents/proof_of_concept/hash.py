@@ -1,27 +1,37 @@
 import binascii
 from Crypto.Cipher import AES
 
-def encrypt(key, plain_text):
-	return(AES.new(key[0:16], AES.MODE_CBC, key[16:]).encrypt(plain_text))
+def encrypt(key, iv, plain_text):
+	return(AES.new(key, AES.MODE_CBC, iv).encrypt(plain_text))
 
 def crc32(message):
 	return(binascii.crc32(message) & 0xFFFFFFFF)
 
 def read(message, location):
-	return(message[location:location+0x10] + '\x00' * ((-len(message))&0xF))
+	value = message[location:location+0x10]
+	return(pad(value, 0xF, '\x00'))
+
+def pad(data, lenght, placeholder):
+	return (data + placeholder * (-(len(data))&lenght))
 
 def hash(data):
 	data = data * int(0x10000//len(data))
-	data = data + '\x00' * (-(len(data))&0xFFFF)
-
-	crc1 = hex(crc32(data.encode()))[2:]
-	bits = ''.join([read(data, int(crc1[0:4],16)), read(data, int(crc1[4:],16))])
-
-	crc2 = hex(crc32(bits.encode()))
-
-	hex_string = hex(int(int.from_bytes(read(data, int(crc2[0:4],16)).encode(), byteorder='big')+1) // (int.from_bytes(read(data, int(crc2[4:],16)).encode(), byteorder='big')+1))[2:]
+	data = pad(data, 0xFFFF, '\x00')
 	
-	plain_text = bytes.fromhex(hex_string + '0' * ((-len(hex_string))&0x1F))
+	crc1 = hex(crc32(data.encode())).replace('0x','')
+	crc1 = pad(crc1, 0x7, '0')
+	bits1 = (read(data, int(crc1[0:4],16))+read(data, int(crc1[4:],16))).encode()
 
-	return(encrypt(bits, plain_text))
+	crc2 = hex(crc32(bits1))[2:]
+	crc2 = pad(crc2, 0x7, '0')
+	bits2 = (read(data, int(crc2[0:4],16))+read(data, int(crc2[4:],16))).encode()
+
+	hex_string1 = hex(int(int.from_bytes(bits1[0:16], byteorder='big')+int(crc1[0:4],16)) // (int.from_bytes(bits2[16:], byteorder='big')+int(crc2[4:],16)))[2:]
+	hex_string2 = hex(int(int.from_bytes(bits2[0:16], byteorder='big')+int(crc2[0:4],16)) // (int.from_bytes(bits1[16:], byteorder='big')+int(crc1[4:],16)))[2:]
+	plain_text1 = bytes.fromhex(pad(hex_string1, 0x1F, '0'))
+	plain_text2 = bytes.fromhex(pad(hex_string2, 0x1F, '0'))
+
+	return(bytes.fromhex(encrypt(bits1[0:16],bits1[16:], plain_text1).hex()+encrypt(bits2[0:16],bits2[16:], plain_text2).hex()))
+
+
 
