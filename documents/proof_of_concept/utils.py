@@ -29,6 +29,6 @@ def init():
 	try:
 		iterations = int(sys.argv[2])
 	except:
-		iterations = 2**18
+		iterations = 2**20
 
 	return([iterate(seed, iterations),iterations])
