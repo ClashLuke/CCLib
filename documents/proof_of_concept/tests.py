@@ -38,12 +38,11 @@ def evaluate_similarity(hashes, iterations):
 			break
 	print('\n')
 
-def plot(data):
+def plot(data, name):
 	import matplotlib.pyplot as plt	
-	plt.ion()
-	plt.plot(data)
-	plt.show(block=False)
-	plt.pause(0.001)
+	plt.clf()
+	plt.scatter(data[1],data[0],s=0.2)
+	plt.savefig(name+".svg")
 
 def bit_histogram(hashes):
 	values = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -51,7 +50,18 @@ def bit_histogram(hashes):
 	for hash in hashes:
 		for i in range(lenght):
 			values[i] = values[i] + int(hash[i],16) 
-	return([v/len(hashes) for v in values])
+	values = [v/len(hashes) for v in values]
+
+	return [values, [i for i in range(len(values))]]
+
+
+def bucket_histogram(hashes, buckets):
+	values = []
+	for i in range(buckets+1):
+		values.append(0)
+	for hash in hashes:
+		values[int(hash,16)&buckets] += 1
+	return [values, [i for i in range(len(values))]]
 
 def test_time():
 	import time
@@ -66,5 +76,5 @@ if __name__ == "__main__":
 	hashes = test_time()
 	evaluate_probability(hashes)
 	evaluate_similarity(hashes, 16)
-	plot(bit_histogram(hashes))
-	input("Press any key to stop")
+	plot(bit_histogram(hashes),"bit_histogram")
+	plot(bucket_histogram(hashes,0x3FF),"bucket_histogram")
