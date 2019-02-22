@@ -63,17 +63,30 @@ def bucket_histogram(hashes, buckets):
 		values[int(hash,16)&buckets] += 1
 	return [values, [i for i in range(len(values))]]
 
-def test_time():
+def test_hash_time():
 	import time
 	ctime = time.time()
 	data = init()
 	ctime = int(time.time() - ctime)
-	print("Total calculation took {}s".format(ctime))
-	print("Calculation per hash took {}µs\n".format(int(1000000*ctime/data[1])))
+	print("[Squash] Total calculation took {}s".format(ctime))
+	print("[Squash] Calculation per hash took {}µs\n".format(int(1000000*ctime/data[1])))
 	return(data[0])
 
+def test_keccak_time():
+	import time
+	import hashlib
+	hash_value = hashlib.sha3_256(str(time).encode()).digest()
+	iterations = 0x10000000
+	ctime = time.time()
+	for i in range(iterations):
+		hash_value = hashlib.sha3_256(hash_value).digest()
+	ctime = int(time.time() - ctime)
+	print("[Keccak] Calculation of 2**29 hashes took {}s".format(ctime))
+	print("[Keccak] Calculation per hash took {}ns\n".format(int(1000000000*ctime/iterations)))
+
 if __name__ == "__main__":
-	hashes = test_time()
+	test_keccak_time()
+	hashes = test_hash_time()
 	evaluate_probability(hashes)
 	evaluate_similarity(hashes, 16)
 	plot(bit_histogram(hashes),"bit_histogram")
