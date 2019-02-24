@@ -90,4 +90,4 @@ if __name__ == "__main__":
 	evaluate_probability(hashes)
 	evaluate_similarity(hashes, 16)
 	plot(bit_histogram(hashes),"bit_histogram")
-	plot(bucket_histogram(hashes,0x3FF),"bucket_histogram")
+	plot(bucket_histogram(hashes,0xFFF),"bucket_histogram")
