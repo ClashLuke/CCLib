@@ -69,7 +69,7 @@ def test_hash_time():
 	data = init()
 	ctime = int(time.time() - ctime)
 	print("[Squash] Total calculation took {}s".format(ctime))
-	print("[Squash] Calculation per hash took {}µs\n".format(int(1000000*ctime/data[1])))
+	print("[Squash] Calculation per hash took {}ns\n".format(int(1000000000*ctime/data[1])))
 	return(data[0])
 
 def test_keccak_time():
@@ -85,7 +85,7 @@ def test_keccak_time():
 	print("[Keccak] Calculation per hash took {}ns\n".format(int(1000000000*ctime/iterations)))
 
 if __name__ == "__main__":
-	test_keccak_time()
+	#test_keccak_time()
 	hashes = test_hash_time()
 	evaluate_probability(hashes)
 	evaluate_similarity(hashes, 16)
