@@ -63,6 +63,15 @@ def bucket_histogram(hashes, buckets):
 		values[int(hash,16)&buckets] += 1
 	return [values, [i for i in range(len(values))]]
 
+def test_equality(hashes):
+	for i in range(len(hashes)):
+		if hashes[i] in hashes[0:i]+hashes[i+1:]:
+			print("Found collision at hash {}\n".format(hashes[i]))
+			return
+	print("No collisions found.\n")
+	return
+
+
 def test_hash_time():
 	import time
 	ctime = time.time()
@@ -87,7 +96,8 @@ def test_keccak_time():
 if __name__ == "__main__":
 	#test_keccak_time()
 	hashes = test_hash_time()
+	test_equality(hashes)
 	evaluate_probability(hashes)
 	evaluate_similarity(hashes, 16)
 	plot(bit_histogram(hashes),"bit_histogram")
-	plot(bucket_histogram(hashes,0xFFF),"bucket_histogram")
+	plot(bucket_histogram(hashes,0xFFFF),"bucket_histogram")

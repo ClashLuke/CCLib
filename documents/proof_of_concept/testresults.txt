@@ -1,8 +1,9 @@
 [Keccak] Calculation of 2**29 hashes took 219s
 [Keccak] Calculation per hash took 815ns
 
-[Squash] Total calculation took 335s
-[Squash] Calculation per hash took 159740ns
+[Squash] Calculation per hash took 214993ns
+
+Found collision at hash 69ae2a832b46a039efd444076bc917b04cfc60107b6224e616525828979d0723
 
 Value 0  has a total share of 6%
 Value 1  has a total share of 6%
@@ -22,7 +23,7 @@ Value 14 has a total share of 6%
 Value 15 has a total share of 6%
 
 
-				Hash									Difference
+				Hash						Difference
 6e563dedcf49320831a8ec214481f4d870cb9f26a4eba85e4ae0f2ba2832dc45	30814c572bbd56245fc93dec61bc62e862f4b912455a7ebf753c34d1001f362c
 7a213583061c2df73ca560d4777f7dda6a62e1b785cec1aa25649bb3c3814951	f435086ac93d151105038c5ddd12870e1669be7f2f2de7b4258c670765b193f4
 38382d452bd373dcddbc88e907739c10024c50fb6674e6b3c7278deffdd2a8ce	42f9184eeb49ba2b6ff9e8fb700ce1ca682691cc2f5aebf76e4d1ed4d6bfa193
