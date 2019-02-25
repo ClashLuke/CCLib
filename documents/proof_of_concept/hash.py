@@ -22,11 +22,19 @@ def hash(data):
 	crc1 = pad_classic(crc1, 0x7, '0')
 	bits1 = (read(data, int(crc1[0:4],16))+read(data, int(crc1[4:],16)))
 
-	crc2 = hex(crc32(bits1))[2:]
+	crc2 = hex(crc32(data+bits1))[2:]
 	crc2 = pad_classic(crc2, 0x7, '0')
 	bits2 = (read(data, int(crc2[0:4],16))+read(data, int(crc2[4:],16)))
 
-	return(bytes.fromhex(encrypt(bits1[0:16],bits1[16:], bits2).hex()))
+	crc3 = hex((int(crc1,16) + int(crc2,16))&0xFFFFFFFF)
+	crc3 = pad_classic(crc2, 0x7, '0')
+	bits3 = (read(data, int(crc3[0:4],16))+read(data, int(crc3[4:],16)))
+
+	if int((int(crc1,16) / int(crc2,16)))&1:
+		bits2 = bits2[:16]
+	else:
+		bits2 = bits2[16:]
+	return(bytes.fromhex(encrypt(bits1, bits2, bits3).hex()))
 
 
 

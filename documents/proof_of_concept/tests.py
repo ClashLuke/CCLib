@@ -1,4 +1,4 @@
-from utils import init, padr
+from utils import squash_init, keccak_init, padr
 
 def count(hashes):
 	values = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -43,6 +43,7 @@ def plot(data, name):
 	plt.clf()
 	plt.scatter(data[1],data[0],s=0.2)
 	plt.savefig(name+".svg")
+	plt.savefig(name+".png")
 
 def bit_histogram(hashes):
 	values = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -54,7 +55,6 @@ def bit_histogram(hashes):
 
 	return [values, [i for i in range(len(values))]]
 
-
 def bucket_histogram(hashes, buckets):
 	values = []
 	for i in range(buckets+1):
@@ -63,41 +63,37 @@ def bucket_histogram(hashes, buckets):
 		values[int(hash,16)&buckets] += 1
 	return [values, [i for i in range(len(values))]]
 
-def test_equality(hashes):
+def test_collisions(hashes):
+	collisions = 0
 	for i in range(len(hashes)):
 		if hashes[i] in hashes[0:i]+hashes[i+1:]:
-			print("Found collision at hash {}\n".format(hashes[i]))
-			return
-	print("No collisions found.\n")
+			collisions = collisions + 1
+	print("Found a total number of {} Collisions.\n".format(collisions))
 	return
 
 
 def test_hash_time():
-	import time
-	ctime = time.time()
-	data = init()
-	ctime = int(time.time() - ctime)
-	print("[Squash] Total calculation took {}s".format(ctime))
-	print("[Squash] Calculation per hash took {}ns\n".format(int(1000000000*ctime/data[1])))
+	data = squash_init()
+	print("[Squash] Total calculation took {}s".format(data[1]))
+	print("[Squash] Calculation per hash took {}ns\n".format(int(1000000000*data[2])))
 	return(data[0])
 
 def test_keccak_time():
-	import time
-	import hashlib
-	hash_value = hashlib.sha3_256(str(time).encode()).digest()
-	iterations = 0x10000000
-	ctime = time.time()
-	for i in range(iterations):
-		hash_value = hashlib.sha3_256(hash_value).digest()
-	ctime = int(time.time() - ctime)
-	print("[Keccak] Calculation of 2**29 hashes took {}s".format(ctime))
-	print("[Keccak] Calculation per hash took {}ns\n".format(int(1000000000*ctime/iterations)))
+	data = keccak_init()
+	print("[Keccak] Calculation of 2**29 hashes took {}s".format(data[1]))
+	print("[Keccak] Calculation per hash took {}ns\n".format(int(1000000000*data[2])))
+	return(data[0])
 
 if __name__ == "__main__":
-	#test_keccak_time()
-	hashes = test_hash_time()
-	test_equality(hashes)
+	hashes = test_keccak_time()
+	test_collisions(hashes)
 	evaluate_probability(hashes)
 	evaluate_similarity(hashes, 16)
-	plot(bit_histogram(hashes),"bit_histogram")
-	plot(bucket_histogram(hashes,0xFFFF),"bucket_histogram")
+	plot(bit_histogram(hashes),"keccak_bit_histogram")
+	plot(bucket_histogram(hashes,0xFFFF),"keccak_bucket_histogram")
+	hashes = test_hash_time()
+	test_collisions(hashes)
+	evaluate_probability(hashes)
+	evaluate_similarity(hashes, 16)
+	plot(bit_histogram(hashes),"squash_bit_histogram")
+	plot(bucket_histogram(hashes,0xFFFF),"squash_bucket_histogram")
