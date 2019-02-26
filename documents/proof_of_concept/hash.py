@@ -8,8 +8,7 @@ def crc32(message):
 	return(binascii.crc32(message) & 0xFFFFFFFF)
 
 def read(message, location):
-	value = message[location:location+0x10]
-	return(pad_encode(value, 0xF, '\x00'))
+	return(pad_encode(message[location:location+0x10], 0xF, '\x00'))
 
 def pad_classic(data, lenght, placeholder):
 	return (data + placeholder * (-(len(data))&lenght))
@@ -17,24 +16,21 @@ def pad_classic(data, lenght, placeholder):
 def pad_encode(data, lenght, placeholder):
 	return (data + (placeholder * (-(len(data))&lenght)).encode())
 
-def hash(data):	
-	crc1 = hex(crc32(data)).replace('0x','')
-	crc1 = pad_classic(crc1, 0x7, '0')
-	bits1 = (read(data, int(crc1[0:4],16))+read(data, int(crc1[4:],16)))
+def ror(val, r_bits, max_bits):
+    return(((val & (2**max_bits-1)) >> r_bits%max_bits) | (val << (max_bits-(r_bits%max_bits)) & (2**max_bits-1)))
 
-	crc2 = hex(crc32(data+bits1))[2:]
-	crc2 = pad_classic(crc2, 0x7, '0')
-	bits2 = (read(data, int(crc2[0:4],16))+read(data, int(crc2[4:],16)))
+def hash(data):
+	crc = ["","","",""]	
+	crc[0] = pad_classic(hex(crc32(data))[2:], 0x7, '0')
+	bits1 = (read(data, int(crc[0][0:4],16))+read(data, int(crc[0][4:],16)))
 
-	crc3 = hex((int(crc1,16) + int(crc2,16))&0xFFFFFFFF)
-	crc3 = pad_classic(crc2, 0x7, '0')
-	bits3 = (read(data, int(crc3[0:4],16))+read(data, int(crc3[4:],16)))
+	crc[1] = pad_classic(hex(crc32(bytes.fromhex(crc[0])+bits1))[2:], 0x7, '0')
+	crc[2] = pad_classic(hex((int(crc[0],16) + int(crc[1],16))&0xFFFFFFFF)[2:], 0x7, '0')
+	crc[3] = pad_classic(hex(ror(int(crc[0],16), int(crc[1],16)&0x7, 32))[2:], 0x7, '0')
+	bits2 = bytes.fromhex(''.join(crc))
 
-	if int((int(crc1,16) / int(crc2,16)))&1:
-		bits2 = bits2[:16]
+	if int((int(crc[0],16) / int(crc[1],16)))&1:
+		bits3 = read(data, int(crc[2][0:4],16))
 	else:
-		bits2 = bits2[16:]
-	return(bytes.fromhex(encrypt(bits1, bits2, bits3).hex()))
-
-
-
+		bits3 = read(data, int(crc[2][4:],16))
+	return(bytes.fromhex(encrypt(bits3, bits2, bits1).hex()))
