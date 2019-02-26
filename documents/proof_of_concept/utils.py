@@ -22,7 +22,7 @@ def parse_args():
 
 	help = ("--help" in sys.argv) or ("-h" in sys.argv)
 
-	if help or len(sys.argv) == 1:
+	if help or len(sys.argv) == 1 or not(keccak or squash) or not(time or collisions or probability or similarity or bit or bucket):
 		show_help()
 	if iterations:
 		for i in range(len(sys.argv)):

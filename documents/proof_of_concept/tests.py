@@ -97,11 +97,11 @@ def test_hash_time(write = False, time = False, iterations = 2**16, out = "resul
 		data = squash_init(time, iterations<<4)
 		if write:
 			f = open(result_path("testresults.txt",out),"a")
-			f.write("[Squash] Calculation of {} hashes took {}s\n".format(iterations, data[0]))
+			f.write("[Squash] Calculation of {} hashes took {}s\n".format(iterations<<4, data[0]))
 			f.write("[Squash] Calculation per hash took {}ns\n\n".format(int(1000000000*data[1])))
 			f.close()
 		else:
-			print("[Squash] Calculation of {} hashes took {}s".format(iterations, data[0]))
+			print("[Squash] Calculation of {} hashes took {}s".format(iterations<<4, data[0]))
 			print("[Squash] Calculation per hash took {}ns\n".format(int(1000000000*data[1])))
 	return(squash_init(False, iterations))
 
@@ -110,11 +110,11 @@ def test_keccak_time(write = False, time = False, iterations = 2**16, out = "res
 		data = keccak_init(time, iterations<<4)
 		if write:
 			f = open(result_path("testresults.txt",out),"a")
-			f.write("[Keccak] Calculation of {} hashes took {}s\n".format(iterations, data[0]))
+			f.write("[Keccak] Calculation of {} hashes took {}s\n".format(iterations<<4, data[0]))
 			f.write("[Keccak] Calculation per hash took {}ns\n\n".format(int(1000000000*data[1])))
 			f.close()
 		else:
-			print("[Keccak] Calculation of {} hashes took {}s".format(iterations, data[0]))
+			print("[Keccak] Calculation of {} hashes took {}s".format(iterations<<4, data[0]))
 			print("[Keccak] Calculation per hash took {}ns\n".format(int(1000000000*data[1])))
 	return(keccak_init(False, iterations))
 
