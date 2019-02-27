@@ -89,7 +89,7 @@ def test_collisions(hashes, write = False, out = "results"):
 	if write:
 		f = open(result_path("testresults.txt",out),"a")
 		f.write("Found a total number of {} Collisions in {} hashes.\n".format(collisions,l))
-		f.write("Collision probability is {}%.\n".format(100*collisions/l))
+		f.write("Collision probability is {}%.\n".format(int(1000000*collisions/l)/100))
 		f.close()
 	else:
 		print("Found a total number of {} Collisions.\n".format(collisions))

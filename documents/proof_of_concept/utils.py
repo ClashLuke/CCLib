@@ -103,7 +103,7 @@ def padr(data, lenght):
 
 def squash_iterate(seed, start, end):
 	hashes = []
-	mask = 0xFFFF - len(seed)
+	mask = 0x10000 - len(seed)
 	for i in range(start, end):
 		cur = mask - i
 		for j in range(1, 129):
