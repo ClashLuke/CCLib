@@ -77,12 +77,13 @@ def bucket_histogram(hashes, buckets, plot = False, out = "results"):
 
 def test_collisions(hashes, write = False, out = "results"):
 	collisions = 0
-	_hashes = hashes[:]
+	_hashes = sorted(hashes[:])
 	for i in range(len(hashes)):
-		_hash = _hashes[0]
-		_hashes = _hashes[1:]
-		if _hash in _hashes:
-			collisions = collisions + 1
+		try:
+			if _hashes[i] == _hashes[i+1]:
+				collisions = collisions + 1
+		except:
+			break
 	if write:
 		f = open(result_path("testresults.txt",out),"a")
 		f.write("Found a total number of {} Collisions.\n\n".format(collisions))
