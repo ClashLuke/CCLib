@@ -24,7 +24,7 @@ def hash(data):
 	crc[0] = pad_classic(hex(crc32(data))[2:], 0x7, '0')
 	bits1 = (read(data, int(crc[0][0:4],16))+read(data, int(crc[0][4:],16)))
 
-	crc[1] = pad_classic(hex(crc32(bytes.fromhex(crc[0])+bits1))[2:], 0x7, '0')
+	crc[1] = pad_classic(hex(int(crc[0],16)^crc32(bits1))[2:], 0x7, '0')
 	crc[2] = pad_classic(hex(ror(int(crc[0]+pad_classic(hex((int(crc[0],16) + int(crc[1],16))&0xFFFFFFFF)[2:], 0x7, '0'),16), int(crc[1],16)&0x3F))[2:], 0x7, '0')
 	bits2 = bytes.fromhex(''.join(crc))
 
@@ -32,4 +32,5 @@ def hash(data):
 		bits3 = read(data, int(crc[2][0:4],16))
 	else:
 		bits3 = read(data, int(crc[2][4:8],16))
+	#print(len(bits3))
 	return(bytes.fromhex(encrypt(bits3, bits2, bits1).hex()))

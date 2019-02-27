@@ -78,7 +78,9 @@ def bucket_histogram(hashes, buckets, plot = False, out = "results"):
 def test_collisions(hashes, write = False, out = "results"):
 	collisions = 0
 	_hashes = sorted(hashes[:])
-	for i in range(len(hashes)):
+	l = len(hashes)
+	
+	for i in range(l):
 		try:
 			if _hashes[i] == _hashes[i+1]:
 				collisions = collisions + 1
@@ -86,32 +88,33 @@ def test_collisions(hashes, write = False, out = "results"):
 			break
 	if write:
 		f = open(result_path("testresults.txt",out),"a")
-		f.write("Found a total number of {} Collisions.\n\n".format(collisions))
+		f.write("Found a total number of {} Collisions in {} hashes.\n".format(collisions,l))
+		f.write("Collision probability is {}%.\n".format(100*collisions/l))
 		f.close()
 	else:
 		print("Found a total number of {} Collisions.\n".format(collisions))
 	return
 
 
-def test_hash_time(write = False, time = False, iterations = 2**16, out = "results"):
+def test_hash_time(write = False, time = False, iterations = 2**16, out = "results", threads = 1):
 	if time:
-		data = squash_init(time, iterations<<4)
+		data = squash_init(time, iterations<<4, threads)
 		if write:
 			f = open(result_path("testresults.txt",out),"a")
-			f.write("[Squash] Calculation of {} hashes took {}s\n".format(iterations<<4, data[0]))
+			f.write("[Squash] Calculation of {} hashes on {} threads took {}s\n".format(iterations<<4, threads, int(10*data[0])/10))
 			f.write("[Squash] Calculation per hash took {}ns\n\n".format(int(1000000000*data[1])))
 			f.close()
 		else:
 			print("[Squash] Calculation of {} hashes took {}s".format(iterations<<4, data[0]))
 			print("[Squash] Calculation per hash took {}ns\n".format(int(1000000000*data[1])))
-	return(squash_init(False, iterations))
+	return(squash_init(False, iterations, threads))
 
 def test_keccak_time(write = False, time = False, iterations = 2**16, out = "results"):
 	if time:
 		data = keccak_init(time, iterations<<4)
 		if write:
 			f = open(result_path("testresults.txt",out),"a")
-			f.write("[Keccak] Calculation of {} hashes took {}s\n".format(iterations<<4, data[0]))
+			f.write("[Keccak] Calculation of {} hashes took {}s\n".format(iterations<<4, int(10*data[0])/10))
 			f.write("[Keccak] Calculation per hash took {}ns\n\n".format(int(1000000000*data[1])))
 			f.close()
 		else:
@@ -120,7 +123,7 @@ def test_keccak_time(write = False, time = False, iterations = 2**16, out = "res
 	return(keccak_init(False, iterations))
 
 if __name__ == "__main__":
-	keccak, squash, iterations, time, collisions, probability, similarity, bit, bucket, write, plot, out = init()
+	keccak, squash, iterations, threads, time, collisions, probability, similarity, bit, bucket, write, plot, out = init()
 
 	open(result_path("testresults.txt",out),"w").write('')
 	if keccak:
@@ -136,7 +139,7 @@ if __name__ == "__main__":
 		if bit:
 			plot_data(data=bit_histogram(hashes),name="keccak_bit_histogram", plot=plot, out=out)
 	if squash:
-		hashes = test_hash_time(write=write, time=time, iterations=iterations, out=out)
+		hashes = test_hash_time(write=write, time=time, iterations=iterations, out=out, threads=threads)
 		if collisions:
 			test_collisions(hashes, write=write, out=out)
 		if probability:
