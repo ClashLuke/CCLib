@@ -3,8 +3,8 @@
 #include <string.h>
 #include "aes2r.h"
 
-#define MASK 0xFFFF // Size of Seed (-1)
-#define ITER 0x1000 // Maximum is 0xFFFFFFFF
+#define MASK 0xFFFF   // Size of Seed (-1)
+#define ITER 0x100000 // Maximum is 0xFFFFFFFF
 
 static const unsigned char seed[65536] = 
 {
@@ -2194,9 +2194,9 @@ int main(){
 	uint64_t* hash_out64 = (uint64_t*)&hash_out[0];
 	uint64_t* out64 = (uint64_t*)&out[0];
 	uint16_t current = 0;
-	memcpy(&data[0], &seed[0], 65520); //65536 - 32 (256bit)
+	memcpy(&data[0], &seed[0], 65502); //65536 - 32 (256bit)
 	for(uint32_t i = 0; i < ITER; i ++){
-		memcpy(&data[65520], &hash_out[0], 32);
+		memcpy(&data[65502], &hash_out[0], 32);
 		squash(&data[0], &hash_out[0]);
 		//XOR_BLOCKS(out64, hash_out64);
 	}
