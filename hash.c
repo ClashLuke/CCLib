@@ -4,7 +4,7 @@
 #include "aes2r.h"
 
 #define MASK 0xFFFF // Size of Seed (-1)
-#define ITER 0x100000 // Maximum is 0xFFFFFFFF
+#define ITER 0x1000 // Maximum is 0xFFFFFFFF
 
 static const unsigned char seed[65536] = 
 {
@@ -2161,39 +2161,30 @@ static void print256(const uint8_t *b) {
 
 void squash(unsigned char* data, unsigned char* hash_out){
 	unsigned char crc[16] = {0};  // Key
-	unsigned char bits[32] = {0}; // Message
 	uint16_t* crc_16 = (uint16_t*)&crc[0];
 	uint32_t* crc_32 = (uint32_t*)&crc[0];
 	uint64_t* crc_64 = (uint64_t*)&crc[0];
+	uint64_t* bits_64 = (uint64_t*)&hash_out[0];
+	uint64_t* data_64 = (uint64_t*)&data[0];
 
-	uint32_t buffer = crc32(data, 0xFFFF);
-	memcpy(&crc[0], &buffer, 4);
+	crc_32[0] = crc32(data, 0xFFFF);
 
-	memcpy(&bits[0], &data[crc_16[0]], 8);
-	memcpy(&bits[8], &data[crc_16[1]], 8);
+	bits_64[0] = ((uint64_t*)&data[crc_16[0]])[0];
+	bits_64[1] = ((uint64_t*)&data[crc_16[1]])[0];
 
-	buffer ^= crc32(&bits[0], 15);
-	memcpy(&crc[4 ], &buffer, 4);
+	crc_32[1] = crc_32[0] ^ crc32(&hash_out[0], 15);
+	crc_32[2] = ((crc_32[0]+crc_32[1])&0xFFFFFFFF)>>crc[8]&3;
+	crc_32[3] = (crc_32[0])<<crc[8]&3;
 
-	buffer = (crc_32[0]+crc_32[1])&0xFFFFFFFF;
-	memcpy(&crc[8 ], &buffer,   4);
-	memcpy(&crc[12], &crc_32[0],4);
+	crc_64[1] = ROR(crc_64[1],crc[1]&0x3F);
+	crc_64[0] = ROL(crc_64[0],crc[15]&0x3F);
 
-	uint64_t buffer2 = ROR(crc_64[1],crc[1]&0x3F);
-	memcpy(&crc[8], &buffer2, 8);
-	buffer2 = ROR(crc_64[0],crc[15]&0x3F);
-	memcpy(&crc[0], &buffer2, 8);
+	uint64_t num = crc_64[crc[8]&1];
+	if(num != 0) num = (crc_64[crc[0]&1] / num)&1;
+	bits_64[2] = data[crc_16[3]];
+	bits_64[3] = data[crc_16[2+num<<1]];
 
-	uint8_t num = crc[crc_64[8]&1];
-	if(num != 0) num = crc_64[crc[0]&1] / num;
-	if (num&1){
-		memcpy(&bits[16], &data[crc_16[2]], 16);;
-	} else {
-		memcpy(&bits[16], &data[crc_16[3]], 16);;
-	}
-
-	aes2r_encrypt(bits, crc);
-	memcpy(&hash_out[0], &bits[0], 32);
+	aes2r_encrypt(&hash_out[0], &crc[0]);
 }
 
 int main(){
@@ -2203,9 +2194,9 @@ int main(){
 	uint64_t* hash_out64 = (uint64_t*)&hash_out[0];
 	uint64_t* out64 = (uint64_t*)&out[0];
 	uint16_t current = 0;
-	memcpy(&data[0], &seed[0], 65520); //65552 - 32 (256bit)
+	memcpy(&data[0], &seed[0], 65520); //65536 - 32 (256bit)
 	for(uint32_t i = 0; i < ITER; i ++){
-		memcpy(&data[65520], &hash_out, 32);
+		memcpy(&data[65520], &hash_out[0], 32);
 		squash(&data[0], &hash_out[0]);
 		//XOR_BLOCKS(out64, hash_out64);
 	}
