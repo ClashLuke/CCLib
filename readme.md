@@ -1,7 +1,8 @@
 *This readme will be replaced*
 
 # Squash
-A provably fast and expensive hash algorithm
+A provably fast and expensive hash algorithm</br>
+It is recommended to use the python scripts since the C script is a lot slower. (1'300ns vs 300'000'000ns)
 
 ## Parameters
 Atleast one algorithm has to be tested, atleast one test option has to be specified. 
