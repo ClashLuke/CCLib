@@ -84,6 +84,9 @@ def show_help():
 	print("-h, --help                Display this help message")
 	exit()
 
+def pad_classic(data, lenght, placeholder):
+	return (placeholder * (-(len(data))&lenght) + data)
+
 def plot_data(data, name, plot, out):
 	import matplotlib.pyplot as plt	
 	plt.clf()
@@ -103,22 +106,18 @@ def padr(data, lenght):
 
 def squash_iterate(seed, start, end):
 	hashes = []
-	mask = 0x10000 - len(seed)
 	for i in range(start, end):
-		cur = mask - i
-		for j in range(1, 129):
-			hashes.append(hash(seed + (chr(j)*i+'\x00'*cur).encode()).hex())
+		hashes.append(hash(bytes.fromhex(pad_classic(hex(i)[2:],63,'0')),seed).hex())
 	hashes = [h + '0' * (-(len(h))&0x1F) for h in hashes]
 	return hashes
 
 def run_squash_iterate(seed, iterations, threads):
-	iter_per_thread = int(iterations//(threads*128))
-	_seed = seed[:-int(iterations//128)]
+	iter_per_thread = int(iterations//(threads))
 	thread_list = [None] * threads
 	hashes = []
 	que = queue.Queue()
 	for i in range(0,threads):
-		thread_list[i] = Thread(target=lambda q, arg1, arg2, arg3: q.put(squash_iterate(arg1, arg2, arg3)), args=(que, _seed,1+i*iter_per_thread,1+(i+1)*iter_per_thread))
+		thread_list[i] = Thread(target=lambda q, arg1, arg2, arg3: q.put(squash_iterate(arg1, arg2, arg3)), args=(que, seed,i*iter_per_thread,(i+1)*iter_per_thread))
 		thread_list[i].start()
 	for i in range(0,threads):
 		hashes = hashes + que.get()
@@ -126,14 +125,13 @@ def run_squash_iterate(seed, iterations, threads):
 
 def squash_test_time(seed, iterations):
 	hash_value = hashlib.sha3_256(str(time_module.time()).encode()).digest()
-	_seed = seed[:-32]
 	ctime = time_module.time()
 	for i in range(iterations):
-			hash_value = hash(_seed + hash_value)
+			hash_value = hash(hash_value, seed)
 	return (time_module.time() - ctime)
 
 def run_squash_test_time(seed, iterations, threads):
-	iter_per_thread = int(iterations//(threads*128))
+	iter_per_thread = int(iterations//(threads))
 	thread_list = [None] * threads
 	times = []
 	que = queue.Queue()
