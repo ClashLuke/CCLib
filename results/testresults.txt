@@ -1,3 +1,6 @@
+[Squash] Calculation of 4194304 hashes took 101.62301778793335s
+[Squash] Calculation per hash took 24228ns
+
 Found a total number of 0 Collisions in 67108864 hashes.
 Collision probability is 0.0%.
 Value 0  has a total share of 6%
