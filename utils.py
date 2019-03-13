@@ -1,7 +1,5 @@
-from hash import hash
-from threading import Thread
 import time as time_module
-import os.path
+import os
 import queue
 import hashlib
 import sys
@@ -10,9 +8,8 @@ def parse_args():
 	keccak = ("--keccak" in sys.argv) or ("-k" in sys.argv)
 	squash = ("--squash" in sys.argv) or ("-s" in sys.argv)
 	iterations = ("--iterations" in sys.argv) or ("-i" in sys.argv)
-	threads = ("--threads" in sys.argv) or ("-t" in sys.argv)
 
-	time = ("--time" in sys.argv) or ("-T" in sys.argv)
+	time = ("--time" in sys.argv) or ("-t" in sys.argv)
 	collisions = ("--collisions" in sys.argv) or ("-c" in sys.argv)
 	probability = ("--probability" in sys.argv) or ("-p" in sys.argv)
 	similarity = ("--similarity" in sys.argv) or ("-S" in sys.argv)
@@ -36,17 +33,6 @@ def parse_args():
 				except:
 					print("Please enter a valid iteration number.")
 					sys.exit()
-	if threads:
-		for i in range(len(sys.argv)):
-			if sys.argv[i] == "-t" or sys.argv[i] == "--threads":
-				try:
-					threads = int(sys.argv[i+1])
-					break
-				except:
-					print("Please enter a valid threads count.")
-					sys.exit()
-	else:
-		threads = 1
 		
 	if out:
 		for i in range(len(sys.argv)):
@@ -61,7 +47,7 @@ def parse_args():
 					sys.exit()
 	else:
 		out = "results"
-	return([keccak, squash, iterations, threads, time, collisions, probability, similarity, bit, bucket, write, plot, out])
+	return([keccak, squash, iterations, time, collisions, probability, similarity, bit, bucket, write, plot, out])
 			
 
 def show_help():
@@ -69,10 +55,9 @@ def show_help():
 	print("-k, --keccak              Perform tests on keccak")
 	print("-s, --squash              Perform tests on squash")
 	print("-i, --iterations          Set the number of iterations")
-	print("-t, --threads num         Specify the number of threads to use (Squash only)")
 	print('')
 	print("Test options")
-	print("-T, --time                Enable runtime testing")
+	print("-t, --time                Enable runtime testing")
 	print("-c, --collisions          Enable collision testing")
 	print("-p, --probability         Enable testing of value probabilities")
 	print("-S, --similarity          Enable testing of hash similarities")
@@ -107,54 +92,35 @@ def padr(data, lenght):
 	data = str(data)
 	return (data + (' ' * (-(len(data))&lenght))[:-1])
 
-def squash_iterate(seed, start, end):
-	hashes = []
-	for i in range(start, end):
-		hashes.append(hash(bytes.fromhex(pad_classic(hex(i)[2:],63,'0')),seed).hex())
-	hashes = [h + '0' * (-(len(h))&0x1F) for h in hashes]
+def squash_iterate(seed, iterations):
+	if sys.platform == "linux" or sys.platform == "linux2":
+		os.system("./hash.o 1 {}".format(iterations))
+	else:
+		os.system(  "hash.o 1 {}".format(iterations))
+	os.system("sort hashes.txt -o hashes.txt")
+	f = open("hashes.txt",'r')
+	hashes = f.read().split('\n')
+	f.close()
 	return hashes
 
-def run_squash_iterate(seed, iterations, threads):
-	iter_per_thread = int(iterations//(threads))
-	thread_list = [None] * threads
-	hashes = []
-	que = queue.Queue()
-	for i in range(0,threads):
-		thread_list[i] = Thread(target=lambda q, arg1, arg2, arg3: q.put(squash_iterate(arg1, arg2, arg3)), args=(que, seed,i*iter_per_thread,(i+1)*iter_per_thread))
-		thread_list[i].start()
-	for i in range(0,threads):
-		hashes = hashes + que.get()
-	return hashes
-
-def squash_test_time(seed, iterations):
-	hash_value = hashlib.sha3_256(str(time_module.time()).encode()).digest()
+def run_squash_test_time(seed):
 	ctime = time_module.time()
-	for i in range(iterations):
-			hash_value = hash(hash_value, seed)
-	return (time_module.time() - ctime)
-
-def run_squash_test_time(seed, iterations, threads):
-	iter_per_thread = int(iterations//(threads))
-	thread_list = [None] * threads
-	times = []
-	que = queue.Queue()
-	for i in range(0,threads):
-		thread_list[i] = Thread(target=lambda q, arg1, arg2: q.put(squash_test_time(arg1, arg2)), args=(que, seed, iter_per_thread))
-		thread_list[i].start()
-	for i in range(0,threads):
-		times.append(que.get())
-	return max(times)
+	if sys.platform == "linux" or sys.platform == "linux2":
+		os.system("./hash.o 0")
+	else:
+		os.system(  "hash.o 0")
+	return(time_module.time()-ctime)
 
 
-def squash_init(time, iterations, threads):
+def squash_init(time, iterations=0):
 	seed = bytes.fromhex(open("hex.txt","r").read()[:-1])
-
+	os.system("clang hash_module.c -o hash.o -mavx -msse2 -lm")
 	if time:
-		_time = run_squash_test_time(seed, iterations, threads)
-		_per_hash = _time / iterations
+		_time = run_squash_test_time(seed)
+		_per_hash = _time / 2**28
 		return([_time,_per_hash])
 	else:
-		_hashes = run_squash_iterate(seed, iterations, threads)
+		_hashes = squash_iterate(seed, iterations)
 		return(_hashes)
 
 
@@ -186,11 +152,11 @@ def keccak_init(time, iterations):
 
 
 def init():
-	keccak, squash, iterations, threads, time, collisions, probability, similarity, bit, bucket, write, plot, out = parse_args()
+	keccak, squash, iterations, time, collisions, probability, similarity, bit, bucket, write, plot, out = parse_args()
 	try:
 		os.mkdir(result_path("",out))
 	except:
 		pass
-	return([keccak, squash, iterations, threads, time, collisions, probability, similarity, bit, bucket, write, plot, out])
+	return([keccak, squash, iterations, time, collisions, probability, similarity, bit, bucket, write, plot, out])
 	
 
