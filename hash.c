@@ -180,7 +180,7 @@ void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 
 
 int main(){
-	uint64_t iterations = (uint32_t)pow(2.0,34);
+	uint64_t iterations = (uint64_t)pow(2.0,34);
 	uint8_t data[32] = {[0 ... 31] = 6};
 	uint8_t scratchpad[65536] = {[0 ... 65535] = 5};
 	uint8_t out[32] = {[0 ... 31] = 6};
