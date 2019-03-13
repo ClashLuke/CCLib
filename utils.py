@@ -25,7 +25,7 @@ def parse_args():
 
 	help = ("--help" in sys.argv) or ("-h" in sys.argv)
 
-	if help or len(sys.argv) == 1 or not(keccak or squash) or not(time or collisions or probability or similarity or bit or bucket):
+	if help or len(sys.argv) == 1 or not(keccak or squash) or not(time or collisions or probability or similarity or bit or bucket) or not(iterations):
 		show_help()
 	if iterations:
 		for i in range(len(sys.argv)):
@@ -35,7 +35,7 @@ def parse_args():
 					break
 				except:
 					print("Please enter a valid iteration number.")
-					break
+					sys.exit()
 	if threads:
 		for i in range(len(sys.argv)):
 			if sys.argv[i] == "-t" or sys.argv[i] == "--threads":
@@ -44,7 +44,10 @@ def parse_args():
 					break
 				except:
 					print("Please enter a valid threads count.")
-					break
+					sys.exit()
+	else:
+		threads = 1
+		
 	if out:
 		for i in range(len(sys.argv)):
 			if sys.argv[i] == "-o" or sys.argv[i] == "--out":
@@ -55,7 +58,7 @@ def parse_args():
 					raise Exception('')
 				except:
 					print("Please enter a valid output directory.")
-					break
+					sys.exit()
 	else:
 		out = "results"
 	return([keccak, squash, iterations, threads, time, collisions, probability, similarity, bit, bucket, write, plot, out])
@@ -190,3 +193,4 @@ def init():
 		pass
 	return([keccak, squash, iterations, threads, time, collisions, probability, similarity, bit, bucket, write, plot, out])
 	
+
