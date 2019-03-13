@@ -76,6 +76,9 @@ static const unsigned int crc32_table[] =
   0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4
 };
 
+// Only one round of AES, looking at CryptoNight
+// and other hashes, it can be considered
+// secure "enough".
 __asm__ __volatile__(
 	".globl AES_CBC_encrypt\n"
 	"AES_CBC_encrypt:\n"
