@@ -29,7 +29,8 @@ Output options
 -h, --help                Display this help message
 ```
 By default the out directory is set to "results" and iterations are set to 65536 to enable quick, relatively accurate testing. All other values are disabled by default.</br>
-An example for a command could be the following: `python3 tests.py -s -i 65536 -t -c -p -S -w -b -B`. It performs all tests on squash while using 65536 (2**16) iterations.
+An example for a command could be the following: `python3 tests.py -s -i 65536 -t -c -p -S -w -b -B`. It performs all tests on squash while using 65536 (2**16) iterations.</br>
+**ATTENTION** due to recent changes of the sorting habits of the hashes (sort before all tasks are done instead of afterwords), the "similarity" test became somewhat obsolete for squash. To check the similarity of the hashes, go to docs/hash_sample.txt or generate one yourself using the python module in tests/.
 
 
 ## Dependencies
