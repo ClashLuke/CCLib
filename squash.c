@@ -151,8 +151,12 @@ __asm__ __volatile__(
 	"jne	LOOP\n"
 	"ret"
 );
+inline void AES_CBC_encrypt(const unsigned char* in, unsigned char* out,
+				unsigned char* ivec, unsigned long length,
+				const unsigned char* KS){
+		XASM_LINK("AES_CBC_encrypt");}
 
-
+#ifdef __SSE2__
 void ror128(__m128i in, __m128i* out, uint16_t n){
 	uint8_t shift = n&0x3f;
 	__m128i v0 = _mm_slli_epi64(in, shift);
@@ -175,37 +179,166 @@ void rol128(__m128i in, __m128i* out, uint16_t n){
 	*out = _mm_or_si128(v1,v2);
 	return;
 }
-inline void AES_CBC_encrypt(const unsigned char* in, unsigned char* out,
-				unsigned char* ivec, unsigned long length,
-				const unsigned char* KS){
-		XASM_LINK("AES_CBC_encrypt");}
+#else
+#  ifdef UINT64_MAX
+void ror128(uint64_t hi, uint64_t lo, uint8_t n, uint64_t* hi_out, uint64_t* lo_out){
+	if (n&0x40) {
+		lo ^= hi;
+		hi ^= lo;
+		lo ^= hi;
+	}
+	uint8_t shift = n&0x3f;
+	if (!shift) {
+		*hi_out = hi;
+		*lo_out = lo;
+		return;
+	}
+	hi_out = (hi>>shift) | (lo<<(64-shift));
+	lo_out = (lo>>shift) | (hi<<(64-shift));
+	return;
+}
+void rol128(uint64_t hi, uint64_t lo, uint8_t n, uint64_t* hi_out, uint64_t* lo_out){
+	if (n&0x40) {
+		lo ^= hi;
+		hi ^= lo;
+		lo ^= hi;
+	}
+	uint8_t shift = n&0x3f;
+	if (!shift) {
+		*hi_out = hi;
+		*lo_out = lo;
+		return;
+	}
+	hi_out = (hi<<shift) | (lo>>(64-shift));
+	lo_out = (lo<<shift) | (hi>>(64-shift));
+	return;
+}
+#  else
+void rol128(uint32_t* in, uint8_t n, uint32_t* out){
+	out[0] = in[0]; out[1] = in[1];
+	out[2] = in[2]; out[3] = in[3];
+	uint8_t nums[4] = {0,1,2,3};
+	if (n&0x40) {
+		nums[0] = 2;
+		nums[1] = 3;
+		nums[2] = 0;
+		nums[3] = 1;
+	}
+	if (n&0x20) {
+		nums[0] =  1+nums[0];
+		nums[1] = (1+nums[1])&3;
+		nums[2] =  1+nums[2];
+		nums[3] = (1+nums[3])&3;
+	}
+	uint8_t shift = n&0x1f;
+	if (!shift) return;
+	out[0] = (out[num[0]]<<shift) | (out[num[1]]>>(32-shift));
+	out[1] = (out[num[1]]<<shift) | (out[num[2]]>>(32-shift));
+	out[2] = (out[num[2]]<<shift) | (out[num[3]]>>(32-shift));
+	out[3] = (out[num[3]]<<shift) | (out[num[0]]>>(32-shift));
+	return;
+}
+void ror128(uint32_t* in, uint8_t n, uint32_t* out){
+	out[0] = in[0]; out[1] = in[1];
+	out[2] = in[2]; out[3] = in[3];
+	uint8_t nums[4] = {0,1,2,3};
+	if (n&0x40) {
+		nums[0] = 2;
+		nums[1] = 3;
+		nums[2] = 0;
+		nums[3] = 1;
+	}
+	if (n&0x20) {
+		nums[0] =  1+nums[0];
+		nums[1] = (1+nums[1])&3;
+		nums[2] =  1+nums[2];
+		nums[3] = (1+nums[3])&3;
+	}
+	uint8_t shift = n&0x1f;
+	if (!shift) return;
+	out[0] = (out[num[0]]>>shift) | (out[num[1]]<<(32-shift));
+	out[1] = (out[num[1]]>>shift) | (out[num[2]]<<(32-shift));
+	out[2] = (out[num[2]]>>shift) | (out[num[3]]<<(32-shift));
+	out[3] = (out[num[3]]>>shift) | (out[num[0]]<<(32-shift));
+	return;
+}
+#  endif
+#endif
+
+#ifdef UINT64_MAX
+uint32_t add32(uint32_t a, uint32_t b, uint8_t* carry){
+	if((a>>31)&&(b>>31)) carry[0]=1;
+	return(a+b);
+}
+/* Returns *a % b, and sets *a = *a_old / b; */
+void div32(uint64_t *a, uint32_t b) {
+#  ifdef __i386__  /* u64 / u32 division with little i386 machine code. */
+  uint32_t upper = ((uint32_t*)a)[1], r;
+  ((uint32_t*)a)[1] = 0;
+  if (upper >= b) {   
+    ((uint32_t*)a)[1] = upper / b;
+    upper %= b;
+  }
+  __asm__("divl %2" : "=a" (((uint32_t*)a)[0]), "=d" (r) :
+      "rm" (b), "0" (((uint32_t*)a)[0]), "1" (upper));
+#  else
+  a[0] = a[0] / b;  /* Calls __udivdi3 in libgcc. */
+#  endif
+}
+#endif
 
 void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	uint16_t  crc_16[16] =	{0};
 	uint32_t* crc_32 = (uint32_t*)crc_16;
 	uint64_t* crc_64 = (uint64_t*)crc_16;
 	uint64_t* data_64 = (uint64_t*)data;
-	__m128i iv = _mm_set_epi64x(0,0);
-	__m128i key = _mm_set_epi64x(0,0);
+	#ifndef UINT64_MAX
+	uint32_t* data_32 = (uint32_t*)data;
+	#endif
+	#ifdef __SSE2__
+	__m128i iv = _mm_set_epi32(0,0,0,0);
+	__m128i key = _mm_set_epi32(0,0,0,0);
+	#else
+	uint64_t iv[2] = {0};
+	uint64_t key[2] = {0};
+	#endif
 
 	crc_32[0] = crc32(data);
 	crc_32[1] = crc32(&data[4]);
 
 	crc_32[2] = ((uint32_t*)&scratchpad[crc_16[0]])[0];
 	crc_32[3] = ((uint32_t*)&scratchpad[crc_16[2]])[0];
+	#ifdef UINT64_MAX
 	crc_64[1] ^= data_64[1];
 	crc_64[2] = (crc_64[1] + data_64[2]) ^ (crc_64[1] / data_64[2]);
 	crc_64[3] = data_64[3];
+	#else
+	crc_32[2] ^= data_32[2];
+	crc_32[3] ^= data_32[3];
+	uint8_t carry = 0;
+	uint64_t div_out = crc_64[1];
+	div32(crc_64[1], data_32[5]);
+	crc_32[5] = add32(crc_32[3],data_32[5],&carry) ^ div_out;
+	div_out = crc_64[1];
+	div32(crc_64[1], data_32[4]);
+	crc_32[4] = (crc_32[2]+data_32[4]+carry) ^ div_out;
+	crc_32[6] = data_32[6];
+	crc_32[7] = data_32[7];
+	#endif
 
+	#ifdef __SSE2__
 	ror128(_mm_set_epi64x(crc_64[0],crc_64[1]),&iv,crc_16[15]);
 	rol128(_mm_set_epi64x(crc_64[2],crc_64[3]),&key,crc_16[0 ]);
+	#else
+	ror128(crc_64[0],crc_64[1],crc_16[15],&iv,&iv[1]);
+	rol128(crc_64[2],crc_64[3],crc_16[ 0],&key,&key[1]);
+	#endif
 	AES_CBC_encrypt((const unsigned char*)crc_16, (unsigned char*)out, (unsigned char*)&iv, 32, (const unsigned char*)&key);
 	return;
 }
 
-
 int main(){
-	uint64_t iterations = (uint64_t)pow(2.0,34);
+	uint64_t iterations = (uint64_t)pow(2.0,26);
 	uint8_t data[32] = {[0 ... 31] = 6};
 	uint8_t scratchpad[65536] = {[0 ... 65535] = 5};
 	uint8_t out[32] = {[0 ... 31] = 6};
