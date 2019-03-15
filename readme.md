@@ -4,6 +4,13 @@
 A provably fast and expensive hash algorithm</br>
 The C script is SSE2 and ASM optimised, the python script is able to run the following tests.
 
+## ToDo
+The following things have to be done
+* Check if ASM CRCs have the same result as C CRC
+* Add AES ASM instructions
+* Security Analysis (Review)
+* Benchmark on ARMv8, SSE4.2 compatible CPU and AMD GPUs.
+
 ## Parameters
 Atleast one algorithm has to be tested, atleast one test option has to be specified. 
 ```
