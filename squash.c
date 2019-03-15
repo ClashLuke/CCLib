@@ -100,11 +100,11 @@ uint32_t crc32c_table[256] = {
 
 uint32_t crc32(unsigned char* buf)
 {
-    uintptr_t crc =  0xffffffff;
-    for(uint8_t len=0;len<4;len++){
-        crc = crc32c_table[(crc ^ *buf++) & 0xff] ^ (crc >> 8);
-    }
-    return (uint32_t)crc ^ 0xffffffff;
+	uintptr_t crc =  0xffffffff;
+	for(uint8_t len=0;len<4;len++){
+		crc = crc32c_table[(crc ^ *buf++) & 0xff] ^ (crc >> 8);
+	}
+	return (uint32_t)crc ^ 0xffffffff;
 }
 #endif
 // Only one round of AES, looking at CryptoNight
@@ -155,29 +155,29 @@ __asm__ __volatile__(
 
 void ror128(__m128i in, __m128i* out, uint16_t n){
 	uint8_t shift = n&0x3f;
-		__m128i v0 = _mm_slli_epi64(in, shift);
-		__m128i v1 = _mm_slli_si128(in, 8);
-		v1 = _mm_srli_epi64(v1, 64-shift);
-		v1 = _mm_or_si128(v0, v1);
-		v0 = _mm_slli_si128(in, 8);
+	__m128i v0 = _mm_slli_epi64(in, shift);
+	__m128i v1 = _mm_slli_si128(in, 8);
+	v1 = _mm_srli_epi64(v1, 64-shift);
+	v1 = _mm_or_si128(v0, v1);
+	v0 = _mm_slli_si128(in, 8);
 	__m128i v2 = _mm_slli_epi64(v0, shift^64);
 	*out = _mm_or_si128(v1,v2);
 	return;
 }
 void rol128(__m128i in, __m128i* out, uint16_t n){
 	uint8_t shift = n&0x3f;
-		__m128i v0 = _mm_srli_epi64(in, shift);
-		__m128i v1 = _mm_srli_si128(in, 8);
-		v1 = _mm_slli_epi64(v1, 64-shift);
-		v1 = _mm_or_si128(v0, v1);
-		v0 = _mm_srli_si128(in, 8);
+	__m128i v0 = _mm_srli_epi64(in, shift);
+	__m128i v1 = _mm_srli_si128(in, 8);
+	v1 = _mm_slli_epi64(v1, 64-shift);
+	v1 = _mm_or_si128(v0, v1);
+	v0 = _mm_srli_si128(in, 8);
 	__m128i v2 = _mm_srli_epi64(v0, shift^64);
 	*out = _mm_or_si128(v1,v2);
 	return;
 }
 inline void AES_CBC_encrypt(const unsigned char* in, unsigned char* out,
-							 unsigned char* ivec, unsigned long length,
-							 const unsigned char* KS/*, int nr*/){
+				unsigned char* ivec, unsigned long length,
+				const unsigned char* KS){
 		XASM_LINK("AES_CBC_encrypt");}
 
 void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
@@ -191,8 +191,8 @@ void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	crc_32[0] = crc32(data);
 	crc_32[1] = crc32(&data[4]);
 
-	crc_32[2] = (uint32_t)scratchpad[crc_16[0]];
-	crc_32[3] = (uint32_t)scratchpad[crc_16[2]];
+	crc_32[2] = ((uint32_t*)&scratchpad[crc_16[0]])[0];
+	crc_32[3] = ((uint32_t*)&scratchpad[crc_16[2]])[0];
 	crc_64[1] ^= data_64[1];
 	crc_64[2] = (crc_64[1] + data_64[2]) ^ (crc_64[1] / data_64[2]);
 	crc_64[3] = data_64[3];
@@ -205,7 +205,7 @@ void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 
 
 int main(){
-	uint64_t iterations = (uint64_t)pow(2.0,28);
+	uint64_t iterations = (uint64_t)pow(2.0,34);
 	uint8_t data[32] = {[0 ... 31] = 6};
 	uint8_t scratchpad[65536] = {[0 ... 65535] = 5};
 	uint8_t out[32] = {[0 ... 31] = 6};
