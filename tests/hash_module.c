@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <strings.h>
+#include "aes.h"
 
 #ifndef _mm_set_epi64x
 	#define _mm_set_epi64x(m0, m1) _mm_set_epi64(_m_from_int64(m0), _m_from_int64(m1))
@@ -36,7 +37,6 @@ uint8_t tallymarker_hextobin(const char* str, uint8_t* bytes, uint32_t blen)
 
    return(0);
 }
-
 
 #if (defined(_CPU_X86_64_) || defined(_CPU_X86_)) && !defined(_COMPILER_MICROSOFT_) && defined(__SSE4_2__)
 /* Compute CRC-32C using the SSE4.2 hardware instruction. */
@@ -131,109 +131,124 @@ uint32_t crc32c_table[256] = {
 
 uint32_t crc32(unsigned char* buf)
 {
-    uintptr_t crc =  0xffffffff;
-    for(uint8_t len=0;len<4;len++){
-        crc = crc32c_table[(crc ^ *buf++) & 0xff] ^ (crc >> 8);
-    }
-    return (uint32_t)crc ^ 0xffffffff;
+	uintptr_t crc =  0xffffffff;
+	for(uint8_t len=0;len<4;len++){
+		crc = crc32c_table[(crc ^ *buf++) & 0xff] ^ (crc >> 8);
+	}
+	return (uint32_t)crc ^ 0xffffffff;
 }
 #endif
+#if defined(__SSE2__)
+#define SHL(v, n) \
+({ \
+    __m128i v1, v2; \
+ \
+    if ((n) >= 64) \
+    { \
+        v1 = _mm_slli_si128(v, 8); \
+        v1 = _mm_slli_epi64(v1, (n) - 64); \
+    } \
+    else \
+    { \
+        v1 = _mm_slli_epi64(v, n); \
+        v2 = _mm_slli_si128(v, 8); \
+        v2 = _mm_srli_epi64(v2, 64 - (n)); \
+        v1 = _mm_or_si128(v1, v2); \
+    } \
+    v1; \
+})
 
-// Only one round of AES, looking at CryptoNight
-// and other hashes, it can be considered
-// secure "enough".
-__asm__ __volatile__(
-	".globl AES_CBC_encrypt\n"
-	"AES_CBC_encrypt:\n"
-	"# parameter 1: %rdi\n"
-	"# parameter 2: %rsi\n"
-	"# parameter 3: %rdx\n"
-	"# parameter 4: %rcx\n"
-	"# parameter 5: %r8\n"
-	"# parameter 6: %r9d\n"
-	"movq	%rcx, %r10\n"
-	"shrq	$4, %rcx\n"
-	"shlq	$60, %r10\n"
-	"je	NO_PARTS\n"
-	"addq	$1, %rcx\n"
-	"NO_PARTS:\n"
-	"subq	$16, %rsi\n"
-	"movdqa	(%rdx), %xmm1\n"
-	"LOOP:\n"
-	"pxor	(%rdi), %xmm1\n"
-	"pxor	(%r8), %xmm1\n"
-	"addq	$16,%rsi\n"
-	"addq	$16,%rdi\n"
-	"aesenc	16(%r8),%xmm1\n"
-	"aesenc	32(%r8),%xmm1\n"
-	"aesenc	48(%r8),%xmm1\n"
-	"aesenc	64(%r8),%xmm1\n"
-	"aesenc	80(%r8),%xmm1\n"
-	"aesenc	96(%r8),%xmm1\n"
-	"aesenc	112(%r8),%xmm1\n"
-	"aesenc	128(%r8),%xmm1\n"
-	"aesenc	144(%r8),%xmm1\n"
-	"movdqa	160(%r8),%xmm2\n"
-	"jmp	LAST\n"
-	"\n"
-	"LAST:\n"
-	"decq	%rcx\n"
-	"aesenclast %xmm2,%xmm1\n"
-	"movdqu	%xmm1,(%rsi)\n"
-	"jne	LOOP\n"
-	"ret"
-);
+#define SHR(v, n) \
+({ \
+    __m128i v1, v2; \
+ \
+    if ((n) >= 64) \
+    { \
+        v1 = _mm_srli_si128(v, 8); \
+        v1 = _mm_srli_epi64(v1, (n) - 64); \
+    } \
+    else \
+    { \
+        v1 = _mm_srli_epi64(v, n); \
+        v2 = _mm_srli_si128(v, 8); \
+        v2 = _mm_slli_epi64(v2, 64 - (n)); \
+        v1 = _mm_or_si128(v1, v2); \
+    } \
+    v1; \
+})
 
 void ror128(__m128i in, __m128i* out, uint16_t n){
-	uint8_t shift = n&0x3f;
-        __m128i v0 = _mm_slli_epi64(in, shift);
-        __m128i v1 = _mm_slli_si128(in, 8);
-        v1 = _mm_srli_epi64(v1, 64-shift);
-        v1 = _mm_or_si128(v0, v1);
-        v0 = _mm_slli_si128(in, 8);
-	__m128i v2 = _mm_slli_epi64(v0, shift^64);
-	*out = _mm_or_si128(v1,v2);
+	uint8_t shift = n&0x7f;
+	__m128i left  = SHL(in, shift);
+	__m128i right = SHR(in, 128-shift);
+	out[0] = _mm_or_si128(left,right);
 	return;
 }
 void rol128(__m128i in, __m128i* out, uint16_t n){
-	uint8_t shift = n&0x3f;
-        __m128i v0 = _mm_srli_epi64(in, shift);
-        __m128i v1 = _mm_srli_si128(in, 8);
-        v1 = _mm_slli_epi64(v1, 64-shift);
-        v1 = _mm_or_si128(v0, v1);
-        v0 = _mm_srli_si128(in, 8);
-	__m128i v2 = _mm_srli_epi64(v0, shift^64);
-	*out = _mm_or_si128(v1,v2);
+	uint8_t shift = n&0x7f;
+	__m128i right = SHR(in, shift);
+	__m128i left  = SHL(in, 128-shift);
+	out[0] = _mm_or_si128(left,right);
 	return;
 }
-inline void AES_CBC_encrypt(const unsigned char* in, unsigned char* out,
-							 unsigned char* ivec, unsigned long length,
-							 const unsigned char* KS/*, int nr*/){
-		XASM_LINK("AES_CBC_encrypt");}
 
-void hash(uint8_t* data, char* scratchpad, uint8_t* out){
+#else
+void ror128(uint64_t* in, uint64_t* out, uint16_t n){
+	uint8_t num = (n&0x40)==0x40;
+	uint8_t shift = n&0x3f;
+	if (shift==0){
+		out[0] = in[1^num];
+		out[1] = in[  num];
+		return;
+	}
+	out[0] = (in[1^num]<<shift) | (in[  num]>>(64-shift));
+	out[1] = (in[  num]<<shift) | (in[1^num]>>(64-shift));
+	return;
+}
+void rol128(uint64_t* in, uint64_t* out, uint16_t n){
+	uint8_t num = (n&0x40)==0x40;
+	uint8_t shift = n&0x3f;
+	if (shift==0){
+		out[0] = in[1^num];
+		out[1] = in[  num];
+		return;
+	}
+	out[0] = (in[1^num]>>shift) | (in[  num]<<(64-shift));
+	out[1] = (in[  num]>>shift) | (in[1^num]<<(64-shift));
+	return;
+}
+#endif
+
+void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	uint16_t  crc_16[16] =	{0};
 	uint32_t* crc_32 = (uint32_t*)crc_16;
 	uint64_t* crc_64 = (uint64_t*)crc_16;
 	uint64_t* data_64 = (uint64_t*)data;
+#if defined(__SSE2__)
 	__m128i iv = _mm_set_epi64x(0,0);
 	__m128i key = _mm_set_epi64x(0,0);
-
+#else
+	uint64_t iv[2] = {0};
+	uint64_t key[2] = {0};
+#endif
 	crc_32[0] = crc32(data);
 	crc_32[1] = crc32(&data[4]);
-
-	crc_32[2] = (uint32_t)scratchpad[crc_16[0]];
-	crc_32[3] = (uint32_t)scratchpad[crc_16[2]];
+	crc_32[2] = ((uint32_t*)&scratchpad[crc_16[0]])[0];
+	crc_32[3] = ((uint32_t*)&scratchpad[crc_16[2]])[0];
 	crc_64[1] ^= data_64[1];
 	crc_64[2] = (data_64[2] + crc_64[1]) ^ (data_64[2] / crc_64[1]);
 	crc_64[3] = data_64[3];
-
-	ror128(_mm_set_epi64x(crc_64[0],crc_64[1]),&iv,crc_16[15]);
-	rol128(_mm_set_epi64x(crc_64[2],crc_64[3]),&key,crc_16[0 ]);
-	AES_CBC_encrypt((const unsigned char*)crc_16, (unsigned char*)out, (unsigned char*)&iv, 32, (const unsigned char*)&key);
+#if defined(__SSE2__)
+	ror128(_mm_set_epi64x(crc_64[0],crc_64[1]),&iv ,crc_16[15]);
+	rol128(_mm_set_epi64x(crc_64[2],crc_64[3]),&key,crc_16[ 0]);
+	aes((uint8_t*)crc_16, out, (uint8_t*)&key, (uint8_t*)&iv);
+#else
+	ror128(crc_64    ,iv ,crc_16[15]);
+	rol128(&crc_64[2],key,crc_16[ 0]);
+	aes((uint8_t*)crc_16, out, (uint8_t*)key, (uint8_t*)iv);
+#endif
 	return;
 }
-
 
 int main(int argc, char *argv[]){
 	if (atoi(argv[1])&1){
@@ -250,7 +265,7 @@ int main(int argc, char *argv[]){
 		for(uint8_t i=0;i<255;i++){
 			for(uint8_t j=0;j<32;j++) hashes[i][j] = i;
 		}
-		hash(hashes[0], scratchpad, hashes[0]);
+		hash(hashes[0], (uint8_t*)scratchpad, hashes[0]);
 		fprintf(fp, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x"
 				"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
 				hashes[0][0],  hashes[0][1],  hashes[0][2],  hashes[0][3],  hashes[0][4],  hashes[0][5],  hashes[0][6],  hashes[0][7],
@@ -259,7 +274,7 @@ int main(int argc, char *argv[]){
 				hashes[0][24], hashes[0][25], hashes[0][26], hashes[0][27], hashes[0][28], hashes[0][29], hashes[0][30], hashes[0][31]
 				);
 		for(uint64_t j=0;j<iterations;j++){
-			for(uint64_t i=0; i<255;i++) hash(hashes[i], scratchpad, hashes[i]);
+			for(uint64_t i=0; i<255;i++) hash(hashes[i], (uint8_t*)scratchpad, hashes[i]);
 			for(uint64_t i=0; i<255;i++){
 			fprintf(fp, "\n%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x"
 				"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
@@ -273,10 +288,10 @@ int main(int argc, char *argv[]){
 		fclose(fp);
 	} else {
 		FILE* fp = fopen("hashes.txt", "w");
-		uint64_t iterations = 1048576;//<<8;
+		uint64_t iterations = 1048576<<8;
 		char scratchpad[65536] = {[0 ... 65535] = 5};
 		uint8_t data[32] = {[0 ... 31] = 6};
-		for(uint64_t j=0;j<iterations;j++)hash(data, scratchpad, data);
+		for(uint64_t j=0;j<iterations;j++)hash(data, (uint8_t*)scratchpad, data);
 		return((int)data[0]);
 	}
 	return 1;
