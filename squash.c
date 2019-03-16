@@ -4,10 +4,6 @@
 #include <math.h>
 #include "aes.h"
 
-#ifndef _mm_set_epi64x
-	#define _mm_set_epi64x(m0, m1) _mm_set_epi64(_m_from_int64(m0), _m_from_int64(m1))
-#endif
-
 #if (defined(_CPU_X86_64_) || defined(_CPU_X86_)) && !defined(_COMPILER_MICROSOFT_) && defined(__SSE4_2__)
 /* Compute CRC-32C using the SSE4.2 hardware instruction. */
 uint32_t crc32(unsigned char* buf)
@@ -109,61 +105,6 @@ uint32_t crc32(unsigned char* buf)
 }
 #endif
 
-#if defined(__SSE2__)
-#define SHL(v, n) \
-({ \
-    __m128i v1, v2; \
- \
-    if ((n) >= 64) \
-    { \
-        v1 = _mm_slli_si128(v, 8); \
-        v1 = _mm_slli_epi64(v1, (n) - 64); \
-    } \
-    else \
-    { \
-        v1 = _mm_slli_epi64(v, n); \
-        v2 = _mm_slli_si128(v, 8); \
-        v2 = _mm_srli_epi64(v2, 64 - (n)); \
-        v1 = _mm_or_si128(v1, v2); \
-    } \
-    v1; \
-})
-
-#define SHR(v, n) \
-({ \
-    __m128i v1, v2; \
- \
-    if ((n) >= 64) \
-    { \
-        v1 = _mm_srli_si128(v, 8); \
-        v1 = _mm_srli_epi64(v1, (n) - 64); \
-    } \
-    else \
-    { \
-        v1 = _mm_srli_epi64(v, n); \
-        v2 = _mm_srli_si128(v, 8); \
-        v2 = _mm_slli_epi64(v2, 64 - (n)); \
-        v1 = _mm_or_si128(v1, v2); \
-    } \
-    v1; \
-})
-
-void ror128(__m128i in, __m128i* out, uint16_t n){
-	uint8_t shift = n&0x7f;
-	__m128i left  = SHL(in, shift);
-	__m128i right = SHR(in, 128-shift);
-	out[0] = _mm_or_si128(left,right);
-	return;
-}
-void rol128(__m128i in, __m128i* out, uint16_t n){
-	uint8_t shift = n&0x7f;
-	__m128i right = SHR(in, shift);
-	__m128i left  = SHL(in, 128-shift);
-	out[0] = _mm_or_si128(left,right);
-	return;
-}
-
-#else
 void ror128(uint64_t* in, uint64_t* out, uint16_t n){
 	uint8_t num = (n&0x40)==0x40;
 	uint8_t shift = n&0x3f;
@@ -202,19 +143,11 @@ void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	crc_64[1] ^= data_64[1];
 	crc_64[2] = (data_64[2] + crc_64[1]) ^ (data_64[2] / crc_64[1]);
 	crc_64[3] = data_64[3];
-#if defined(__SSE2__)
-	__m128i iv = _mm_set_epi64x(0,0);
-	__m128i key = _mm_set_epi64x(0,0);
-	ror128(_mm_set_epi64x(crc_64[0],crc_64[1]),&iv ,crc_16[15]);
-	rol128(_mm_set_epi64x(crc_64[2],crc_64[3]),&key,crc_16[ 0]);
-	aes((uint8_t*)crc_16, out, (uint8_t*)&key, (uint8_t*)&iv);
-#else
 	uint64_t iv[2] = {0};
 	uint64_t key[2] = {0};
 	ror128(crc_64    ,iv ,crc_16[15]);
 	rol128(&crc_64[2],key,crc_16[ 0]);
 	aes((uint8_t*)crc_16, out, (uint8_t*)key, (uint8_t*)iv);
-#endif
 	return;
 }
 
