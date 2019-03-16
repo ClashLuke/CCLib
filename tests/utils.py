@@ -114,10 +114,10 @@ def run_squash_test_time(seed):
 
 def squash_init(time, iterations=0):
 	seed = bytes.fromhex(open("hex.txt","r").read()[:-1])
-	os.system("clang hash_module.c -o hash.o -mavx -msse2 -lm")
+	os.system("clang hash_module.c -o hash.o -mavx -msse2 -msse4.2 -lm")
 	if time:
 		_time = run_squash_test_time(seed)
-		_per_hash = _time / 2**28
+		_per_hash = _time / 2**32
 		return([_time,_per_hash])
 	else:
 		_hashes = squash_iterate(seed, iterations)

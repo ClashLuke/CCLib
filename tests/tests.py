@@ -106,7 +106,7 @@ def test_hash_time(write = False, time = False, iterations = 2**16, out = "resul
 		data = squash_init(time)
 		if write:
 			f = open(result_path("testresults.txt",out),"a")
-			f.write("[Squash] Calculation of {} hashes took {}s\n".format(1<<28, int(10*data[0])/10))
+			f.write("[Squash] Calculation of {} hashes took {}s\n".format(1<<32, int(10*data[0])/10))
 			f.write("[Squash] Calculation per hash took {}ns\n\n".format(int(1000000000*data[1])))
 			f.close()
 		else:
