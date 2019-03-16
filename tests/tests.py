@@ -1,14 +1,5 @@
 from utils import squash_init, keccak_init, padr, plot_data, show_help, parse_args, result_path, init
 
-
-def count(hashes):
-	values = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	hash = ''.join(hashes)
-	for h in hash:
-		foo = int(h,16)
-		values[foo] = values[foo] + 1
-	return values
-
 def compare(hashes, iterations):
 	lenght = len(hashes[0])
 	differences = []
@@ -22,42 +13,6 @@ def compare(hashes, iterations):
 			curr_diff = curr_diff + curr
 		differences.append(curr_diff)
 	return(differences)
-	
-def evaluate_probability(hashes, write = False, out = "results"):
-	counts = count(hashes)
-	total = sum(counts)
-	counts = [int(100*c/total) for c in counts]
-	if write:
-		f = open(result_path("testresults.txt",out),"a")
-		for i in range(len(counts)):
-			f.write("Value {}has a total share of {}%\n".format(padr(i,3),counts[i]))
-		f.write('\n')
-		f.close()
-	else:
-		for i in range(len(counts)):
-			print("Value {}has a total share of {}%".format(padr(i,3),counts[i]))
-		print('\n')
-
-def evaluate_similarity(hashes, iterations, write = False, out = "results"):
-	differences = compare(hashes,iterations)
-	if write:
-		f = open(result_path("testresults.txt",out),"a")
-		f.write("\t\t\t\tHash\t\t\t\t\t\t\t\t\tDifference\n")
-		for i in range(1,iterations+1):
-			try:
-				f.write(str(hashes[i]) + '\t' + str(differences[i-1])+'\n')
-			except:
-				break
-		f.write('\n')
-		f.close()
-	else:
-		print("\t\t\t\tHash\t\t\t\t\t\t\t\t\tDifference")
-		for i in range(1,iterations+1):
-			try:
-				print(hashes[i], differences[i-1],sep='\t')
-			except:
-				break
-		print('\n')
 
 def bit_histogram(hashes, plot = False, out = "results"):
 	values = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -94,10 +49,9 @@ def test_collisions(hashes, write = False, out = "results"):
 	if write:
 		f = open(result_path("testresults.txt",out),"a")
 		f.write("Found a total number of {} Collisions in {} hashes.\n".format(collisions,l))
-		f.write("Collision probability is {}%.\n".format(int(1000000*collisions/l)/100))
 		f.close()
 	else:
-		print("Found a total number of {} Collisions.\n".format(collisions))
+		print("Found a total number of {} Collisions in {} hashes.\n".format(collisions,l))
 	return
 
 
@@ -128,17 +82,13 @@ def test_keccak_time(write = False, time = False, iterations = 2**16, out = "res
 	return(keccak_init(False, iterations))
 
 if __name__ == "__main__":
-	keccak, squash, iterations, time, collisions, probability, similarity, bit, bucket, write, plot, out = init()
+	keccak, squash, iterations, time, collisions, bit, bucket, write, plot, out = init()
 
 	open(result_path("testresults.txt",out),"w").write('')
 	if keccak:
 		hashes = test_keccak_time(write=write, time=time, iterations=iterations, out=out)
 		if collisions:
 			test_collisions(hashes, write=write, out=out)
-		if probability:
-			evaluate_probability(hashes, write=write, out=out)
-		if similarity:
-			evaluate_similarity(hashes, 16, write=write, out=out)
 		if bucket:
 			plot_data(data=bucket_histogram(hashes,0xFFFF),name="keccak_bucket_histogram", plot=plot, out=out)
 		if bit:
@@ -147,10 +97,6 @@ if __name__ == "__main__":
 		hashes = test_hash_time(write=write, time=time, iterations=iterations, out=out)
 		if collisions:
 			test_collisions(hashes, write=write, out=out)
-		if probability:
-			evaluate_probability(hashes, write=write, out=out)
-		if similarity:
-			evaluate_similarity(hashes, 16, write=write, out=out)
 		if bucket:
 			plot_data(data=bucket_histogram(hashes,0xFFFF),name="squash_bucket_histogram", plot=plot, out=out)
 		if bit:

@@ -11,8 +11,6 @@ def parse_args():
 
 	time = ("--time" in sys.argv) or ("-t" in sys.argv)
 	collisions = ("--collisions" in sys.argv) or ("-c" in sys.argv)
-	probability = ("--probability" in sys.argv) or ("-p" in sys.argv)
-	similarity = ("--similarity" in sys.argv) or ("-S" in sys.argv)
 	bit = ("--bit" in sys.argv) or ("-b" in sys.argv)
 	bucket = ("--bucket" in sys.argv) or ("-B" in sys.argv)
 
@@ -22,7 +20,7 @@ def parse_args():
 
 	help = ("--help" in sys.argv) or ("-h" in sys.argv)
 
-	if help or len(sys.argv) == 1 or not(keccak or squash) or not(time or collisions or probability or similarity or bit or bucket) or not(iterations):
+	if help or len(sys.argv) == 1 or not(keccak or squash) or not(time or collisions or bit or bucket) or not(iterations):
 		show_help()
 	if iterations:
 		for i in range(len(sys.argv)):
@@ -47,7 +45,7 @@ def parse_args():
 					sys.exit()
 	else:
 		out = "results"
-	return([keccak, squash, iterations, time, collisions, probability, similarity, bit, bucket, write, plot, out])
+	return([keccak, squash, iterations, time, collisions, bit, bucket, write, plot, out])
 			
 
 def show_help():
@@ -59,8 +57,6 @@ def show_help():
 	print("Test options")
 	print("-t, --time                Enable runtime testing")
 	print("-c, --collisions          Enable collision testing")
-	print("-p, --probability         Enable testing of value probabilities")
-	print("-S, --similarity          Enable testing of hash similarities")
 	print("-b, --bit                 Enable bit histogram")
 	print("-B, --bucket              Enable bucket histogram")
 	print('')
@@ -114,7 +110,7 @@ def run_squash_test_time(seed):
 
 def squash_init(time, iterations=0):
 	seed = bytes.fromhex(open("hex.txt","r").read()[:-1])
-	os.system("clang hash_module.c -o hash.o -mavx -msse2 -msse4.2 -lm")
+	os.system("clang hash_module.c -o hash.o -mavx -msse4.2 -lm")
 	if time:
 		_time = run_squash_test_time(seed)
 		_per_hash = _time / 2**32
@@ -152,11 +148,11 @@ def keccak_init(time, iterations):
 
 
 def init():
-	keccak, squash, iterations, time, collisions, probability, similarity, bit, bucket, write, plot, out = parse_args()
+	keccak, squash, iterations, time, collisions, bit, bucket, write, plot, out = parse_args()
 	try:
 		os.mkdir(result_path("",out))
 	except:
 		pass
-	return([keccak, squash, iterations, time, collisions, probability, similarity, bit, bucket, write, plot, out])
+	return([keccak, squash, iterations, time, collisions, bit, bucket, write, plot, out])
 	
 
