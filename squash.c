@@ -109,96 +109,25 @@ uint32_t crc32(unsigned char* buf)
 }
 #endif
 
-
-#ifdef UINT64_MAX
 void ror128(uint32_t* in_32, uint32_t* out_32, uint16_t n){
 	uint64_t* out = (uint64_t*)out_32;
 	uint64_t* in = (uint64_t*)in_32;
-	uint8_t num = ((n&0x40)>>6);
+	uint8_t num = (n&0x40)==0x40;
 	uint8_t shift = n&0x3f;
-	printf("%jx,%jx\n",(in[  num]>>shift), (in[1^num]<<(64-shift)));
-	printf("%jx,%jx\n",(in[1^num]>>shift), (in[  num]<<(64-shift)));
-	out[0] = (in[  num]>>shift) | (in[1^num]<<(64-shift));
-	out[1] = (in[1^num]>>shift) | (in[  num]<<(64-shift));
+	out[0] = (in[  num]<<shift) | (in[1^num]>>(64-shift));
+	out[1] = (in[1^num]<<shift) | (in[  num]>>(64-shift));
 	return;
 }
 void rol128(uint32_t* in_32, uint32_t* out_32, uint16_t n){
 	uint64_t* out = (uint64_t*)out_32;
 	uint64_t* in = (uint64_t*)in_32;
-	uint8_t num = ((n&0x40)>>6);
+	uint8_t num = (n&0x40)==0x40;
 	uint8_t shift = n&0x3f;
-	printf("%jx,%jx\n",(in[  num]<<shift), (in[1^num]>>(64-shift)));
-	printf("%jx,%jx\n",(in[1^num]<<shift), (in[  num]>>(64-shift)));
-	out[0] = (in[  num]<<shift) | (in[1^num]>>(64-shift));
-	out[1] = (in[1^num]<<shift) | (in[  num]>>(64-shift));
+	out[0] = (in[  num]>>shift) | (in[1^num]<<(64-shift));
+	out[1] = (in[1^num]>>shift) | (in[  num]<<(64-shift));
 	return;
 }
-#else
-void rol128(uint32_t* in, uint32_t* out, uint16_t n){
-	uint8_t nums[4] = {0,1,2,3};
-	if ((n&0x40)>>6) {
-		nums[0] = 2;
-		nums[1] = 3;
-		nums[2] = 0;
-		nums[3] = 1;
-	}
-	if ((n&0x20)>>5) {
-		nums[0] = (nums[0]-1)&3;
-		nums[1] =  nums[1]-1;
-		nums[2] = (nums[2]-1)&3;
-		nums[3] =  nums[3]-1;
-	}
-	uint8_t shift = n&0x1f;
-	out[0] = (in[nums[0]]<<shift) | (in[nums[1]]>>(32-shift));
-	out[1] = (in[nums[1]]<<shift) | (in[nums[2]]>>(32-shift));
-	out[2] = (in[nums[2]]<<shift) | (in[nums[3]]>>(32-shift));
-	out[3] = (in[nums[3]]<<shift) | (in[nums[0]]>>(32-shift));
-	return;
-}
-void ror128(uint32_t* in, uint32_t* out, uint16_t n){
-	uint8_t nums[4] = {0,1,2,3};
-	if ((n&0x40)>>6) {
-		nums[0] = 2;
-		nums[1] = 3;
-		nums[2] = 0;
-		nums[3] = 1;
-	}
-	if ((n&0x20)>>5) {
-		nums[0] =  1+nums[0];
-		nums[1] = (1+nums[1])&3;
-		nums[2] =  1+nums[2];
-		nums[3] = (1+nums[3])&3;
-	}
-	uint8_t shift = n&0x1f;
-	out[0] = (in[nums[0]]>>shift) | (in[nums[1]]<<(32-shift));
-	out[1] = (in[nums[1]]>>shift) | (in[nums[2]]<<(32-shift));
-	out[2] = (in[nums[2]]>>shift) | (in[nums[3]]<<(32-shift));
-	out[3] = (in[nums[3]]>>shift) | (in[nums[0]]<<(32-shift));
-	return;
-}
-#endif
 
-#ifndef UINT64_MAX
-uint32_t add32(uint32_t a, uint32_t b, uint8_t* carry){
-	if((a>>31)&&(b>>31))carry[0]=1;
-	return(a+b);
-}
-void div32(uint64_t* a, uint32_t b) {
-#  ifdef __i386__  /* u64 / u32 division with little i386 machine code. */
-	uint32_t upper = ((uint32_t*)a)[1], r;
-	((uint32_t*)a)[1] = 0;
-	if (upper >= b) {   
-		((uint32_t*)a)[1] = upper / b;
-		upper %= b;
-	}
-	__asm__("divl %2" : "=a" (((uint32_t*)a)[0]), "=d" (r) :
-		"rm" (b), "0" (((uint32_t*)a)[0]), "1" (upper));
-#  else
-	a[0] = a[0] / b;  /* Calls __udivdi3 in libgcc. */
-#  endif
-	a[0]=a[0]>>32;
-}
-#endif
 
 void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	uint16_t  crc_16[16] =	{0};
@@ -211,30 +140,11 @@ void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	crc_32[1] = crc32(&data[4]);
 	crc_32[2] = ((uint32_t*)&scratchpad[crc_16[0]])[0];
 	crc_32[3] = ((uint32_t*)&scratchpad[crc_16[2]])[0];
-	#ifdef UINT64_MAX
 	crc_64[1] ^= data_64[1];
 	crc_64[2] = (crc_64[1] + data_64[2]) ^ (crc_64[1] / data_64[2]);
 	crc_64[3] = data_64[3];
 	ror128(crc_32    ,iv ,crc_16[15]);
-	ror128(&crc_32[4],key,crc_16[ 0]);
-	#else
-	uint32_t* data_32 = (uint32_t*)data;
-	crc_32[2] ^= data_32[2];
-	crc_32[3] ^= data_32[3];
-	uint8_t carry = 0;
-	uint64_t div_out = crc_64[1];
-	div32(&div_out, data_32[5]);
-	crc_32[5] = add32(crc_32[3],data_32[5],&carry) ^ div_out;
-	div_out = crc_64[1];
-	div32(&div_out, data_32[4]);
-	crc_32[4] = (crc_32[2]+data_32[4]+carry) ^ div_out;
-	crc_32[6] = data_32[6];
-	crc_32[7] = data_32[7];
-	ror128(crc_32    ,iv ,crc_16[15]);
 	rol128(&crc_32[4],key,crc_16[ 0]);
-	#endif
-
-	printf("%u,%u|%jx,%jx,%jx,%jx|%jx,%jx|%jx,%jx\n",crc_16[15]&0x7F,crc_16[ 0]&0x7F,crc_64[0],crc_64[1],crc_64[2],crc_64[3],((uint64_t*)&iv)[0],((uint64_t*)&iv)[1],((uint64_t*)&key)[0],((uint64_t*)&key)[1]);
 	aes((uint8_t*)crc_16, out, (uint8_t*)&key, (uint8_t*)&iv);
 	return;
 }
