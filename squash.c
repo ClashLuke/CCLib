@@ -4,10 +4,6 @@
 #include <math.h>
 #include "aes.h"
 
-#ifndef _mm_set_epi64x
-	#define _mm_set_epi64x(m0, m1) _mm_set_epi64(_m_from_int64(m0), _m_from_int64(m1))
-#endif
-
 #if (defined(_CPU_X86_64_) || defined(_CPU_X86_)) && !defined(_COMPILER_MICROSOFT_) && defined(__SSE4_2__)
 /* Compute CRC-32C using the SSE4.2 hardware instruction. */
 uint32_t crc32(unsigned char* buf)
@@ -109,48 +105,54 @@ uint32_t crc32(unsigned char* buf)
 }
 #endif
 
-void ror128(uint32_t* in_32, uint32_t* out_32, uint16_t n){
-	uint64_t* out = (uint64_t*)out_32;
-	uint64_t* in = (uint64_t*)in_32;
+void ror128(uint64_t* in, uint64_t* out, uint16_t n){
 	uint8_t num = (n&0x40)==0x40;
 	uint8_t shift = n&0x3f;
-	out[0] = (in[  num]<<shift) | (in[1^num]>>(64-shift));
-	out[1] = (in[1^num]<<shift) | (in[  num]>>(64-shift));
+	if (shift==0){
+		out[0] = in[1^num];
+		out[1] = in[  num];
+		return;
+	}
+	out[0] = (in[1^num]<<shift) | (in[  num]>>(64-shift));
+	out[1] = (in[  num]<<shift) | (in[1^num]>>(64-shift));
 	return;
 }
-void rol128(uint32_t* in_32, uint32_t* out_32, uint16_t n){
-	uint64_t* out = (uint64_t*)out_32;
-	uint64_t* in = (uint64_t*)in_32;
+void rol128(uint64_t* in, uint64_t* out, uint16_t n){
 	uint8_t num = (n&0x40)==0x40;
 	uint8_t shift = n&0x3f;
-	out[0] = (in[  num]>>shift) | (in[1^num]<<(64-shift));
-	out[1] = (in[1^num]>>shift) | (in[  num]<<(64-shift));
+	if (shift==0){
+		out[0] = in[1^num];
+		out[1] = in[  num];
+		return;
+	}
+	out[0] = (in[1^num]>>shift) | (in[  num]<<(64-shift));
+	out[1] = (in[  num]>>shift) | (in[1^num]<<(64-shift));
 	return;
 }
-
+#endif
 
 void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	uint16_t  crc_16[16] =	{0};
 	uint32_t* crc_32 = (uint32_t*)crc_16;
 	uint64_t* crc_64 = (uint64_t*)crc_16;
 	uint64_t* data_64 = (uint64_t*)data;
-	uint32_t iv[4] = {0};
-	uint32_t key[4] = {0};
 	crc_32[0] = crc32(data);
 	crc_32[1] = crc32(&data[4]);
 	crc_32[2] = ((uint32_t*)&scratchpad[crc_16[0]])[0];
 	crc_32[3] = ((uint32_t*)&scratchpad[crc_16[2]])[0];
 	crc_64[1] ^= data_64[1];
-	crc_64[2] = (crc_64[1] + data_64[2]) ^ (crc_64[1] / data_64[2]);
+	crc_64[2] = (data_64[2] + crc_64[1]) ^ (data_64[2] / crc_64[1]);
 	crc_64[3] = data_64[3];
-	ror128(crc_32    ,iv ,crc_16[15]);
-	rol128(&crc_32[4],key,crc_16[ 0]);
-	aes((uint8_t*)crc_16, out, (uint8_t*)&key, (uint8_t*)&iv);
+	uint64_t iv[2] = {0};
+	uint64_t key[2] = {0};
+	ror128(crc_64    ,iv ,crc_16[15]);
+	rol128(&crc_64[2],key,crc_16[ 0]);
+	aes((uint8_t*)crc_16, out, (uint8_t*)key, (uint8_t*)iv);
 	return;
 }
 
 int main(){
-	uint64_t iterations = (uint64_t)pow(2.0,2);
+	uint64_t iterations = (uint64_t)pow(2.0,8);
 	uint8_t data[32] = {[0 ... 31] = 6};
 	uint8_t scratchpad[65536] = {[0 ... 65535] = 5};
 	uint8_t out[32] = {[0 ... 31] = 6};

@@ -9,7 +9,6 @@ The following things have to be done
 - [x] Add AES ASM instructions
 - [ ] Security Analysis (Review)
 - [ ] Benchmark on ARMv8, SSE4.2 compatible CPU and AMD GPUs.
-- [ ] Add 128bit rotation (SSE2 optimisation)
 
 ## Benchmarking
 To test out squash, it is recommended to use the shipped python scripts which can be found in `tests/`. Please note that the C code in this folder writes to a file and therefore is a lot slower than the C code in squash.c.
@@ -43,14 +42,10 @@ An example for a command could be the following: `python3 tests.py -s -i 65536 -
 
 
 ### Dependencies
-Those scripts use Python3.7, please make sure you use it instead of the older versions.
+Those scripts use [clang](https://releases.llvm.org/download.html) and [Python3.7](https://www.python.org/downloads/release/python-372/), please make sure you use it instead of the older versions.
 To create plots (bucket histogram and bit histogram), you will need to install matplotlib.
-You can install it using the following command `python3.7 -m pip install matplotlib`.\s\s
-[Python3.7](https://www.python.org/downloads/release/python-372/)\s\s
-[Windows Installer](https://www.python.org/ftp/python/3.7.2/python-3.7.2-amd64.exe)\s\s
-[Linux Instructions](https://gist.github.com/SeppPenner/6a5a30ebc8f79936fa136c524417761d)\s\s
-You will also need to install clang. Downloadable for [Windows](https://releases.llvm.org/7.0.1/LLVM-7.0.1-win64.exe), [Ubuntu 18.04](https://releases.llvm.org/7.0.1/clang+llvm-7.0.1-x86_64-linux-gnu-ubuntu-18.04.tar.xz) or most other operating systems at the official [download page](https://releases.llvm.org/download.html).\s\s
-A CPU has to be capable to perform 64bits operations and needs the AES-NI, speedups for SSE4.2 and ARMv8 are available.
+You can install it using the following command `python3.7 -m pip install matplotlib`.</br>
+A CPU has to be capable of performing 64bit operations and needs the [AES-NI](https://en.wikipedia.org/wiki/AES_instruction_set), speedups for SSE4.2 and ARMv8 are available.
 
 ### Plots
 The plots have no labeling and therefore are described in here.</br> 
@@ -58,7 +53,7 @@ In the bit histogram you can see the average value of a group of four bits at a 
 The bucket histogram cuts of the first part of every hash value and only takes the last 16bit. Those are then used to fit everything into a bucket. The X-Axis displays the buckets, where each bucket corresponds to a value (such as 0, 1 or 65535). The Y-Axis corresponds to the absolute number of entities in this bucket. Ideally this is a straight line aswell at ITERATIONS/65536.</br>
 
 ### Speed
-On a [Xeon E3-1225v2](https://ark.intel.com/content/www/us/en/ark/products/65733/intel-xeon-processor-e3-1225-v2-8m-cache-3-20-ghz.html), the algorithm has an average speed of 156ns in C, 21000ns in Python. For comparision, keccak takes about 800ns on average. Which results in 15.6 cpb for squash, 80 cpb for keccak.
+On a [Xeon E3-1225v2](https://ark.intel.com/content/www/us/en/ark/products/65733/intel-xeon-processor-e3-1225-v2-8m-cache-3-20-ghz.html), the algorithm has an average speed of 165.8 in C, 21000ns in Python. For comparision, keccak takes about 800ns on average. Which results in 16.5 cpb for squash, 80 cpb for keccak - on an Ivy Bridge CPU.
 
 **Please note, that this Project is still under development. It works perfectly fine on all machines machines**
 

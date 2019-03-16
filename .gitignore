@@ -1,4 +1,3 @@
-__pycache__/*
-hash
+tests/__pycache__/*
 hashes.txt
 *.o
