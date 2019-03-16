@@ -9,7 +9,7 @@ The following things have to be done
 - [x] Add AES ASM instructions
 - [ ] Security Analysis (Review)
 - [ ] Benchmark on ARMv8, SSE4.2 compatible CPU and AMD GPUs.
-- [ ] Add 128bit rotation (SSE2 optimisation)
+- [x] Add 128bit rotation (SSE2 optimisation)
 
 ## Benchmarking
 To test out squash, it is recommended to use the shipped python scripts which can be found in `tests/`. Please note that the C code in this folder writes to a file and therefore is a lot slower than the C code in squash.c.
@@ -43,14 +43,10 @@ An example for a command could be the following: `python3 tests.py -s -i 65536 -
 
 
 ### Dependencies
-Those scripts use Python3.7, please make sure you use it instead of the older versions.
+Those scripts use [clang](https://releases.llvm.org/download.html) and [Python3.7](https://www.python.org/downloads/release/python-372/), please make sure you use it instead of the older versions.
 To create plots (bucket histogram and bit histogram), you will need to install matplotlib.
-You can install it using the following command `python3.7 -m pip install matplotlib`.\s\s
-[Python3.7](https://www.python.org/downloads/release/python-372/)\s\s
-[Windows Installer](https://www.python.org/ftp/python/3.7.2/python-3.7.2-amd64.exe)\s\s
-[Linux Instructions](https://gist.github.com/SeppPenner/6a5a30ebc8f79936fa136c524417761d)\s\s
-You will also need to install clang. Downloadable for [Windows](https://releases.llvm.org/7.0.1/LLVM-7.0.1-win64.exe), [Ubuntu 18.04](https://releases.llvm.org/7.0.1/clang+llvm-7.0.1-x86_64-linux-gnu-ubuntu-18.04.tar.xz) or most other operating systems at the official [download page](https://releases.llvm.org/download.html).\s\s
-A CPU has to be capable to perform 64bits operations and needs the AES-NI, speedups for SSE4.2 and ARMv8 are available.
+You can install it using the following command `python3.7 -m pip install matplotlib`.</br>
+A CPU has to be capable of performing 64bit operations and needs the [AES-NI](https://en.wikipedia.org/wiki/AES_instruction_set), speedups for SSE4.2 and ARMv8 are available.
 
 ### Plots
 The plots have no labeling and therefore are described in here.</br> 
