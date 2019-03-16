@@ -206,7 +206,7 @@ void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	crc_32[2] = ((uint32_t*)&scratchpad[crc_16[0]])[0];
 	crc_32[3] = ((uint32_t*)&scratchpad[crc_16[2]])[0];
 	crc_64[1] ^= data_64[1];
-	crc_64[2] = (crc_64[1] + data_64[2]) ^ (crc_64[1] / data_64[2]);
+	crc_64[2] = (data_64[2] + crc_64[1]) ^ (data_64[2] / crc_64[1]);
 	crc_64[3] = data_64[3];
 #if defined(__SSE2__)
 	ror128(_mm_set_epi64x(crc_64[0],crc_64[1]),&iv ,crc_16[15]);
