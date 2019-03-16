@@ -224,13 +224,6 @@ void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	uint32_t* crc_32 = (uint32_t*)crc_16;
 	uint64_t* crc_64 = (uint64_t*)crc_16;
 	uint64_t* data_64 = (uint64_t*)data;
-#if defined(__SSE2__)
-	__m128i iv = _mm_set_epi64x(0,0);
-	__m128i key = _mm_set_epi64x(0,0);
-#else
-	uint64_t iv[2] = {0};
-	uint64_t key[2] = {0};
-#endif
 	crc_32[0] = crc32(data);
 	crc_32[1] = crc32(&data[4]);
 	crc_32[2] = ((uint32_t*)&scratchpad[crc_16[0]])[0];
@@ -239,10 +232,14 @@ void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	crc_64[2] = (data_64[2] + crc_64[1]) ^ (data_64[2] / crc_64[1]);
 	crc_64[3] = data_64[3];
 #if defined(__SSE2__)
+	__m128i iv = _mm_set_epi64x(0,0);
+	__m128i key = _mm_set_epi64x(0,0);
 	ror128(_mm_set_epi64x(crc_64[0],crc_64[1]),&iv ,crc_16[15]);
 	rol128(_mm_set_epi64x(crc_64[2],crc_64[3]),&key,crc_16[ 0]);
 	aes((uint8_t*)crc_16, out, (uint8_t*)&key, (uint8_t*)&iv);
 #else
+	uint64_t iv[2] = {0};
+	uint64_t key[2] = {0};
 	ror128(crc_64    ,iv ,crc_16[15]);
 	rol128(&crc_64[2],key,crc_16[ 0]);
 	aes((uint8_t*)crc_16, out, (uint8_t*)key, (uint8_t*)iv);
@@ -288,7 +285,7 @@ int main(int argc, char *argv[]){
 		fclose(fp);
 	} else {
 		FILE* fp = fopen("hashes.txt", "w");
-		uint64_t iterations = 1048576<<8;
+		uint64_t iterations = 4294967296; // 4Gi
 		char scratchpad[65536] = {[0 ... 65535] = 5};
 		uint8_t data[32] = {[0 ... 31] = 6};
 		for(uint64_t j=0;j<iterations;j++)hash(data, (uint8_t*)scratchpad, data);
