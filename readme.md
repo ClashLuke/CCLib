@@ -41,13 +41,14 @@ An example for a command could be the following: `python3 tests.py -s -i 65536 -
 
 
 ## Dependencies
-Those scripts use Python3, please make sure you use it instead of the older versions.
-You will need to download the following libraries:
-
-	matplotlib
-	pycrypto
-
-You can install those dependencies using the following command `python3 -m pip install matplotlib pycrypto`.
+Those scripts use Python3.7, please make sure you use it instead of the older versions.
+To create plots (bucket histogram and bit histogram), you will need to install matplotlib.
+You can install it using the following command `python3.7 -m pip install matplotlib`.\s\s
+[Python3.7](https://www.python.org/downloads/release/python-372/)\s\s
+[Windows Installer](https://www.python.org/ftp/python/3.7.2/python-3.7.2-amd64.exe)\s\s
+[Linux Instructions](https://gist.github.com/SeppPenner/6a5a30ebc8f79936fa136c524417761d)\s\s
+You will also need to install clang. Downloadable for [Windows](https://releases.llvm.org/7.0.1/LLVM-7.0.1-win64.exe), [Ubuntu 18.04](https://releases.llvm.org/7.0.1/clang+llvm-7.0.1-x86_64-linux-gnu-ubuntu-18.04.tar.xz) or most other operating systems at the official [download page](https://releases.llvm.org/download.html).\s\s
+A CPU has run on 64bits (due to the division), speedups for SSE4.2 and ARMv8 are available.
 
 ## Plots
 The plots have no labeling and therefore are described in here.</br> 
