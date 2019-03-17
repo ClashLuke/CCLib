@@ -160,7 +160,6 @@ void rol128(uint64_t* in, uint64_t* out, uint16_t n){
 	out[1] = (in[  num]>>shift) | (in[1^num]<<(64-shift));
 	return;
 }
-#endif
 
 void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	uint16_t  crc_16[16] =	{0};
@@ -193,8 +192,8 @@ int main(int argc, char *argv[]){
 		FILE* fp = fopen("hashes.txt", "w");
 		char* a = argv[2];
 		uint64_t iterations = ((uint64_t)atoi(a))>>8;
-		uint8_t hashes[255][32] = {0};
-		for(uint8_t i=0;i<255;i++){
+		uint8_t hashes[256][32] = {0};
+		for(uint16_t i=0;i<256;i++){
 			for(uint8_t j=0;j<32;j++) hashes[i][j] = i;
 		}
 		hash(hashes[0], (uint8_t*)scratchpad, hashes[0]);
@@ -206,8 +205,8 @@ int main(int argc, char *argv[]){
 				hashes[0][24], hashes[0][25], hashes[0][26], hashes[0][27], hashes[0][28], hashes[0][29], hashes[0][30], hashes[0][31]
 				);
 		for(uint64_t j=0;j<iterations;j++){
-			for(uint64_t i=0; i<255;i++) hash(hashes[i], (uint8_t*)scratchpad, hashes[i]);
-			for(uint64_t i=0; i<255;i++){
+			for(uint64_t i=0; i<256;i++) hash(hashes[i], (uint8_t*)scratchpad, hashes[i]);
+			for(uint64_t i=0; i<256;i++){
 			fprintf(fp, "\n%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x"
 				"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
 				hashes[i][0],  hashes[i][1],  hashes[i][2],  hashes[i][3],  hashes[i][4],  hashes[i][5],  hashes[i][6],  hashes[i][7],
@@ -219,7 +218,7 @@ int main(int argc, char *argv[]){
 		}
 		fclose(fp);
 	} else {
-		uint64_t iterations = 4294967296; // 4Gi
+		uint64_t iterations = 65536;//4294967296; // 4Gi
 		char scratchpad[65536] = {[0 ... 65535] = 5};
 		uint8_t data[32] = {[0 ... 31] = 6};
 		for(uint64_t j=0;j<iterations;j++)hash(data, (uint8_t*)scratchpad, data);

@@ -98,7 +98,7 @@ def test_time(seed):
 	return(time_module.time()-ctime)
 
 
-def init(time, iterations=0):
+def sinit(time, iterations=0):
 	seed = bytes.fromhex(open("hex.txt","r").read()[:-1])
 	os.system("clang hash_module.c -o hash.o -mavx -msse4.2 -lm")
 	if time:

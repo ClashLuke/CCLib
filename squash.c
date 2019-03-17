@@ -129,7 +129,6 @@ void rol128(uint64_t* in, uint64_t* out, uint16_t n){
 	out[1] = (in[  num]>>shift) | (in[1^num]<<(64-shift));
 	return;
 }
-#endif
 
 void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	uint16_t  crc_16[16] =	{0};
@@ -152,7 +151,7 @@ void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 }
 
 int main(){
-	uint64_t iterations = (uint64_t)pow(2.0,8);
+	uint64_t iterations = (uint64_t)pow(2.0,32);
 	uint8_t data[32] = {[0 ... 31] = 6};
 	uint8_t scratchpad[65536] = {[0 ... 65535] = 5};
 	uint8_t out[32] = {[0 ... 31] = 6};
