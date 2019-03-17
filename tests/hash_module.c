@@ -35,21 +35,8 @@ uint8_t tallymarker_hextobin(const char* str, uint8_t* bytes, uint32_t blen)
    return(0);
 }
 
-#if (defined(_CPU_X86_64_) || defined(_CPU_X86_)) && !defined(_COMPILER_MICROSOFT_) && defined(__SSE4_2__)
-/* Compute CRC-32C using the SSE4.2 hardware instruction. */
-uint32_t crc32(unsigned char* buf)
-{
-	uintptr_t crc0 = 0xffffffff;
-	for(uint8_t len=0;len<4;len++){
-		__asm__("crc32b\t" "(%1), %0"
-				: "=r"(crc0)
-				: "r"(buf), "0"(crc0));
-		buf++;
-	}
-	return (uint32_t)crc0 ^ 0xffffffff;
-}
-#elif defined(_CPU_AARCH64_)
-#define CRC_TARGET __attribute__((target("+crc")))
+
+#if defined(_CPU_AARCH64_)
 /* Compute CRC-32C using the ARMv8 CRC32 extension. */
 static inline uint32_t crc32(unsigned char* in)
 {

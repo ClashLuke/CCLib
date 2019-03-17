@@ -1,23 +1,9 @@
 #include <stdio.h>
 #include <stdint.h>
-#include <math.h>
 #include "aes.h"
 
-#if (defined(_CPU_X86_64_) || defined(_CPU_X86_)) && !defined(_COMPILER_MICROSOFT_) && defined(__SSE4_2__)
-/* Compute CRC-32C using the SSE4.2 hardware instruction. */
-uint32_t crc32(unsigned char* buf)
-{
-	uintptr_t crc0 = 0xffffffff;
-	for(uint8_t len=0;len<4;len++){
-		__asm__("crc32b\t" "(%1), %0"
-				: "=r"(crc0)
-				: "r"(buf), "0"(crc0));
-		buf++;
-	}
-	return (uint32_t)crc0 ^ 0xffffffff;
-}
-#elif defined(_CPU_AARCH64_)
-#define CRC_TARGET __attribute__((target("+crc")))
+
+#if defined(_CPU_AARCH64_)
 /* Compute CRC-32C using the ARMv8 CRC32 extension. */
 static inline uint32_t crc32(unsigned char* in)
 {
@@ -153,10 +139,10 @@ void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 }
 
 int main(){
-	uint64_t iterations = (uint64_t)pow(2.0,34);
+	uint64_t iterations = 17179869184;
 	uint8_t data[32] = {[0 ... 31] = 6};
 	uint8_t scratchpad[65536] = {[0 ... 65535] = 5};
 	uint8_t out[32] = {[0 ... 31] = 6};
 	for(uint64_t i=0; i<iterations;i++) hash(out, scratchpad, out);
-	printf("%x,%x,%x,%x,%x,%x,%x,%x",((uint32_t*)out)[0],((uint32_t*)out)[1],((uint32_t*)out)[2],((uint32_t*)out)[3],((uint32_t*)out)[4],((uint32_t*)out)[5],((uint32_t*)out)[6],((uint32_t*)out)[7]);
+	printf("%x,%x,%x,%x,%x,%x,%x,%x\n",((uint32_t*)out)[0],((uint32_t*)out)[1],((uint32_t*)out)[2],((uint32_t*)out)[3],((uint32_t*)out)[4],((uint32_t*)out)[5],((uint32_t*)out)[6],((uint32_t*)out)[7]);
 }
