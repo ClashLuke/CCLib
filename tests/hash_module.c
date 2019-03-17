@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include <emmintrin.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <math.h>
+#include "aes.h"
+#include <stdlib.h>
 #include <strings.h>
 #include "aes.h"
 
@@ -162,10 +162,11 @@ void rol128(uint64_t* in, uint64_t* out, uint16_t n){
 }
 
 void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
-	uint16_t  crc_16[16] =	{0};
-	uint32_t* crc_32 = (uint32_t*)crc_16;
-	uint64_t* crc_64 = (uint64_t*)crc_16;
-	uint64_t* data_64 = (uint64_t*)data;
+	uint16_t  crc_16[16] = {0};
+	uint32_t* crc_32     = (uint32_t*)crc_16;
+	uint64_t* crc_64     = (uint64_t*)crc_16;
+	uint64_t* data_64    = (uint64_t*)data;
+	uint64_t* out_64     = (uint64_t*)out;
 	crc_32[0] = crc32(data);
 	crc_32[1] = crc32(&data[4]);
 	crc_32[2] = ((uint32_t*)&scratchpad[crc_16[0]])[0];
@@ -173,11 +174,13 @@ void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	crc_64[1] ^= data_64[1];
 	crc_64[2] = (data_64[2] + crc_64[1]) ^ (data_64[2] / crc_64[1]);
 	crc_64[3] = data_64[3];
-	uint64_t iv[2] = {0};
-	uint64_t key[2] = {0};
-	ror128(crc_64    ,iv ,crc_16[15]);
-	rol128(&crc_64[2],key,crc_16[ 0]);
-	aes((uint8_t*)crc_16, out, (uint8_t*)key, (uint8_t*)iv);
+	uint64_t key[2][2] = {0};
+	ror128(crc_64    , key[0], crc_16[15]);
+	rol128(&crc_64[2], key[1], crc_16[ 0]);
+	out_64[0] = crc_64[0]; out_64[1] = crc_64[1];
+	out_64[2] = crc_64[2]; out_64[3] = crc_64[3];
+	aes(out    , (uint8_t*)key[0]);
+	aes(&out[16], (uint8_t*)key[1]);
 	return;
 }
 
@@ -218,7 +221,7 @@ int main(int argc, char *argv[]){
 		}
 		fclose(fp);
 	} else {
-		uint64_t iterations = 65536;//4294967296; // 4Gi
+		uint64_t iterations = 4294967296; // 4Gi
 		char scratchpad[65536] = {[0 ... 65535] = 5};
 		uint8_t data[32] = {[0 ... 31] = 6};
 		for(uint64_t j=0;j<iterations;j++)hash(data, (uint8_t*)scratchpad, data);

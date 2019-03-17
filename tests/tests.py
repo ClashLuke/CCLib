@@ -59,9 +59,9 @@ def test_hash_time(write = False, time = False, iterations = 2**16, out = "resul
 			f.write("Calculation per hash took {}ns\n\n".format(int(1000000000*data[1])))
 			f.close()
 		else:
-			print("Calculation of {} hashes took {}s".format(1<<28, data[0]))
+			print("Calculation of {} hashes took {}s".format(1<<32, data[0]))
 			print("Calculation per hash took {}ns\n".format(int(1000000000*data[1])))
-	sinit(False, iterations)
+	#sinit(False, iterations)
 	return
 
 if __name__ == "__main__":
