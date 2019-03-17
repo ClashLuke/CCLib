@@ -100,7 +100,7 @@ def test_time(seed):
 
 def sinit(time, iterations=0):
 	seed = bytes.fromhex(open("hex.txt","r").read()[:-1])
-	os.system("clang hash_module.c aes.c -o hash.o -lm -maes -msse4.2")
+	os.system("gcc squash.c aes.c -O3 -march=native -o hash.o -maes")
 	if time:
 		_time = test_time(seed)
 		_per_hash = _time / 2**32
