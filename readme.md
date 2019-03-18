@@ -5,8 +5,6 @@ A provably fast and expensive hash algorithm</br>
 
 ## ToDo
 The following things have to be done
-- [ ] Check if ASM CRCs have the same result as C CRC
-- [x] Add AES ASM instructions
 - [ ] Security Analysis (Review)
 - [ ] Benchmark on ARMv8, SSE4.2 compatible CPU and AMD GPUs.
 
