@@ -133,16 +133,15 @@ void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	rol128(&crc_64[2], key[1], crc_16[ 0]);
 	out_64[0] = crc_64[0]; out_64[1] = crc_64[1];
 	out_64[2] = crc_64[2]; out_64[3] = crc_64[3];
-	aes(out    , (uint8_t*)key[0]);
+	aes(out     , (uint8_t*)key[0]);
 	aes(&out[16], (uint8_t*)key[1]);
 	return;
 }
 
 int main(){
 	uint64_t iterations = 17179869184;
-	uint8_t data[32] = {[0 ... 31] = 6};
-	uint8_t scratchpad[65536] = {[0 ... 65535] = 5};
+	uint8_t scratchpad[65539] = {[0 ... 65538] = 5}; // 65535 (uint16_t maxvalue) + 4 (32bit/8bit)
 	uint8_t out[32] = {[0 ... 31] = 6};
 	for(uint64_t i=0; i<iterations;i++) hash(out, scratchpad, out);
-	printf("%x,%x,%x,%x,%x,%x,%x,%x\n",((uint32_t*)out)[0],((uint32_t*)out)[1],((uint32_t*)out)[2],((uint32_t*)out)[3],((uint32_t*)out)[4],((uint32_t*)out)[5],((uint32_t*)out)[6],((uint32_t*)out)[7]);
+	printf("\n%x,%x,%x,%x,%x,%x,%x,%x\n",((uint32_t*)out)[0],((uint32_t*)out)[1],((uint32_t*)out)[2],((uint32_t*)out)[3],((uint32_t*)out)[4],((uint32_t*)out)[5],((uint32_t*)out)[6],((uint32_t*)out)[7]);
 }

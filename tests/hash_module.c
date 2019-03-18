@@ -177,7 +177,7 @@ int main(int argc, char *argv[]){
 		FILE* file = fopen("hex.txt", "r");
 		for(uint32_t i=0;i<131072;i++)scratchpad_hex[i] = fgetc(file);
 		fclose(file);
-		char scratchpad[65536] = {[0 ... 65535] = 0};
+		char scratchpad[65539] = {[0 ... 65538] = 0};
 		tallymarker_hextobin(scratchpad_hex,(uint8_t*)scratchpad,65536);
 		FILE* fp = fopen("hashes.txt", "w");
 		char* a = argv[2];
@@ -209,7 +209,7 @@ int main(int argc, char *argv[]){
 		fclose(fp);
 	} else {
 		uint64_t iterations = 4294967296; // 4Gi
-		char scratchpad[65536] = {[0 ... 65535] = 5};
+		uint8_t scratchpad[65539] = {[0 ... 65538] = 5}; // 65535 (uint16_t maxvalue) + 4 (32bit/8bit)
 		uint8_t data[32] = {[0 ... 31] = 6};
 		for(uint64_t j=0;j<iterations;j++)hash(data, (uint8_t*)scratchpad, data);
 		return((int)data[0]);

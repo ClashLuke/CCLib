@@ -38,7 +38,7 @@ An example for a command could be the following: `python3 tests.py -s -i 65536 -
 
 ### Dependencies
 Those scripts use [Python3.7](https://www.python.org/downloads/release/python-372/), please make sure you use it instead of the older versions.
-To create plots (bucket histogram and bit histogram), you will need to install matplotlib.
+To create plots (bucket histogram and bit histogram), you will need to install [matplotlib](https://matplotlib.org/).
 You can install it using the following command `python3.7 -m pip install matplotlib`.</br>
 A CPU has to be capable of performing 64bit operations, speedups for the [AES-NI](https://en.wikipedia.org/wiki/AES_instruction_set) and ARMv8 are available.
 
@@ -49,10 +49,10 @@ The bucket histogram cuts of the first part of every hash value and only takes t
 
 ### Speed
 On a [Xeon E3-1225v2](https://ark.intel.com/content/www/us/en/ark/products/65733/intel-xeon-processor-e3-1225-v2-8m-cache-3-20-ghz.html), the algorithm has an average speed of 47ns. For comparision, keccak takes about 800ns on average. Which results in 4.7 cpb for squash, 80 cpb for keccak - on an Ivy Bridge CPU.<br>
+On a [Raspberry Pi 3b+](https://www.raspberrypi.org/magpi/raspberry-pi-specs-benchmarks/), the calculation of one hash takes about 1534ns on average, which results in 33.5 cpb. For comparision, one keccak execution takes about 15467ns which results in 338 cpb.
 
 ### Compilation
-To get the optimal speed, it is recommended to compile using the `-O3 -march=native` (5x speed) flags aswell as `-maes` (9x speed) if supported by the CPU. Additionally it is recommended to use GCC instead of Clang. The compilation process will take about 20% less time and the execution of the hash will be about 25% faster.
-
+To get the optimal speed, it is recommended to compile using the `-O3 -march=native` (5x speed) flags aswell as `-maes` (9x speed) if supported by the CPU. Additionally it is recommended to use GCC instead of Clang. The compilation process will take about 20% less time and the execution of the hash will be about 25% faster. Differences in execution speed from GCC-6, GCC-7 and GCC-8 are very low, but GCC-7 consistantly gets the fastest results.
 **Please note, that this Project is still under development. It works perfectly fine on all machines machines**
 
 If you have got any issues, please open a case.
