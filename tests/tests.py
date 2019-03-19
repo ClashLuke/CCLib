@@ -52,7 +52,7 @@ def test_collisions(write = False, out = "results"):
 
 def test_hash_time(write = False, time = False, iterations = 2**16, out = "results"):
 	if time:
-		data = sinit(time)
+		data = sinit(True)
 		if write:
 			f = open(result_path("testresults.txt",out),"a")
 			f.write("Calculation of {} hashes took {}s\n".format(1<<32, int(10*data[0])/10))
@@ -61,7 +61,7 @@ def test_hash_time(write = False, time = False, iterations = 2**16, out = "resul
 		else:
 			print("Calculation of {} hashes took {}s".format(1<<32, data[0]))
 			print("Calculation per hash took {}ns\n".format(int(1000000000*data[1])))
-	#sinit(False, iterations)
+	sinit(False, iterations)
 	return
 
 if __name__ == "__main__":
