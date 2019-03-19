@@ -1,6 +1,3 @@
-Calculation of 34359738368 hashes took 808s
-Calculation per hash took 49ns
+Calculation of 4294967296 hashes took 249.2s
+Calculation per hash took 58ns
 
-
-Found a total number of 0 Collisions in 268435456 hashes.
-Collision probability is 0.0%.
