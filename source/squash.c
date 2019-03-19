@@ -80,11 +80,43 @@ static inline uint32_t crc32(uint32_t msg) {
 	crc=crc32c_table[crc&0xff]^(crc>>8);
 	crc=crc32c_table[crc&0xff]^(crc>>8);
 #endif
-	return crc^0xFFFFFFFF;
+	return crc^;
 }
 
+void squash_0(uint8_t* data, uint8_t* out){
+	uint8_t   shift[4]   = {0};
+	uint64_t  key[2][2]  = {0};
+	uint16_t  crc_16[16] = {0};
+	uint32_t* crc_32     = (uint32_t*)crc_16;
+	uint64_t* crc_64     = (uint64_t*)crc_16;
+	uint32_t* data_32    = (uint32_t*)data;
+	uint64_t* data_64    = (uint64_t*)data;
+	uint16_t* out_16     = (uint16_t*)out;
+	uint64_t* out_64     = (uint64_t*)out;
+	crc_32[0] = crc32(data_32[0]);
+	crc_32[1] = crc32(data_32[1]);
+	crc_32[2] = crc32(data_32[2]);
+	crc_32[3] = crc32(data_32[3]);
+	crc_64[2] = (data_64[2] + crc_64[0]) ^ (data_64[2] / crc_64[0]);
+	crc_64[3] = (data_64[3] + crc_64[1]) ^ (data_64[3] / crc_64[1]);
+	out_64[0] = crc_64[0]; out_64[1] = crc_64[1];
+	out_64[2] = crc_64[2]; out_64[3] = crc_64[3];
+	shift[0] = out_16[15]&0x3f;
+	shift[2] = out_16[ 0]&0x3f;
+	shift[1] = 64-shift[0];
+	shift[3] = 64-shift[2];
+	key[0][0] = (out_64[0]>>shift[0]) | (out_64[0]<<(shift[1]));
+	key[0][1] = (out_64[1]>>shift[0]) | (out_64[1]<<(shift[1]));
+	key[1][0] = (out_64[2]<<shift[2]) | (out_64[2]>>(shift[3]));
+	key[1][1] = (out_64[3]<<shift[2]) | (out_64[3]>>(shift[3]));
+	aes(out     , (uint8_t*)key[0]);
+	aes(&out[16], (uint8_t*)key[1]);
+	return;
+}
 
-void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
+// Squash_1 uses a lookup in addition to the previous operations
+// to force a hasher to have 64KiB read-only scratchpad in L1 cache
+void squash_1(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	uint8_t   shift[4]   = {0};
 	uint64_t  key[2][2]  = {0};
 	uint64_t  divr[2]    = {0};
@@ -111,10 +143,48 @@ void hash(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	shift[2] = out_16[ 0]&0x3f;
 	shift[1] = 64-shift[0];
 	shift[3] = 64-shift[2];
-	key[0][0] = (out_64[1]>>shift[0]) | (out_64[0]<<(shift[1]));
-	key[0][1] = (out_64[0]>>shift[0]) | (out_64[1]<<(shift[1]));
-	key[1][0] = (out_64[3]<<shift[2]) | (out_64[2]>>(shift[3]));
-	key[1][1] = (out_64[2]<<shift[2]) | (out_64[3]>>(shift[3]));
+	key[0][0] = (out_64[0]>>shift[0]) | (out_64[0]<<(shift[1]));
+	key[0][1] = (out_64[1]>>shift[0]) | (out_64[1]<<(shift[1]));
+	key[1][0] = (out_64[2]<<shift[2]) | (out_64[2]>>(shift[3]));
+	key[1][1] = (out_64[3]<<shift[2]) | (out_64[3]>>(shift[3]));
+	aes(out     , (uint8_t*)key[0]);
+	aes(&out[16], (uint8_t*)key[1]);
+	return;
+}
+
+// Difference from Squash_1 is a 32bit integer is used to obtain the
+// data from the scratchpad.
+void squash_2(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
+	uint8_t   shift[4]   = {0};
+	uint64_t  key[2][2]  = {0};
+	uint64_t  divr[2]    = {0};
+	uint16_t  crc_16[16] = {0};
+	uint32_t* crc_32     = (uint32_t*)crc_16;
+	uint64_t* crc_64     = (uint64_t*)crc_16;
+	uint32_t* data_32    = (uint32_t*)data;
+	uint64_t* data_64    = (uint64_t*)data;
+	uint16_t* out_16     = (uint16_t*)out;
+	uint64_t* out_64     = (uint64_t*)out;
+	crc_32[0] = crc32(data_32[0]);
+	crc_32[1] = crc32(data_32[1]);
+	crc_32[2] = crc32(data_32[2]);
+	crc_32[3] = crc32(data_32[3]);
+	crc_32[4] = ((uint32_t*)&scratchpad[crc_32[0]])[0];
+	crc_32[5] = ((uint32_t*)&scratchpad[crc_32[1]])[0];
+	crc_32[6] = ((uint32_t*)&scratchpad[crc_32[2]])[0];
+	crc_32[7] = ((uint32_t*)&scratchpad[crc_32[3]])[0];
+	divr[0] = (data_64[2] + crc_64[0]) ^ (data_64[2] / crc_64[1]);
+	divr[1] = (data_64[3] + crc_64[2]) ^ (data_64[3] / crc_64[3]);
+	out_64[0] = crc_64[0]^divr[0]; out_64[1] = crc_64[1]^divr[0];
+	out_64[2] = crc_64[2]^divr[1]; out_64[3] = crc_64[3]^divr[1];
+	shift[0] = out_16[15]&0x3f;
+	shift[2] = out_16[ 0]&0x3f;
+	shift[1] = 64-shift[0];
+	shift[3] = 64-shift[2];
+	key[0][0] = (out_64[0]>>shift[0]) | (out_64[0]<<(shift[1]));
+	key[0][1] = (out_64[1]>>shift[0]) | (out_64[1]<<(shift[1]));
+	key[1][0] = (out_64[2]<<shift[2]) | (out_64[2]>>(shift[3]));
+	key[1][1] = (out_64[3]<<shift[2]) | (out_64[3]>>(shift[3]));
 	aes(out     , (uint8_t*)key[0]);
 	aes(&out[16], (uint8_t*)key[1]);
 	return;
@@ -124,6 +194,6 @@ int main(){
 	uint64_t iterations = 17179869184;
 	uint8_t scratchpad[65539] = {[0 ... 65538] = 5}; // 65535 (uint16_t maxvalue) + 4 (32bit/8bit)
 	uint8_t out[32] = {[0 ... 31] = 6};
-	for(uint64_t i=0; i<iterations;i++) hash(out, scratchpad, out);
+	for(uint64_t i=0; i<iterations;i++) squash_1(out, scratchpad, out);
 	printf("\n%x,%x,%x,%x,%x,%x,%x,%x\n",((uint32_t*)out)[0],((uint32_t*)out)[1],((uint32_t*)out)[2],((uint32_t*)out)[3],((uint32_t*)out)[4],((uint32_t*)out)[5],((uint32_t*)out)[6],((uint32_t*)out)[7]);
 }
