@@ -3,7 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "squash.h"
-#include "blake2/blake2.h"
+#if !defined(HAVE_SSE2)
+#include "blake2/neon/blake2.h"
+#else
+#include "blake2/sse/blake2.h"
+#endif
+
 
 #define HASH_BYTES   32                 // hash length in bytes
 #define CACHE_ROUNDS 4                  // number of rounds in cache production
