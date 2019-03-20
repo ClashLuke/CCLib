@@ -33,28 +33,27 @@ void make_cache(uint8_t* scratchpad, uint8_t* cache){
 		for(uint32_t i=0;i<iterations;i++){
 			index[0] = cache_64[i*4]&mask;
 			index[1] = (i-1+iterations)&mask; 
-			temp_cache[0] = cache_64[index[0]  ]^cache_64[index[1]  ];
-			temp_cache[1] = cache_64[index[0]+1]^cache_64[index[1]+1];
-			temp_cache[2] = cache_64[index[0]+2]^cache_64[index[1]+2];
-			temp_cache[3] = cache_64[index[0]+3]^cache_64[index[1]+3];
+			for(uint8_t k=0;k<4;k++)
+				temp_cache[k] = ((uint64_t*)&cache[index[0]+k])[0]^((uint64_t*)&cache[index[1]+k])[0];
 			squash_2((uint8_t*)temp_cache, scratchpad, &cache[i*32]);
 		}
 	}
 }
 
-void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint8_t* out){
+void calc_dataset_item(uint8_t* cache, uint64_t item_number, uint8_t* out){
 	uint32_t  mask        = 2097151; // Hashcount - 1 
-	uint32_t  mask_32     = 67108863;
+	uint32_t  mask_32     = 67043327; // Cachesize-scratchpad size
 	uint64_t* cache_64    = (uint64_t*)cache; 
 	uint8_t   mix_8[32]   = {0};
 	uint64_t* mix         = (uint64_t*)mix_8;
-	mix[0] = cache_64[item_number&mask  ]; mix[1] = cache_64[item_number&mask+1];
-	mix[2] = cache_64[item_number&mask+2]; mix[3] = cache_64[item_number&mask+3];
+	item_number = item_number << 5;
+	for(uint8_t i=0;i<4;i++)
+		mix[i] = ((uint64_t*)&cache[(item_number&mask)+i])[0];
 	squash_2(mix_8, &cache[item_number&mask_32], out);
 }
 
 void calc_dataset(uint8_t* cache, uint8_t* out){
-	for(uint64_t i=0;i<4294967296;i+=32){
+	for(uint64_t i=0;i<4294967296;i+=32){ // (1<<32)>>5
 		calc_dataset_item(cache, i, &out[i]);
 	}
 }
@@ -84,8 +83,6 @@ void cache_from_seed(uint8_t* seed, uint8_t* cache){
 	scratchpad = malloc (sizeof(uint8_t) * 65536);
 	if (scratchpad == NULL) exit(1);
 	make_scratchpad(seed, scratchpad);
-	cache = malloc (sizeof(uint8_t) * 67108864);
-	if (cache == NULL) exit(1);
 	make_cache(scratchpad, cache);
 }
 void dataset_from_seed(uint8_t* seed, uint8_t* dataset){

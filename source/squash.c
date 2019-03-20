@@ -118,7 +118,7 @@ void squash_0(uint8_t* data, uint8_t* out){
 }
 
 // Squash_1 uses a lookup in addition to the previous operations
-// to force a hasher to have 255B read-only scratchpad in L1 cache
+// to force a hasher to have 256B read-only scratchpad in L1 cache
 void squash_1(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	uint8_t   shift[4]   = {0};
 	uint64_t  key[2][2]  = {0};
@@ -196,29 +196,29 @@ void squash_2(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 // Difference from Squash_2 is a 32bit integer is used to obtain the
 // data from the dataset. (4 GiB dataset)
 void squash_3_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
-	uint8_t   shift[4]   = {0};
-	uint64_t  key[2][2]  = {0};
-	uint64_t  divr[2]    = {0};
-	uint16_t  crc_16[16] = {0};
-	uint32_t* crc_32     = (uint32_t*)crc_16;
-	uint64_t* crc_64     = (uint64_t*)crc_16;
-	uint32_t* data_32    = (uint32_t*)data;
-	uint64_t* data_64    = (uint64_t*)data;
-	uint16_t* out_16     = (uint16_t*)out;
-	uint64_t* out_64     = (uint64_t*)out;
+	uint8_t   shift[4]      = {0};
+	uint64_t  key[2][2]     = {0};
+	uint64_t  divr[2]       = {0};
+	uint16_t  crc_16[16]    = {0};
+	uint32_t* crc_32        = (uint32_t*)crc_16;
+	uint64_t* crc_64        = (uint64_t*)crc_16;
+	uint32_t* data_32       = (uint32_t*)data;
+	uint64_t* data_64       = (uint64_t*)data;
+	uint16_t* out_16        = (uint16_t*)out;
+	uint64_t* out_64        = (uint64_t*)out;
 	crc_32[0] = crc32(data_32[0]);
 	crc_32[1] = crc32(data_32[1]);
 	crc_32[2] = crc32(data_32[2]);
 	crc_32[3] = crc32(data_32[3]);
-	crc_32[4] = ((uint32_t*)&dataset[crc_32[0]])[0];
-	crc_32[5] = ((uint32_t*)&dataset[crc_32[1]])[0];
-	crc_32[6] = ((uint32_t*)&dataset[crc_32[2]])[0];
-	crc_32[7] = ((uint32_t*)&dataset[crc_32[3]])[0];
+	crc_32[4] = ((uint32_t*)&dataset[(crc_32[0]>>7)<<7])[0];
+	crc_32[5] = ((uint32_t*)&dataset[(crc_32[1]>>7)<<7])[1];
+	crc_32[6] = ((uint32_t*)&dataset[(crc_32[2]>>7)<<7])[2];
+	crc_32[7] = ((uint32_t*)&dataset[(crc_32[3]>>7)<<7])[3];
 	for(uint16_t i=1;i<ACCESSES;i++){
-		crc_32[4] = ((uint32_t*)&dataset[crc_32[4]])[0];
-		crc_32[5] = ((uint32_t*)&dataset[crc_32[5]])[0];
-		crc_32[6] = ((uint32_t*)&dataset[crc_32[6]])[0];
-		crc_32[7] = ((uint32_t*)&dataset[crc_32[7]])[0];
+		crc_32[4] = ((uint32_t*)&dataset[(crc_32[4]>>7)<<7])[0];
+		crc_32[5] = ((uint32_t*)&dataset[(crc_32[5]>>7)<<7])[1];
+		crc_32[6] = ((uint32_t*)&dataset[(crc_32[6]>>7)<<7])[2];
+		crc_32[7] = ((uint32_t*)&dataset[(crc_32[7]>>7)<<7])[3];
 	}
 	divr[0] = (data_64[2] + crc_64[2]) ^ (data_64[2] / crc_64[0]);
 	divr[1] = (data_64[3] + crc_64[3]) ^ (data_64[3] / crc_64[1]);
@@ -240,38 +240,39 @@ void squash_3_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 // Difference from Squash_2 is a 32bit integer is used to obtain the
 // data from the scratchpad. (4 GiB scratchpad)
 void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
-	uint8_t   shift[4]        = {0};
-	uint64_t  key[2][2]       = {0};
-	uint64_t  divr[2]         = {0};
-	uint16_t* crc_16[16]      = {0};
-	uint32_t* crc_32          = (uint32_t*)crc_16;
-	uint64_t* crc_64          = (uint64_t*)crc_16;
-	uint32_t* data_32         = (uint32_t*)data;
-	uint64_t* data_64         = (uint64_t*)data;
-	uint16_t* out_16          = (uint16_t*)out;
-	uint64_t* out_64          = (uint64_t*)out;
-	uint32_t dataset_item[8] = {0};
+	uint8_t   shift[4]          = {0};
+	uint64_t  key[2][2]         = {0};
+	uint64_t  divr[2]           = {0};
+	uint16_t* crc_16[16]        = {0};
+	uint32_t* crc_32            = (uint32_t*)crc_16;
+	uint64_t* crc_64            = (uint64_t*)crc_16;
+	uint32_t* data_32           = (uint32_t*)data;
+	uint64_t* data_64           = (uint64_t*)data;
+	uint16_t* out_16            = (uint16_t*)out;
+	uint64_t* out_64            = (uint64_t*)out;
+	uint8_t   dataset_items[32] = {0};
+	uint32_t* dataset_item      = (uint32_t*)dataset_items;
 	crc_32[0] = crc32(data_32[0]);
 	crc_32[1] = crc32(data_32[1]);
 	crc_32[2] = crc32(data_32[2]);
 	crc_32[3] = crc32(data_32[3]);
-	calc_dataset_item(cache, crc_32[0], (uint8_t*)dataset_item);
+	calc_dataset_item(cache, (crc_32[0]>>7)<<7, dataset_items);
 	crc_32[4] = dataset_item[0];
-	calc_dataset_item(cache, crc_32[1], (uint8_t*)dataset_item);
-	crc_32[5] = dataset_item[0];
-	calc_dataset_item(cache, crc_32[2], (uint8_t*)dataset_item);
-	crc_32[6] = dataset_item[0];
-	calc_dataset_item(cache, crc_32[3], (uint8_t*)dataset_item);
-	crc_32[7] = dataset_item[0];
+	calc_dataset_item(cache, (crc_32[1]>>7)<<7, dataset_items);
+	crc_32[5] = dataset_item[1];
+	calc_dataset_item(cache, (crc_32[2]>>7)<<7, dataset_items);
+	crc_32[6] = dataset_item[2];
+	calc_dataset_item(cache, (crc_32[3]>>7)<<7, dataset_items);
+	crc_32[7] = dataset_item[3];
 	for(uint16_t i=1;i<ACCESSES;i++){
-		calc_dataset_item(cache, crc_32[4], (uint8_t*)dataset_item);
+		calc_dataset_item(cache, (crc_32[4]>>7)<<7, dataset_items);
 		crc_32[4] = dataset_item[0];
-		calc_dataset_item(cache, crc_32[5], (uint8_t*)dataset_item);
-		crc_32[5] = dataset_item[0];
-		calc_dataset_item(cache, crc_32[6], (uint8_t*)dataset_item);
-		crc_32[6] = dataset_item[0];
-		calc_dataset_item(cache, crc_32[7], (uint8_t*)dataset_item);
-		crc_32[7] = dataset_item[0];
+		calc_dataset_item(cache, (crc_32[5]>>7)<<7, dataset_items);
+		crc_32[5] = dataset_item[1];
+		calc_dataset_item(cache, (crc_32[6]>>7)<<7, dataset_items);
+		crc_32[6] = dataset_item[2];
+		calc_dataset_item(cache, (crc_32[7]>>7)<<7, dataset_items);
+		crc_32[7] = dataset_item[3];
 	}
 	divr[0] = (data_64[2] + crc_64[2]) ^ (data_64[2] / crc_64[0]);
 	divr[1] = (data_64[3] + crc_64[3]) ^ (data_64[3] / crc_64[1]);
