@@ -4,7 +4,7 @@
 #include <time.h>
 #include "pow.h"
 
-#define ITERATIONS 268435456
+#define ITERATIONS 2097152
 
 uint64_t benchmark_mine(uint64_t block_height){
 	uint8_t   result[32] = {0};
@@ -25,11 +25,11 @@ uint64_t benchmark_mine(uint64_t block_height){
 	current_time = (uint32_t)time(NULL);
 	for(uint32_t i=0;i<ITERATIONS;i++){
 		squash_pow_full(header, i, dataset, result);
-		final ^= result[0];
+		final ^= result_64[0];
 	}
 	uint32_t end_time = (uint32_t)time(NULL);
 	printf("\tCalculation of %u hashes took: %us\n",ITERATIONS, end_time-current_time);
-	printf("\tHashrate is about: %uH/s\n\n", ITERATIONS/(end_time-current_time));
+	printf("\tHashrate is about: %uH/s\n", ITERATIONS/(end_time-current_time));
 	return final;
 }
 
@@ -47,16 +47,16 @@ uint64_t benchmark_validation(uint64_t block_height){
 	printf("\tSeed calculation took: %us\n",(uint32_t)time(NULL)-current_time);
 	current_time = (uint32_t)time(NULL);
 	cache_from_seed(seed, cache);
-	printf("\nCache generation took: %us\n",(uint32_t)time(NULL)-current_time);
+	printf("\tCache generation took: %us\n",(uint32_t)time(NULL)-current_time);
 	free(seed);
 	current_time = (uint32_t)time(NULL);
 	for(uint32_t i=0;i<ITERATIONS;i++){
 		squash_pow_light(header, i, cache, result);
-		final ^= result[0];
+		final ^= result_64[0];
 	}
 	uint32_t end_time = (uint32_t)time(NULL);
 	printf("\tCalculation of %u hashes took: %us\n",ITERATIONS, end_time-current_time);
-	printf("\tHashrate is about: %uH/s\n\n", ITERATIONS/(end_time-current_time));
+	printf("\tHashrate is about: %uH/s\n", ITERATIONS/(end_time-current_time));
 	return final;
 }
 
@@ -64,8 +64,8 @@ uint64_t benchmark_validation(uint64_t block_height){
 
 int main(){
 	printf("Mining\n");
-	printf("\tResult: %016jx",benchmark_mine(10));
+	printf("\tResult: %016jx\n\n",benchmark_mine(10));
 	printf("Validation\n");
-	printf("\tResult: %016jx",benchmark_validation(10));
+	printf("\tResult: %016jx\n\n",benchmark_validation(10));
 	return 1;
 }
