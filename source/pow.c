@@ -16,7 +16,7 @@ void make_scratchpad(uint8_t* seed, uint8_t* scratchpad){
 }
 
 void make_cache(uint8_t* scratchpad, uint8_t* cache){
-	/* 32MiB cache is allocated before executing
+	/* 64MiB cache is allocated before executing
 	   this function */
 	uint32_t  iterations    = 67108864/HASH_BYTES;
 	uint32_t  mask          = iterations-1;
@@ -70,7 +70,7 @@ void squash_pow_light(uint8_t* header, uint64_t nonce, uint8_t* cache, uint8_t* 
 	squash_3_light(seed, cache, result);
 }
 
-void get_seedhash(uint64_t block_number, uint8_t* seed){
+void get_seedhash(uint64_t block_number, uint8_t* seed){ /* IN: block number | OUT: seed */
 	for(uint64_t i=0;i<block_number/EPOCH_LENGTH;i++) squash_0(seed, seed);
 }
 

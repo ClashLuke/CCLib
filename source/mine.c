@@ -3,7 +3,6 @@
 #include "pow.h"
 #include "blockchain.h"
 
-#include <stdio.h>
 uint64_t mine_block(uint8_t* header, uint8_t* dataset, uint64_t difficulty){
 	uint8_t   result[32] = {0};
 	uint64_t* result_64  = (uint64_t*)result;
@@ -29,6 +28,8 @@ uint64_t mine_block(uint8_t* header, uint8_t* dataset, uint64_t difficulty){
 	}
 	return nonce;
 }
+
+
 
 void mine(uint64_t block_height){
 	uint8_t* seed    = malloc(sizeof(uint8_t) * 32);
