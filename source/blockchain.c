@@ -1,29 +1,30 @@
 #include <stdint.h>
+#include <string.h>
+#include <stdio.h>
 
-uint8_t* getheader(){
+void get_current_header(uint8_t* header_out){
 	/* Currently a dummy function
 	Extracts the header of the data
 	of the block at a given height */
-	uint8_t header[80] = {0};
 	// Obtain header data
-	header = {[0 ... 79] = 6};
-	return header;
+	uint8_t header[80] =  {[0 ... 79] = 6};
+	memcpy(header_out, header, 80);
 }
-uint8_t* getheader(uint64_t block_height){
+void getheader(uint64_t block_height, uint8_t* header_out){
 	/* Currently a dummy function
 	Returns the block header of a previous
 	Block, stored in the chain. */
-	uint8_t header[80] = {0};
 	// Obtain header data
-	header = {[0 ... 79] = 6};
-	return header;
+	uint8_t header[80] =  {[0 ... 79] = 6};
+	memcpy(header_out, header, 80);
 }
-void gethash(uint64_t block_height){
+void gethash(uint64_t block_height, uint8_t* hash_out){
 	/* Currently a dummy function
 	Extracts the block hash of the data
 	of the block at a given height */
-	// Get difficulty
-	return 1024;
+	// Get Block Hash
+	uint8_t hash[32] =  {[0 ... 31] = 6};
+	memcpy(hash_out, hash, 32);
 }
 uint64_t getdifficulty(uint64_t block_height){
 	/* Currently a dummy function
@@ -31,7 +32,9 @@ uint64_t getdifficulty(uint64_t block_height){
 	block height. You can calculate up to
 	one block in advance. */
 	// Get difficulty
-	return 1024;
+	uint64_t out = 1<<16;
+	//out = out<<2;
+	return out;
 }
 void submitblock(uint8_t* header, uint64_t nonce){
 	/* Currently a dummy function

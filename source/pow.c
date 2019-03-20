@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include "squash.h"
 #include "blake2/blake2.h"
 
@@ -20,7 +21,6 @@ void make_cache(uint8_t* scratchpad, uint8_t* cache){
 	uint32_t  iterations    = 67108864/HASH_BYTES;
 	uint32_t  mask          = iterations-1;
 	uint64_t* cache_64      = (uint64_t*)cache; 
-	uint64_t* seed_64       = (uint64_t*)seed; 
 	uint64_t  temp_cache[4] = {0};
 	uint64_t  index[2]      = {0};
 	for(uint32_t i=0;i<iterations;i++) squash_2(&cache[i*32], scratchpad, &cache[(i+1)*32]);
