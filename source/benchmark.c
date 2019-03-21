@@ -5,7 +5,7 @@
 #include <time.h>
 #include "pow.h"
 
-#define ITERATIONS 64 // iterations are multiplied with 64
+#define ITERATIONS 65536 // iterations are multiplied with 64
 
 void benchmark_dataset_generation(uint8_t* seed, uint8_t* dataset){
 	char     buffer[65] = {0};
@@ -52,7 +52,7 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 	if(printing){
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 		for(uint8_t j=0;j<64;j++){
-			for(uint32_t i=0;i<ITERATIONS;i++){
+			for(uint32_t i=0;i<iterations;i++){
 				squash_pow_full(header, i+(j*ITERATIONS), dataset, result);
 				temp[0] ^= result_64[0]; temp[1] ^= result_64[1];
 				temp[2] ^= result_64[2]; temp[3] ^= result_64[3];
@@ -62,7 +62,7 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 		}
 		printf("\r%*s\r",80,"");
 	} else {
-		for(uint32_t i=0;i<iterations;i++){
+		for(uint32_t i=0;i<(iterations<<6);i++){
 			squash_pow_full(header, i, dataset, result);
 			temp[0] ^= result_64[0]; temp[1] ^= result_64[1];
 			temp[2] ^= result_64[2]; temp[3] ^= result_64[3];
@@ -70,8 +70,8 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 	}
 	free(dataset);
 	uint32_t end_time = (uint32_t)time(NULL);
-	printf("\tCalculation of %u hashes took: %us\n",iterations, end_time-current_time);
-	printf("\tHashrate is approximately: %uH/s\n", iterations/(end_time-current_time));
+	printf("\tCalculation of %u hashes took: %us\n",iterations<<6, end_time-current_time);
+	printf("\tHashrate is approximately: %uH/s\n", (iterations<<6)/(end_time-current_time));
 	printf("\tResult: %016jx,%016jx,%016jx,%016jx\n",temp[0],temp[1],temp[2],temp[3]);
 	return 0;
 }

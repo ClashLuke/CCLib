@@ -8,13 +8,12 @@
 #else
 #include "blake2/sse/blake2.h"
 #endif
-#include "xxHash/xxh3.h"
 
 
 #define HASH_BYTES      32                 // hash length in bytes
 #define CACHE_ROUNDS    4                  // number of rounds in cache production
 #define EPOCH_LENGTH    60                 // blocks per epoch
-#define DATASET_PARENTS 64                 // number of hashes before calculating dataset entry
+#define DATASET_PARENTS 16                 // number of hashes before calculating dataset entry
 // Assuming 4 blocks per second, an epoch estimates 15 minutes
 
 void make_scratchpad(uint8_t* seed, uint8_t* scratchpad){
@@ -48,12 +47,13 @@ void calc_dataset_item(uint8_t* cache, uint64_t item_number, uint8_t* out){
 	uint64_t* cache_64    = (uint64_t*)cache; 
 	uint8_t   mix_8[32]   = {0};
 	uint64_t* mix         = (uint64_t*)mix_8;
+	uint32_t* mix_32      = (uint32_t*)mix_8;
 	item_number = item_number << 5;
 	for(uint8_t i=0;i<4;i++)
 		mix[i] = ((uint64_t*)&cache[(item_number&mask)+i])[0];
 	for(uint16_t i=0;i<DATASET_PARENTS;i++)
-		for(uint8_t j=0;j<4;j++)
-			mix[j] = XXH64(&cache[mix[j]&mask_32], 4, mix[j]);
+		for(uint8_t j=0;j<8;j++)
+			mix_32[j] = crc32(((uint32_t*)&cache[mix[j]&mask_32])[0]);
 	squash_2(mix_8, &cache[item_number&mask_32], out);
 }
 

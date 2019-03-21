@@ -3,7 +3,7 @@
 #include "aes.h"
 #include "pow.h"
 
-#define ACCESSES 4096
+#define ACCESSES 256
 
 uint32_t crc32c_table[256] = {
 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
@@ -72,7 +72,7 @@ uint32_t crc32c_table[256] = {
 	0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
 };
 
-static inline uint32_t crc32(uint32_t msg) {
+uint32_t crc32(uint32_t msg) {
 	uint32_t crc = 0xFFFFFFFF;
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
 	__asm__("crc32w %w0,%w0,%w1\n":"+r"(crc):"r"(msg));
@@ -210,15 +210,15 @@ void squash_3_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	crc_32[1] = crc32(data_32[1]);
 	crc_32[2] = crc32(data_32[2]);
 	crc_32[3] = crc32(data_32[3]);
-	crc_32[4] = ((uint32_t*)&dataset[(crc_32[0]>>7)<<7])[0];
-	crc_32[5] = ((uint32_t*)&dataset[(crc_32[1]>>7)<<7])[1];
-	crc_32[6] = ((uint32_t*)&dataset[(crc_32[2]>>7)<<7])[2];
-	crc_32[7] = ((uint32_t*)&dataset[(crc_32[3]>>7)<<7])[3];
+	crc_32[4] = ((uint32_t*)&dataset[(crc_32[0]&0xffffff80)])[0];
+	crc_32[5] = ((uint32_t*)&dataset[(crc_32[1]&0xffffff80)])[1];
+	crc_32[6] = ((uint32_t*)&dataset[(crc_32[2]&0xffffff80)])[2];
+	crc_32[7] = ((uint32_t*)&dataset[(crc_32[3]&0xffffff80)])[3];
 	for(uint16_t i=1;i<ACCESSES;i++){
-		crc_32[4] = ((uint32_t*)&dataset[(crc_32[4]>>7)<<7])[0];
-		crc_32[5] = ((uint32_t*)&dataset[(crc_32[5]>>7)<<7])[1];
-		crc_32[6] = ((uint32_t*)&dataset[(crc_32[6]>>7)<<7])[2];
-		crc_32[7] = ((uint32_t*)&dataset[(crc_32[7]>>7)<<7])[3];
+		crc_32[4] = ((uint32_t*)&dataset[(crc_32[4]&0xffffff80)])[0];
+		crc_32[5] = ((uint32_t*)&dataset[(crc_32[5]&0xffffff80)])[1];
+		crc_32[6] = ((uint32_t*)&dataset[(crc_32[6]&0xffffff80)])[2];
+		crc_32[7] = ((uint32_t*)&dataset[(crc_32[7]&0xffffff80)])[3];
 	}
 	divr[0] = (data_64[2] + crc_64[2]) ^ (data_64[2] / crc_64[0]);
 	divr[1] = (data_64[3] + crc_64[3]) ^ (data_64[3] / crc_64[1]);
@@ -256,22 +256,22 @@ void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
 	crc_32[1] = crc32(data_32[1]);
 	crc_32[2] = crc32(data_32[2]);
 	crc_32[3] = crc32(data_32[3]);
-	calc_dataset_item(cache, (crc_32[0]>>7)<<7, dataset_items);
+	calc_dataset_item(cache, (crc_32[0]&0xffffff80), dataset_items);
 	crc_32[4] = dataset_item[0];
-	calc_dataset_item(cache, (crc_32[1]>>7)<<7, dataset_items);
+	calc_dataset_item(cache, (crc_32[1]&0xffffff80), dataset_items);
 	crc_32[5] = dataset_item[1];
-	calc_dataset_item(cache, (crc_32[2]>>7)<<7, dataset_items);
+	calc_dataset_item(cache, (crc_32[2]&0xffffff80), dataset_items);
 	crc_32[6] = dataset_item[2];
-	calc_dataset_item(cache, (crc_32[3]>>7)<<7, dataset_items);
+	calc_dataset_item(cache, (crc_32[3]&0xffffff80), dataset_items);
 	crc_32[7] = dataset_item[3];
 	for(uint16_t i=1;i<ACCESSES;i++){
-		calc_dataset_item(cache, (crc_32[4]>>7)<<7, dataset_items);
+		calc_dataset_item(cache, (crc_32[4]&0xffffff80), dataset_items);
 		crc_32[4] = dataset_item[0];
-		calc_dataset_item(cache, (crc_32[5]>>7)<<7, dataset_items);
+		calc_dataset_item(cache, (crc_32[5]&0xffffff80), dataset_items);
 		crc_32[5] = dataset_item[1];
-		calc_dataset_item(cache, (crc_32[6]>>7)<<7, dataset_items);
+		calc_dataset_item(cache, (crc_32[6]&0xffffff80), dataset_items);
 		crc_32[6] = dataset_item[2];
-		calc_dataset_item(cache, (crc_32[7]>>7)<<7, dataset_items);
+		calc_dataset_item(cache, (crc_32[7]&0xffffff80), dataset_items);
 		crc_32[7] = dataset_item[3];
 	}
 	divr[0] = (data_64[2] + crc_64[2]) ^ (data_64[2] / crc_64[0]);
