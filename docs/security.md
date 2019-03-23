@@ -1,4 +1,8 @@
-# Security
+**Contents**
+
+- [Squash 0](#Squash 0)
+- [Squash 1](#Squash 1)
+
 SquashPoWs security relies entirely on the underlying squash function. Since squash 2 and 3 are variations of squash 1 with a larger scratchpad, we will we will focus on the squash variants 0 and 1 in here.
 
 ## Squash 0
@@ -9,10 +13,13 @@ Assuming that there is a perfect CRC, a 32bit redundancy check (with random 32bi
 ### Step 2 - Integer Math
 The next 128bit are calculated using two times two 64bit integer arithmetics. First, the next 64bit of input data are used to be added to the first two CRCs. Since an addition is a XOR with carry, it can be assumed that the first bit is a casual XOR, all following bits are a doubled XOR. This results in a slightly increased probability for high results - which, since the highest bit is cut off, does not matter. To even the first few bits out, a division of the previous data (3rd 64bit of the input, 1st 64bit of the CRC results) is added to the previous result using a XOR. The resulting expression looks like this `crc_64[2] = (data_64[2] + crc_64[0]) ^ (data_64[2] / crc_64[0]);`. This results in another 128bit with 64bit collision-resistance (assuming that the ADD operator is cryptographically insecure). While those 64bit operations are easy for a modern CPU, it is difficult for ASICs to implement those [2](https://www.slideshare.net/bschn2/the-rainforest-algorithm)
 
-### Step 3 - Rotation
+### Step 3 - Bit Moving
+A bit reverse and a byteswap of existing data are additionally added, since those require one cycle but significantly increase GPU and ASIC resistance. None of these increases entropy nor collision resistance, but the byteswap is optimised for x86 and ARM instructionsets, which results in a slowdown for GPUs. Additionally the bit reverse is optimised in the ARM instructionset as [rbit](http://www.keil.com/support/man/docs/armasm/armasm_dom1361289889382.htm), which increases performance for low-power devices such as [ARM Server CPUs](https://www.arm.com/products/silicon-ip-cpu/neoverse/neoverse-n1) or smartphones.
+
+### Step 4 - Rotation
 Compared to the previous operations, the rotations are relatively cheap. `key[1][0] = (out_64[0]>>shift[0]) | (out_64[0]<<(shift[1]));` Two 64bit rotations in each direction are used to obtain keys to encrypt the previously generated 256bit with. Those are variable rotations, the number of bits to shift is obtained by reading from the first/last byte of the previous 256bit. Since those dont change fundamentally change data but instead are a fancy copy mechanism which provides additional protection against ASICs but cost nothing on a casual CPU [2](https://www.slideshare.net/bschn2/the-rainforest-algorithm).
 
-### Step 4 - Encryption
+### Step 5 - Encryption
 The last step, an AES ECB encryption, is there to increase entropy, GPU resistance and ASIC resistance as seen [here](https://www.slideshare.net/bschn2/the-rainforest-algorithm). It does not fundamentally increase collision resistance or security. The encryption is performed using the first 128bit of the previous results (the CRC results) and encrypts them with the key obtained from the integer math. The code looks like this: `aes(out, (uint8_t*)key[0]);`. The same thing goes for the second 128bit encrypted with the rotated CRC.
 
 ## Squash 1

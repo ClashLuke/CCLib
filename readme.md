@@ -9,7 +9,7 @@ The following things have to be done
 - [ ] Benchmark on ARMv8, SSE4.2 compatible CPU and AMD GPUs.
 
 ### Tests
-Tests and sample results can be found in the [Tests Branch](https://github.com/ClashLuke/Squash-Hash/tree/tests). Head over there for further instructions.
+Tests and sample results can be found in the [Tests Branch](https://github.com/ClashLuke/Squash-Hash/tree/testing). Head over there for further instructions.
 
 ### Speed
 On a [Xeon E3-1225v2](https://ark.intel.com/content/www/us/en/ark/products/65733/intel-xeon-processor-e3-1225-v2-8m-cache-3-20-ghz.html), the algorithm has an average speed of 58.5ns. For comparision, keccak takes about 800ns on average. Which results in 5.8 cpb for squash, 80 cpb for keccak - on an Ivy Bridge CPU.<br>
@@ -21,7 +21,7 @@ To get the optimal speed, it is recommended to compile using the `-O3 -march=nat
 ## SquashPoW
 
 ### Speed
-The same Xeon E3-1225v2 as mentioned above has about 128kH/s (single-threaded) using the 4GiB dataset.
+The same Xeon E3-1225v2 as mentioned above has about 1.1MH/s (single-threaded, using DDR3-1333 RAM) using the 4GiB dataset, 1.2kH/s using the light mode and a 64MiB cache.
 
 
 
