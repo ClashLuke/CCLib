@@ -13,7 +13,7 @@
 #define HASH_BYTES      32                 // hash length in bytes
 #define CACHE_ROUNDS    4                  // number of rounds in cache production
 #define EPOCH_LENGTH    60                 // blocks per epoch
-#define DATASET_PARENTS 16                 // number of hashes before calculating dataset entry
+#define DATASET_PARENTS 256                // number of hashes before calculating dataset entry
 // Assuming 4 blocks per second, an epoch estimates 15 minutes
 
 void make_scratchpad(uint8_t* seed, uint8_t* scratchpad){
@@ -52,8 +52,14 @@ void calc_dataset_item(uint8_t* cache, uint64_t item_number, uint8_t* out){
 	for(uint8_t i=0;i<4;i++)
 		mix[i] = ((uint64_t*)&cache[(item_number&mask)+i])[0];
 	for(uint16_t i=0;i<DATASET_PARENTS;i++)
-		for(uint8_t j=0;j<8;j++)
-			mix_32[j] = crc32(((uint32_t*)&cache[mix[j]&mask_32])[0]);
+		mix_32[0] = crc32(((uint32_t*)&cache[mix[0]&mask_32])[0]);
+		mix_32[1] = crc32(((uint32_t*)&cache[mix[1]&mask_32])[0]);
+		mix_32[2] = crc32(((uint32_t*)&cache[mix[2]&mask_32])[0]);
+		mix_32[3] = crc32(((uint32_t*)&cache[mix[3]&mask_32])[0]);
+		mix_32[4] = crc32(((uint32_t*)&cache[mix[4]&mask_32])[0]);
+		mix_32[5] = crc32(((uint32_t*)&cache[mix[5]&mask_32])[0]);
+		mix_32[6] = crc32(((uint32_t*)&cache[mix[6]&mask_32])[0]);
+		mix_32[7] = crc32(((uint32_t*)&cache[mix[7]&mask_32])[0]);
 	squash_2(mix_8, &cache[item_number&mask_32], out);
 }
 

@@ -5,7 +5,7 @@
 #include <time.h>
 #include "pow.h"
 
-#define ITERATIONS 65536 // iterations are multiplied with 64
+#define ITERATIONS 256 // iterations are multiplied with 64
 
 void benchmark_dataset_generation(uint8_t* seed, uint8_t* dataset){
 	char     buffer[65] = {0};
