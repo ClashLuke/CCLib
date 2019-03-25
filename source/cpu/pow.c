@@ -14,7 +14,7 @@
 #define HASH_BYTES      32                 // hash length in bytes
 #define CACHE_ROUNDS    4                  // number of rounds in cache production
 #define EPOCH_LENGTH    60                 // blocks per epoch
-#define DATASET_PARENTS 1024                // number of hashes before calculating dataset entry
+#define DATASET_PARENTS 256                // number of hashes before calculating dataset entry
 // Assuming 4 blocks per second, an epoch estimates 15 minutes
 
 void make_scratchpad(uint8_t* seed, uint8_t* scratchpad){
