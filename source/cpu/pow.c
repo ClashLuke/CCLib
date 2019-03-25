@@ -51,7 +51,7 @@ void calc_dataset_item(uint8_t* cache, uint64_t item_number, uint8_t* out){
 	item_number = item_number << 5;
 	for(uint8_t i=0;i<4;i++)
 		mix[i] = ((uint64_t*)&cache[(item_number&mask)+i])[0];
-	for(uint16_t i=0;i<DATASET_PARENTS;i++)
+	for(uint16_t i=0;i<DATASET_PARENTS;i++){
 		mix_32[i^0] = crc32(((uint32_t*)&cache[mix_32[i^0]&mask_32])[0]);
 		mix_32[i^1] = crc32(((uint32_t*)&cache[mix_32[i^1]&mask_32])[0]);
 		mix_32[i^2] = crc32(((uint32_t*)&cache[mix_32[i^2]&mask_32])[0]);
@@ -60,6 +60,7 @@ void calc_dataset_item(uint8_t* cache, uint64_t item_number, uint8_t* out){
 		mix_32[i^5] = crc32(((uint32_t*)&cache[mix_32[i^5]&mask_32])[0]);
 		mix_32[i^6] = crc32(((uint32_t*)&cache[mix_32[i^6]&mask_32])[0]);
 		mix_32[i^7] = crc32(((uint32_t*)&cache[mix_32[i^7]&mask_32])[0]);
+	}
 	squash_2(mix_8, &cache[item_number&mask_32], out);
 }
 
