@@ -28,8 +28,8 @@ void benchmark_dataset_generation(uint8_t* seed, uint64_t* dataset){
 }
 
 uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
-	uint8_t   result[32]   = {0};
-	uint64_t* result_64    = (uint64_t*)result;
+	uint64_t* result_64    = malloc(32);
+	uint8_t*  result       = (uint8_t*)result_64;
 	uint64_t  temp[4]      = {0};
 	uint8_t   header[88]   = {0};
 	uint64_t* seed_64      = malloc(32);
@@ -73,6 +73,7 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 		}
 	}
 	free(dataset);
+	free(result);
 	uint32_t end_time = (uint32_t)time(NULL);
 	printf("\tCalculation of %u hashes took: %us\n",iterations<<6, end_time-current_time);
 	printf("\tHashrate is approximately: %uH/s\n", (iterations<<6)/(end_time-current_time));
@@ -81,8 +82,8 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 }
 
 uint64_t benchmark_validation(uint64_t block_height, uint8_t printing){
-	uint64_t  result_64[4] = {0};
-	uint8_t*  result       = (uint8_t*)result;
+	uint64_t* result_64    = malloc(32);
+	uint8_t*  result       = (uint8_t*)result_64;
 	uint64_t  temp[4]      = {0};
 	uint8_t   header[88]   = {0};
 	uint64_t* seed_64      = malloc(32);
@@ -121,6 +122,7 @@ uint64_t benchmark_validation(uint64_t block_height, uint8_t printing){
 		}
 	}
 	free(cache);
+	free(result);
 	uint32_t end_time = (uint32_t)time(NULL);
 	printf("\tCalculation of %u hashes took: %us\n",iterations, end_time-current_time);
 	printf("\tHashrate is approximately: %uH/s\n", iterations/(end_time-current_time));

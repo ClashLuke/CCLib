@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include "aes.h"
 #include "pow.h"
 
@@ -305,30 +306,29 @@ void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
 	uint64_t* data_64         = (uint64_t*)data;
 	uint16_t* out_16          = (uint16_t*)out;
 	uint64_t* out_64          = (uint64_t*)out;
-	uint64_t  dataset_item[4] = {0};
-	uint8_t*  dataset_item_8  = (uint8_t*)dataset_item;
+	uint64_t* dataset_item    = malloc(32);
 	uint32_t* dataset_item_32 = (uint32_t*)dataset_item;
 	uint16_t  temp_storage  = 0;
 	crc_32[0] = crc32(data_32[0]);
 	crc_32[1] = crc32(data_32[1]);
 	crc_32[2] = crc32(data_32[2]);
 	crc_32[3] = crc32(data_32[3]);
-	calc_dataset_item(cache, (crc_32[0]&0xffffff80), dataset_item_8);
+	calc_dataset_item(cache, (crc_32[0]&0xffffff80), dataset_item);
 	crc_32[4] = dataset_item_32[0];
-	calc_dataset_item(cache, (crc_32[1]&0xffffff80), dataset_item_8);
+	calc_dataset_item(cache, (crc_32[1]&0xffffff80), dataset_item);
 	crc_32[5] = dataset_item_32[1];
-	calc_dataset_item(cache, (crc_32[2]&0xffffff80), dataset_item_8);
+	calc_dataset_item(cache, (crc_32[2]&0xffffff80), dataset_item);
 	crc_32[6] = dataset_item_32[2];
-	calc_dataset_item(cache, (crc_32[3]&0xffffff80), dataset_item_8);
+	calc_dataset_item(cache, (crc_32[3]&0xffffff80), dataset_item);
 	crc_32[7] = dataset_item_32[3];
 	for(uint16_t i=1;i<ACCESSES;i++){
-		calc_dataset_item(cache, (crc_32[5]&0xffffff80), dataset_item_8);
+		calc_dataset_item(cache, (crc_32[5]&0xffffff80), dataset_item);
 		crc_32[4] = dataset_item_32[0];
-		calc_dataset_item(cache, (crc_32[6]&0xffffff80), dataset_item_8);
+		calc_dataset_item(cache, (crc_32[6]&0xffffff80), dataset_item);
 		crc_32[5] = dataset_item_32[1];
-		calc_dataset_item(cache, (crc_32[7]&0xffffff80), dataset_item_8);
+		calc_dataset_item(cache, (crc_32[7]&0xffffff80), dataset_item);
 		crc_32[6] = dataset_item_32[2];
-		calc_dataset_item(cache, (crc_32[4]&0xffffff80), dataset_item_8);
+		calc_dataset_item(cache, (crc_32[4]&0xffffff80), dataset_item);
 		crc_32[7] = dataset_item_32[3];
 		temp_storage = crc_16[10];
 		crc_16[10]   = crc_16[ 9];
@@ -337,6 +337,7 @@ void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
 		crc_16[13]   = crc_16[14];
 		crc_16[14]   = temp_storage;
 	}
+	free(dataset_item);
 	crc_32[0] = reverse(crc_32[0]);
 	crc_32[1] = reverse(crc_32[1]);
 	crc_32[6] = reverse(crc_32[6]);
