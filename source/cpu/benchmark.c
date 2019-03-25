@@ -40,7 +40,7 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 	uint8_t*  dataset      = (uint8_t*)dataset_64;
 	uint32_t  current_time = (uint32_t)time(NULL);
 	char      buffer[65]   = {0};
-	uint32_t  iterations   = ITERATIONS<<6;
+	uint32_t  iterations   = ITERATIONS<<10;
 	for(uint16_t i=0;i<64;i++) buffer[i]=' ';
 	get_seedhash(block_height, seed);
 	printf("\tSeed calculation took: %us\n",(uint32_t)time(NULL)-current_time);
@@ -136,8 +136,8 @@ uint64_t benchmark_validation(uint64_t block_height, uint8_t printing){
 int main(int argc, char *argv[]){
 	uint8_t printing = argc==1?0:atoi(argv[1]);
 	printf("\e[?25l"); // Hide cursor
-	printf("Mining\n");
-	benchmark_mine(10, printing);
+	//printf("Mining\n");
+	//benchmark_mine(10, printing);
 	printf("Validation\n");
 	benchmark_validation(10, printing);
 	printf("\e[?25h");
