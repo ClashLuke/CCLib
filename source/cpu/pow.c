@@ -42,12 +42,12 @@ void make_cache(uint8_t* scratchpad, uint8_t* cache){
 }
 
 void calc_dataset_item(uint8_t* cache, uint64_t item_number, uint8_t* out){
-	uint32_t  mask        = 2097151; // Hashcount - 1 
-	uint32_t  mask_32     = 67043327; // Cachesize-scratchpad size
-	uint64_t* cache_64    = (uint64_t*)cache; 
-	uint8_t   mix_8[32]   = {0};
-	uint64_t* mix         = (uint64_t*)mix_8;
-	uint32_t* mix_32      = (uint32_t*)mix_8;
+	uint32_t  mask     = 2097151; // Hashcount - 1 
+	uint32_t  mask_32  = 67043327; // Cachesize-scratchpad size
+	uint64_t* cache_64 = (uint64_t*)cache; 
+	uint64_t  mix[4]   = {0};
+	uint8_t*  mix_8    = (uint8_t*)mix;
+	uint32_t* mix_32   = (uint32_t*)mix;
 	item_number = item_number << 5;
 	for(uint8_t i=0;i<4;i++)
 		mix[i] = ((uint64_t*)&cache[(item_number&mask)+i])[0];
@@ -70,16 +70,18 @@ void calc_dataset(uint8_t* cache, uint8_t* out){
 }
 
 void squash_pow_full(uint8_t* header, uint64_t nonce, uint8_t* dataset, uint8_t* result){
-	uint32_t  header_len               = sizeof(header)/sizeof(header[0]);
-	uint8_t   seed[32+2*4]             = {0};
+	uint32_t  header_len = sizeof(header)/sizeof(header[0]);
+	uint64_t  seed_64[4] = {0}; 
+	uint8_t*  seed       = (uint8_t*)seed_64; 
 	memcpy(&header[header_len], (char*)&nonce, 8);
 	blake2b(seed, 32, header, (size_t) header_len+8, NULL, 0);
 	squash_3_full(seed, dataset, result);
 }
 
 void squash_pow_light(uint8_t* header, uint64_t nonce, uint8_t* cache, uint8_t* result){
-	uint32_t  header_len               = sizeof(header)/sizeof(header[0]);
-	uint8_t   seed[32+2*4]             = {0};
+	uint32_t  header_len = sizeof(header)/sizeof(header[0]);
+	uint64_t  seed_64[4] = {0}; 
+	uint8_t*  seed       = (uint8_t*)seed_64; 
 	memcpy(&header[header_len], (char*)&nonce, 8);
 	blake2b(seed, 32, header, (size_t) header_len+8, NULL, 0);
 	squash_3_light(seed, cache, result);
@@ -90,16 +92,16 @@ void get_seedhash(uint64_t block_number, uint8_t* seed){ /* IN: block number | O
 }
 
 void cache_from_seed(uint8_t* seed, uint8_t* cache){
-	uint8_t* scratchpad;
-	scratchpad = malloc (sizeof(uint8_t) * 65536);
+	uint64_t* scratchpad_64 = malloc (65536);
+	uint8_t*  scratchpad    = (uint8_t*)scratchpad_64;
 	if (scratchpad == NULL) exit(1);
 	make_scratchpad(seed, scratchpad);
 	free(scratchpad);
 	make_cache(scratchpad, cache);
 }
 void dataset_from_seed(uint8_t* seed, uint8_t* dataset){
-	uint8_t* cache;
-	cache = malloc (sizeof(uint8_t) * 67108864);
+	uint64_t* cache_64 = malloc (67108864);
+	uint8_t*  cache    = (uint8_t*)cache_64;
 	if (cache == NULL) exit(1);
 	cache_from_seed(seed, cache);
 	calc_dataset(cache, dataset);

@@ -8,8 +8,9 @@
 #define ITERATIONS 256 // iterations are multiplied with 64
 
 void benchmark_dataset_generation(uint8_t* seed, uint8_t* dataset){
-	char     buffer[65] = {0};
-	uint8_t* cache = malloc (sizeof(uint8_t) * 67108864);
+	char      buffer[65] = {0};
+	uint64_t* cache_64   = malloc (67108864);
+	uint8_t*  cache      = (uint8_t*)cache_64;
 	if (cache == NULL) exit(1);
 	cache_from_seed(seed, cache);
 	for(uint8_t i=0;i<64;i++) buffer[i]=' ';
@@ -31,8 +32,11 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 	uint64_t* result_64    = (uint64_t*)result;
 	uint64_t  temp[4]      = {0};
 	uint8_t   header[80]   = {0};
-	uint8_t*  seed         = malloc(sizeof(uint8_t) * 32);
-	uint8_t*  dataset      = malloc(sizeof(uint8_t) * 4294967296);
+	uint64_t* seed_64      = malloc(32);
+	uint64_t  dataset_size = 4294967296;
+	uint64_t* dataset_64   = malloc(dataset_size);
+	uint8_t*  seed         = (uint8_t*)seed_64;
+	uint8_t*  dataset      = (uint8_t*)dataset_64;
 	uint32_t  current_time = (uint32_t)time(NULL);
 	char      buffer[65]   = {0};
 	uint32_t  iterations   = ITERATIONS<<6;
@@ -77,12 +81,14 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 }
 
 uint64_t benchmark_validation(uint64_t block_height, uint8_t printing){
-	uint8_t   result[32]   = {0};
-	uint64_t* result_64    = (uint64_t*)result;
+	uint64_t  result_64[4] = {0};
+	uint8_t*  result       = (uint8_t*)result;
 	uint64_t  temp[4]      = {0};
 	uint8_t   header[80]   = {0};
-	uint8_t*  seed         = malloc(sizeof(uint8_t) * 32);
-	uint8_t*  cache        = malloc(sizeof(uint8_t) * 67108864);
+	uint64_t* seed_64      = malloc(32);
+	uint64_t* cache_64     = malloc(67108864);
+	uint8_t*  seed         = (uint8_t*)seed_64;
+	uint8_t*  cache        = (uint8_t*)cache_64;
 	uint32_t  current_time = (uint32_t)time(NULL);
 	uint32_t  iterations   = ITERATIONS<<6;
 	char      buffer[65]   = {0};
