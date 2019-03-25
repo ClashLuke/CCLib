@@ -70,20 +70,18 @@ void calc_dataset(uint8_t* cache, uint8_t* out){
 }
 
 void squash_pow_full(uint8_t* header, uint64_t nonce, uint8_t* dataset, uint8_t* result){
-	uint32_t  header_len = sizeof(header)/sizeof(header[0]);
 	uint64_t  seed_64[4] = {0}; 
 	uint8_t*  seed       = (uint8_t*)seed_64; 
-	memcpy(&header[header_len], (char*)&nonce, 8);
-	blake2b(seed, 32, header, (size_t) header_len+8, NULL, 0);
+	memcpy(&header[80], (char*)&nonce, 8);
+	blake2b(seed, 32, header, (size_t) 88, NULL, 0);
 	squash_3_full(seed, dataset, result);
 }
 
 void squash_pow_light(uint8_t* header, uint64_t nonce, uint8_t* cache, uint8_t* result){
-	uint32_t  header_len = sizeof(header)/sizeof(header[0]);
 	uint64_t  seed_64[4] = {0}; 
 	uint8_t*  seed       = (uint8_t*)seed_64; 
-	memcpy(&header[header_len], (char*)&nonce, 8);
-	blake2b(seed, 32, header, (size_t) header_len+8, NULL, 0);
+	memcpy(&header[80], (char*)&nonce, 8);
+	blake2b(seed, 32, header, (size_t) 88, NULL, 0);
 	squash_3_light(seed, cache, result);
 }
 

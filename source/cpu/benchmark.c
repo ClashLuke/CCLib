@@ -31,7 +31,7 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 	uint8_t   result[32]   = {0};
 	uint64_t* result_64    = (uint64_t*)result;
 	uint64_t  temp[4]      = {0};
-	uint8_t   header[80]   = {0};
+	uint8_t   header[88]   = {0};
 	uint64_t* seed_64      = malloc(32);
 	uint64_t  dataset_size = 4294967296;
 	uint64_t* dataset_64   = malloc(dataset_size);
@@ -84,7 +84,7 @@ uint64_t benchmark_validation(uint64_t block_height, uint8_t printing){
 	uint64_t  result_64[4] = {0};
 	uint8_t*  result       = (uint8_t*)result;
 	uint64_t  temp[4]      = {0};
-	uint8_t   header[80]   = {0};
+	uint8_t   header[88]   = {0};
 	uint64_t* seed_64      = malloc(32);
 	uint64_t* cache_64     = malloc(67108864);
 	uint8_t*  seed         = (uint8_t*)seed_64;
