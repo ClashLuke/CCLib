@@ -7,7 +7,7 @@
 
 #define ITERATIONS 256 // iterations are multiplied with 64
 
-void benchmark_dataset_generation(uint8_t* seed, uint8_t* dataset){
+void benchmark_dataset_generation(uint8_t* seed, uint64_t* dataset){
 	char      buffer[65] = {0};
 	uint64_t* cache_64   = malloc(67108864);
 	uint8_t*  cache      = (uint8_t*)cache_64;
@@ -16,8 +16,8 @@ void benchmark_dataset_generation(uint8_t* seed, uint8_t* dataset){
 	for(uint8_t i=0;i<64;i++) buffer[i]=' ';
 	printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 	for(uint8_t j=0;j<64;j++){
-		for(uint64_t i=0;i<67108864;i+=32){ // (1<<32)>>6
-			calc_dataset_item(cache, i, &dataset[i]);
+		for(uint64_t i=0;i<8388608;i+=4){ // (1<<32)>>9
+			calc_dataset_item(cache, i, (uint8_t*)&dataset[i]);
 		}
 		buffer[j] = '#';
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
@@ -46,7 +46,7 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 	printf("\tSeed calculation took: %us\n",(uint32_t)time(NULL)-current_time);
 	current_time = (uint32_t)time(NULL);
 	if(printing){
-		benchmark_dataset_generation(seed, dataset);
+		benchmark_dataset_generation(seed, dataset_64);
 	} else {
 		dataset_from_seed(seed, dataset);
 	}
