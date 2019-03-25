@@ -295,18 +295,19 @@ void squash_3_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 // Difference from Squash_2 is a 32bit integer is used to obtain the
 // data from the scratchpad. (4 GiB scratchpad)
 void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
-	uint8_t   shift[4]          = {0};
-	uint64_t  key[2][2]         = {0};
-	uint64_t  divr[2]           = {0};
-	uint64_t  crc_64[4]     = {0};
-	uint32_t* crc_32        = (uint32_t*)crc_64;
-	uint16_t* crc_16        = (uint16_t*)crc_64;
-	uint32_t* data_32           = (uint32_t*)data;
-	uint64_t* data_64           = (uint64_t*)data;
-	uint16_t* out_16            = (uint16_t*)out;
-	uint64_t* out_64            = (uint64_t*)out;
-	uint8_t   dataset_items[32] = {0};
-	uint32_t* dataset_item      = (uint32_t*)dataset_items;
+	uint8_t   shift[4]        = {0};
+	uint64_t  key[2][2]       = {0};
+	uint64_t  divr[2]         = {0};
+	uint64_t  crc_64[4]       = {0};
+	uint32_t* crc_32          = (uint32_t*)crc_64;
+	uint16_t* crc_16          = (uint16_t*)crc_64;
+	uint32_t* data_32         = (uint32_t*)data;
+	uint64_t* data_64         = (uint64_t*)data;
+	uint16_t* out_16          = (uint16_t*)out;
+	uint64_t* out_64          = (uint64_t*)out;
+	uint64_t  dataset_item[4] = {0};
+	uint8_t*  dataset_item_8  = (uint8_t*)dataset_item;
+	uint32_t* dataset_item_32 = (uint32_t*)dataset_item;
 	uint16_t  temp_storage  = 0;
 	crc_32[0] = crc32(data_32[0]);
 	crc_32[1] = crc32(data_32[1]);

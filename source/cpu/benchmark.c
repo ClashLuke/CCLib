@@ -9,7 +9,7 @@
 
 void benchmark_dataset_generation(uint8_t* seed, uint8_t* dataset){
 	char      buffer[65] = {0};
-	uint64_t* cache_64   = malloc (67108864);
+	uint64_t* cache_64   = malloc(67108864);
 	uint8_t*  cache      = (uint8_t*)cache_64;
 	if (cache == NULL) exit(1);
 	cache_from_seed(seed, cache);
