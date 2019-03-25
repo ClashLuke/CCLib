@@ -41,7 +41,7 @@ void make_cache(uint8_t* scratchpad, uint8_t* cache){
 	}
 }
 
-void calc_dataset_item(uint8_t* cache, uint64_t item_number, uint8_t* out){
+void calc_dataset_item(uint8_t* cache, uint64_t item_number, uint64_t* out){
 	uint32_t  mask     = 2097151; // Hashcount - 1 
 	uint32_t  mask_32  = 67043327; // Cachesize-scratchpad size
 	uint64_t* cache_64 = (uint64_t*)cache; 
@@ -61,11 +61,12 @@ void calc_dataset_item(uint8_t* cache, uint64_t item_number, uint8_t* out){
 		mix_32[i^6] = crc32(((uint32_t*)&cache[mix_32[i^6]&mask_32])[0]);
 		mix_32[i^7] = crc32(((uint32_t*)&cache[mix_32[i^7]&mask_32])[0]);
 	}
-	squash_2(mix_8, &cache[item_number&mask_32], out);
+	out[0]=mix[0]; out[1]=mix[1];
+	out[2]=mix[2]; out[3]=mix[3];
 }
 
-void calc_dataset(uint8_t* cache, uint8_t* out){
-	for(uint64_t i=0;i<4294967296;i+=32){ // (1<<32)>>5
+void calc_dataset(uint8_t* cache, uint64_t* out){
+	for(uint64_t i=0;i<536870912;i+=4){ // (1<<32)>>3
 		calc_dataset_item(cache, i, &out[i]);
 	}
 }

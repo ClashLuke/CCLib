@@ -17,7 +17,7 @@ void benchmark_dataset_generation(uint8_t* seed, uint64_t* dataset){
 	printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 	for(uint8_t j=0;j<64;j++){
 		for(uint64_t i=0;i<8388608;i+=4){ // (1<<32)>>9
-			calc_dataset_item(cache, i, (uint8_t*)&dataset[i]);
+			calc_dataset_item(cache, i, &dataset[i]);
 		}
 		buffer[j] = '#';
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
@@ -48,7 +48,7 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 	if(printing){
 		benchmark_dataset_generation(seed, dataset_64);
 	} else {
-		dataset_from_seed(seed, dataset);
+		dataset_from_seed(seed, dataset_64);
 	}
 	printf("\tDataset generation took: %us\n",(uint32_t)time(NULL)-current_time);
 	free(seed);
