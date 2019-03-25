@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "aes.h"
 #include "pow.h"
+#include "error.h"
 
 #define ACCESSES 1024
 
@@ -306,8 +307,9 @@ void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
 	uint64_t* data_64         = (uint64_t*)data;
 	uint16_t* out_16          = (uint16_t*)out;
 	uint64_t* out_64          = (uint64_t*)out;
-	uint64_t* dataset_item    = (uint64_t*)malloc(32);
+	uint64_t* dataset_item    = (uint64_t*)calloc(4,8);
 	uint32_t* dataset_item_32 = (uint32_t*)dataset_item;
+	if(!dataset_item) error_exit(1);
 	uint16_t  temp_storage  = 0;
 	crc_32[0] = crc32(data_32[0]);
 	crc_32[1] = crc32(data_32[1]);
