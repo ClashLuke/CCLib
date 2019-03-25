@@ -9,7 +9,7 @@
 
 void benchmark_dataset_generation(uint8_t* seed, uint64_t* dataset){
 	char      buffer[65] = {0};
-	uint64_t* cache_64   = malloc(67108864);
+	uint64_t* cache_64   = (uint64_t*)malloc(67108864);
 	uint8_t*  cache      = (uint8_t*)cache_64;
 	if (cache == NULL) exit(1);
 	cache_from_seed(seed, cache);
@@ -28,13 +28,13 @@ void benchmark_dataset_generation(uint8_t* seed, uint64_t* dataset){
 }
 
 uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
-	uint64_t* result_64    = malloc(32);
+	uint64_t* result_64    = (uint64_t*)malloc(32);
 	uint8_t*  result       = (uint8_t*)result_64;
 	uint64_t  temp[4]      = {0};
 	uint8_t   header[88]   = {0};
-	uint64_t* seed_64      = malloc(32);
+	uint64_t* seed_64      = (uint64_t*)malloc(32);
 	uint64_t  dataset_size = 4294967296;
-	uint64_t* dataset_64   = malloc(dataset_size);
+	uint64_t* dataset_64   = (uint64_t*)malloc(dataset_size);
 	uint8_t*  seed         = (uint8_t*)seed_64;
 	uint8_t*  dataset      = (uint8_t*)dataset_64;
 	uint32_t  current_time = (uint32_t)time(NULL);
@@ -82,12 +82,12 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 }
 
 uint64_t benchmark_validation(uint64_t block_height, uint8_t printing){
-	uint64_t* result_64    = malloc(32);
+	uint64_t* result_64    = (uint64_t*)malloc(32);
 	uint8_t*  result       = (uint8_t*)result_64;
 	uint64_t  temp[4]      = {0};
 	uint8_t   header[88]   = {0};
-	uint64_t* seed_64      = malloc(32);
-	uint64_t* cache_64     = malloc(67108864);
+	uint64_t* seed_64      = (uint64_t*)malloc(32);
+	uint64_t* cache_64     = (uint64_t*)malloc(67108864);
 	uint8_t*  seed         = (uint8_t*)seed_64;
 	uint8_t*  cache        = (uint8_t*)cache_64;
 	uint32_t  current_time = (uint32_t)time(NULL);
