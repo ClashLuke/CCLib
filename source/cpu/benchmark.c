@@ -4,19 +4,20 @@
 #include <string.h>
 #include <time.h>
 #include "pow.h"
+#include "error.h"
 
-#define ITERATIONS 256 // iterations are multiplied with 64
+#define ITERATIONS 1024 // iterations are multiplied with 64
 
-void benchmark_dataset_generation(uint8_t* seed, uint8_t* dataset){
+void benchmark_dataset_generation(uint8_t* seed, uint64_t* dataset){
 	char      buffer[65] = {0};
-	uint64_t* cache_64   = malloc (67108864);
+	uint64_t* cache_64   = (uint64_t*)calloc(8388608,8);
 	uint8_t*  cache      = (uint8_t*)cache_64;
-	if (cache == NULL) exit(1);
+	if (!cache_64) error_exit(1);
 	cache_from_seed(seed, cache);
 	for(uint8_t i=0;i<64;i++) buffer[i]=' ';
 	printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 	for(uint8_t j=0;j<64;j++){
-		for(uint64_t i=0;i<67108864;i+=32){ // (1<<32)>>6
+		for(uint64_t i=0;i<8388608;i+=4){ // (1<<32)>>9
 			calc_dataset_item(cache, i, &dataset[i]);
 		}
 		buffer[j] = '#';
@@ -28,30 +29,28 @@ void benchmark_dataset_generation(uint8_t* seed, uint8_t* dataset){
 }
 
 uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
-	uint8_t   result[32]   = {0};
-	uint64_t* result_64    = (uint64_t*)result;
+	uint64_t  result_64[4] = {0};
+	uint8_t*  result       = (uint8_t*)result_64;
 	uint64_t  temp[4]      = {0};
 	uint8_t   header[88]   = {0};
-	uint64_t* seed_64      = malloc(32);
-	uint64_t  dataset_size = 4294967296;
-	uint64_t* dataset_64   = malloc(dataset_size);
+	uint64_t* seed_64[4]   = {0};
+	uint64_t* dataset_64   = (uint64_t*)calloc(536870912,8);
+	if (!dataset_64) error_exit(1);
 	uint8_t*  seed         = (uint8_t*)seed_64;
 	uint8_t*  dataset      = (uint8_t*)dataset_64;
 	uint32_t  current_time = (uint32_t)time(NULL);
 	char      buffer[65]   = {0};
-	uint32_t  iterations   = ITERATIONS<<6;
+	uint32_t  iterations   = ITERATIONS<<10;
 	for(uint16_t i=0;i<64;i++) buffer[i]=' ';
-	if (dataset == NULL || seed == NULL) exit(1);
 	get_seedhash(block_height, seed);
 	printf("\tSeed calculation took: %us\n",(uint32_t)time(NULL)-current_time);
 	current_time = (uint32_t)time(NULL);
 	if(printing){
-		benchmark_dataset_generation(seed, dataset);
+		benchmark_dataset_generation(seed, dataset_64);
 	} else {
-		dataset_from_seed(seed, dataset);
+		dataset_from_seed(seed, dataset_64);
 	}
 	printf("\tDataset generation took: %us\n",(uint32_t)time(NULL)-current_time);
-	free(seed);
 	current_time = (uint32_t)time(NULL);
 	if(printing){
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
@@ -82,24 +81,23 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 
 uint64_t benchmark_validation(uint64_t block_height, uint8_t printing){
 	uint64_t  result_64[4] = {0};
-	uint8_t*  result       = (uint8_t*)result;
+	uint8_t*  result       = (uint8_t*)result_64;
 	uint64_t  temp[4]      = {0};
 	uint8_t   header[88]   = {0};
-	uint64_t* seed_64      = malloc(32);
-	uint64_t* cache_64     = malloc(67108864);
+	uint64_t  seed_64[4]   = {0};
+	uint64_t* cache_64     = (uint64_t*)calloc(8388608,8);
+	if (!cache_64) error_exit(1);
 	uint8_t*  seed         = (uint8_t*)seed_64;
 	uint8_t*  cache        = (uint8_t*)cache_64;
 	uint32_t  current_time = (uint32_t)time(NULL);
 	uint32_t  iterations   = ITERATIONS<<6;
 	char      buffer[65]   = {0};
 	for(uint16_t i=0;i<64;i++) buffer[i]=' ';
-	if (cache == NULL || seed == NULL) exit(1);
 	get_seedhash(block_height, seed);
 	printf("\tSeed calculation took: %us\n",(uint32_t)time(NULL)-current_time);
 	current_time = (uint32_t)time(NULL);
 	cache_from_seed(seed, cache);
 	printf("\tCache generation took: %us\n",(uint32_t)time(NULL)-current_time);
-	free(seed);
 	current_time = (uint32_t)time(NULL);
 	if(printing){
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);

@@ -15,27 +15,27 @@ The compilation of those programs is OS specific. Click here to skip forward.
 - [Unix, ARM](#Unix, ARM)
 
 #### Windows, x86
-* Miner: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c mine.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o miner.exe`
-* Validator: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c validate.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o validator.exe`
-* Benchmark: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c benchmark.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o benchmark.exe`
+* Miner: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c error.c mine.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o miner.exe`
+* Validator: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c error.c validate.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o validator.exe`
+* Benchmark: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c error.c benchmark.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o benchmark.exe`
 The executables can then be double-clicked or run via `miner.exe`, `validator.exe` or `benchmark.exe` respectively.
 
 #### Windows, ARM
-* Miner: `gcc -O3 -march=native squash.c blockchain.c aes.c mine.c blake2/neon/blake2b.c pow.c -marm -mfpu=neon -o miner.exe`
-* Validator: `gcc -O3 -march=native squash.c blockchain.c aes.c validate.c blake2/neon/blake2b.c pow.c -marm -mfpu=neon -o validator.exe`
-* Benchmark: `gcc -O3 -march=native squash.c blockchain.c aes.c benchmark.c blake2/neon/blake2b.c pow.c -marm -mfpu=neon -o benchmark.exe`
+* Miner: `gcc -O3 -march=native squash.c blockchain.c aes.c mine.c blake2/neon/blake2b.c pow.c error.c -marm -mfpu=neon -o miner.exe`
+* Validator: `gcc -O3 -march=native squash.c blockchain.c aes.c validate.c blake2/neon/blake2b.c pow.c error.c -marm -mfpu=neon -o validator.exe`
+* Benchmark: `gcc -O3 -march=native squash.c blockchain.c aes.c benchmark.c blake2/neon/blake2b.c pow.c error.c -marm -mfpu=neon -o benchmark.exe`
 The executables can then be double-clicked or run via `miner.exe`, `validator.exe` or `benchmark.exe` respectively.
 
 #### Windows, x86
-* Miner: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c mine.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o miner.exe`
-* Validator: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c validate.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o validator.exe`
-* Benchmark: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c benchmark.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o benchmark.exe`
+* Miner: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c error.c mine.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o miner.exe`
+* Validator: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c error.c validate.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o validator.exe`
+* Benchmark: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c error.c benchmark.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o benchmark.exe`
 The executables can then be run via `./miner`, `./validator` or `./benchmark` respectively.
 
 #### Unix, ARM
-* Miner: `gcc -O3 -march=native squash.c blockchain.c aes.c mine.c blake2/neon/blake2b.c pow.c -marm -mfpu=neon -o miner`
-* Validator: `gcc -O3 -march=native squash.c blockchain.c aes.c validate.c blake2/neon/blake2b.c pow.c -marm -mfpu=neon -o validator`
-* Benchmark: `gcc -O3 -march=native squash.c blockchain.c aes.c benchmark.c blake2/neon/blake2b.c pow.c -marm -mfpu=neon -o benchmark`
+* Miner: `gcc -O3 -march=native squash.c blockchain.c aes.c mine.c blake2/neon/blake2b.c pow.c error.c -marm -mfpu=neon -o miner`
+* Validator: `gcc -O3 -march=native squash.c blockchain.c aes.c validate.c blake2/neon/blake2b.c pow.c error.c -marm -mfpu=neon -o validator`
+* Benchmark: `gcc -O3 -march=native squash.c blockchain.c aes.c benchmark.c blake2/neon/blake2b.c pow.c error.c -marm -mfpu=neon -o benchmark`
 The executables can then be run via `./miner`, `./validator` or `./benchmark` respectively.
 
 ### Results
@@ -44,15 +44,24 @@ The following results were achieved on an [Xeon E3-1225v2](https://ark.intel.com
 ```
 Mining
 	Seed calculation took: 0s
-	Dataset generation took: 10s
-	Calculation of 268435456 hashes took: 1828s
-	Hashrate is about: 146846H/s
-	Result: f27ddd9627fcf5b9
-
+        Dataset generation took: 2375s                                          
+        Calculation of 1048576 hashes took: 13s                                 
+	Hashrate is approximately: 80659H/s
+	Result: 63be88686042cba3,b73cd85fff941207,63ab274e8d55752a,d8fc065c8b6aaa80
 Validation
 	Seed calculation took: 0s
 	Cache generation took: 1s
-	Calculation of 2097152 hashes took: 2087s
-	Hashrate is about: 1004H/s
-	Result: a9caeb21899ee322
+        Calculation of 16384 hashes took: 1258s                                 
+	Hashrate is approximately: 13H/s
+	Result: 3772181f69503516,35f7633eb816624c,fe88b1a570524040,e20a76ee8b500fcb
+```
+
+The results below were achieved on a [Raspberry Pi 3b+](https://www.raspberrypi.org/magpi/raspberry-pi-specs-benchmarks/).
+```
+Validation
+	Seed calculation took: 0s
+	Cache generation took: 29s
+        Calculation of 2048 hashes took: 2334s                                  
+	Hashrate is approximately: 0H/s
+	Result: b7554ca31cf5016a,e530d84c6ab15dbe,7851bb9095ff613f,356eccbf5c0cc93d
 ```
