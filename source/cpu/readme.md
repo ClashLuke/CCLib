@@ -55,3 +55,13 @@ Validation
 	Hashrate is approximately: 13H/s
 	Result: 3772181f69503516,35f7633eb816624c,fe88b1a570524040,e20a76ee8b500fcb
 ```
+
+The results below were achieved on a [Raspberry Pi 3b+](https://www.raspberrypi.org/magpi/raspberry-pi-specs-benchmarks/).
+```
+Validation
+	Seed calculation took: 0s
+	Cache generation took: 29s
+        Calculation of 2048 hashes took: 2334s                                  
+	Hashrate is approximately: 0H/s
+	Result: b7554ca31cf5016a,e530d84c6ab15dbe,7851bb9095ff613f,356eccbf5c0cc93d
+```

@@ -45,8 +45,7 @@ void make_cache(uint8_t* scratchpad, uint8_t* cache){
 void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
 	uint32_t  mask     = 2097119; // Hashcount - 1 
 	uint32_t* cache_32 = (uint32_t*)cache; 
-	uint64_t* mix      = (uint64_t*)calloc(4,8);
-	if(!mix) error_exit(1);
+	uint64_t  mix[4]   = {0};
 	uint8_t*  mix_8    = (uint8_t*)mix;
 	uint32_t* mix_32   = (uint32_t*)mix;
 	uint8_t   i        = 0;
@@ -72,7 +71,6 @@ void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
 	}
 	out[0]=mix[0]; out[1]=mix[1];
 	out[2]=mix[2]; out[3]=mix[3];
-	free(mix);
 }
 
 void calc_dataset(uint8_t* cache, uint64_t* out){
@@ -102,11 +100,9 @@ void get_seedhash(uint64_t block_number, uint8_t* seed){ /* IN: block number | O
 }
 
 void cache_from_seed(uint8_t* seed, uint8_t* cache){
-	uint64_t* scratchpad_64 = (uint64_t*)calloc(8192,8);
-	if(!scratchpad_64) error_exit(1);
-	uint8_t*  scratchpad    = (uint8_t*)scratchpad_64;
+	uint64_t  scratchpad_64[8192] = {0};
+	uint8_t*  scratchpad          = (uint8_t*)scratchpad_64;
 	make_scratchpad(seed, scratchpad);
-	free(scratchpad);
 	make_cache(scratchpad, cache);
 }
 void dataset_from_seed(uint8_t* seed, uint64_t* dataset){

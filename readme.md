@@ -21,7 +21,7 @@ To get the optimal speed, it is recommended to compile using the `-O3 -march=nat
 ## SquashPoW
 
 ### Speed
-The same Xeon E3-1225v2 as mentioned above has about 55.6H/s (single-threaded, using DDR3-1333 RAM) using the 4GiB dataset, 12H/s using the light mode and a 64MiB cache.
+The same Xeon E3-1225v2 as mentioned above has about 55.6H/s (single-threaded, using DDR3-1333 RAM) using the 4GiB dataset, 100kH/s using the light mode and a 64MiB cache.
 
 
 
