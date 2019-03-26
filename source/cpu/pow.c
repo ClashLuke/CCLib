@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "squash.h"
+#include "error.h"
 #if !defined(HAVE_SSE2)
 #include "blake2/neon/blake2.h"
 #else
@@ -41,30 +42,39 @@ void make_cache(uint8_t* scratchpad, uint8_t* cache){
 	}
 }
 
-void calc_dataset_item(uint8_t* cache, uint64_t item_number, uint8_t* out){
-	uint32_t  mask     = 2097151; // Hashcount - 1 
-	uint32_t  mask_32  = 67043327; // Cachesize-scratchpad size
-	uint64_t* cache_64 = (uint64_t*)cache; 
+void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
+	uint32_t  mask     = 2097119; // Hashcount - 1 
+	uint32_t* cache_32 = (uint32_t*)cache; 
 	uint64_t  mix[4]   = {0};
 	uint8_t*  mix_8    = (uint8_t*)mix;
 	uint32_t* mix_32   = (uint32_t*)mix;
-	item_number = item_number << 5;
-	for(uint8_t i=0;i<4;i++)
-		mix[i] = ((uint64_t*)&cache[(item_number&mask)+i])[0];
-	for(uint16_t i=0;i<DATASET_PARENTS;i++)
-		mix_32[0] = crc32(((uint32_t*)&cache[mix[0]&mask_32])[0]);
-		mix_32[1] = crc32(((uint32_t*)&cache[mix[1]&mask_32])[0]);
-		mix_32[2] = crc32(((uint32_t*)&cache[mix[2]&mask_32])[0]);
-		mix_32[3] = crc32(((uint32_t*)&cache[mix[3]&mask_32])[0]);
-		mix_32[4] = crc32(((uint32_t*)&cache[mix[4]&mask_32])[0]);
-		mix_32[5] = crc32(((uint32_t*)&cache[mix[5]&mask_32])[0]);
-		mix_32[6] = crc32(((uint32_t*)&cache[mix[6]&mask_32])[0]);
-		mix_32[7] = crc32(((uint32_t*)&cache[mix[7]&mask_32])[0]);
-	squash_2(mix_8, &cache[item_number&mask_32], out);
+	uint8_t   i        = 0;
+	item_number = item_number >> 2;
+	mix_32[0] = cache_32[(item_number  )%mask];
+	mix_32[1] = cache_32[(item_number+1)%mask];
+	mix_32[2] = cache_32[(item_number+2)%mask];
+	mix_32[3] = cache_32[(item_number+3)%mask];
+	mix_32[4] = cache_32[(item_number+4)%mask];
+	mix_32[5] = cache_32[(item_number+5)%mask];
+	mix_32[6] = cache_32[(item_number+6)%mask];
+	mix_32[7] = cache_32[(item_number+7)%mask];
+	for(uint16_t j=0;j<DATASET_PARENTS;j++){
+		i = j&7;
+		mix_32[i  ] = crc32(cache_32[mix_32[i  ]%mask]);
+		mix_32[i^1] = crc32(cache_32[mix_32[i^1]%mask]);
+		mix_32[i^2] = crc32(cache_32[mix_32[i^2]%mask]);
+		mix_32[i^3] = crc32(cache_32[mix_32[i^3]%mask]);
+		mix_32[i^4] = crc32(cache_32[mix_32[i^4]%mask]);
+		mix_32[i^5] = crc32(cache_32[mix_32[i^5]%mask]);
+		mix_32[i^6] = crc32(cache_32[mix_32[i^6]%mask]);
+		mix_32[i^7] = crc32(cache_32[mix_32[i^7]%mask]);
+	}
+	out[0]=mix[0]; out[1]=mix[1];
+	out[2]=mix[2]; out[3]=mix[3];
 }
 
-void calc_dataset(uint8_t* cache, uint8_t* out){
-	for(uint64_t i=0;i<4294967296;i+=32){ // (1<<32)>>5
+void calc_dataset(uint8_t* cache, uint64_t* out){
+	for(uint64_t i=0;i<536870912;i+=4){ // (1<<32)>>3
 		calc_dataset_item(cache, i, &out[i]);
 	}
 }
@@ -90,17 +100,15 @@ void get_seedhash(uint64_t block_number, uint8_t* seed){ /* IN: block number | O
 }
 
 void cache_from_seed(uint8_t* seed, uint8_t* cache){
-	uint64_t* scratchpad_64 = malloc (65536);
-	uint8_t*  scratchpad    = (uint8_t*)scratchpad_64;
-	if (scratchpad == NULL) exit(1);
+	uint64_t  scratchpad_64[8192] = {0};
+	uint8_t*  scratchpad          = (uint8_t*)scratchpad_64;
 	make_scratchpad(seed, scratchpad);
-	free(scratchpad);
 	make_cache(scratchpad, cache);
 }
-void dataset_from_seed(uint8_t* seed, uint8_t* dataset){
-	uint64_t* cache_64 = malloc (67108864);
+void dataset_from_seed(uint8_t* seed, uint64_t* dataset){
+	uint64_t* cache_64 = (uint64_t*)calloc(8388608,8);
+	if(!cache_64) error_exit(1);
 	uint8_t*  cache    = (uint8_t*)cache_64;
-	if (cache == NULL) exit(1);
 	cache_from_seed(seed, cache);
 	calc_dataset(cache, dataset);
 	free(cache);
