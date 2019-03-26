@@ -1,11 +1,11 @@
 **Contents**
 
-- [Squash 0](#Squash 0)
-- [Squash 1](#Squash 1)
+- [Squash 0](#Squash_0)
+- [Squash 1](#Squash_1)
 
 SquashPoWs security relies entirely on the underlying squash function. Since squash 2 and 3 are variations of squash 1 with a larger scratchpad, we will we will focus on the squash variants 0 and 1 in here.
 
-## Squash 0
+## Squash_0
 
 ### Step 1 - CRC32
 Assuming that there is a perfect CRC, a 32bit redundancy check (with random 32bit inputs) has 2^16 collisions. We calculate the CRC four times to have delays according to the inner-CPU delays. [1](https://github.com/JuliaLang/julia/blob/master/src/crc32c.c#L111) Now 128bit of the input are processed, resulting in 128bit output with 64bit collision-resistance. Code: `crc_32[0] = crc32(data_32[0]);` CRCs are heavily optimised on ARM CPUs since they are an addition to the instructionset. They are relatively expensive for ASICs to implement. [2](https://www.slideshare.net/bschn2/the-rainforest-algorithm)
@@ -22,7 +22,7 @@ Compared to the previous operations, the rotations are relatively cheap. `key[1]
 ### Step 5 - Encryption
 The last step, an AES ECB encryption, is there to increase entropy, GPU resistance and ASIC resistance as seen [here](https://www.slideshare.net/bschn2/the-rainforest-algorithm). It does not fundamentally increase collision resistance or security. The encryption is performed using the first 128bit of the previous results (the CRC results) and encrypts them with the key obtained from the integer math. The code looks like this: `aes(out, (uint8_t*)key[0]);`. The same thing goes for the second 128bit encrypted with the rotated CRC.
 
-## Squash 1
+## Squash_1
 
 ### Differences to Squash 0
 Squash 1 has the same steps as Squash 0, just another step inserted after the first CRC and a slightly changed integer math.
