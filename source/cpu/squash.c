@@ -88,8 +88,7 @@ uint32_t crc32(uint32_t msg) {
 	return crc^0xFFFFFFFF;
 }
 
-uint32_t reverse(uint32_t x)
-{
+uint32_t reverse(uint32_t x){
 #if defined(__aarch64__) && !defined(__x86_64__)
 	  __asm__("rbit %0":"+r"(v));
 #else

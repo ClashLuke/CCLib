@@ -44,16 +44,16 @@ The following results were achieved on an [Xeon E3-1225v2](https://ark.intel.com
 ```
 Mining
 	Seed calculation took: 0s
-        Dataset generation took: 2375s                                          
-        Calculation of 1048576 hashes took: 13s                                 
-	Hashrate is approximately: 80659H/s
-	Result: 63be88686042cba3,b73cd85fff941207,63ab274e8d55752a,d8fc065c8b6aaa80
+        Dataset generation took: 2433s                                          
+        Calculation of 67108864 hashes took: 695s                               
+	Hashrate is approximately: 96559H/s
+	Result: 49b6a650a4c2ae52,5b76a8fefbf57036,eb1ed6d0dc1eda0e,803f57daaa6cc653
 Validation
 	Seed calculation took: 0s
 	Cache generation took: 1s
-        Calculation of 16384 hashes took: 1258s                                 
-	Hashrate is approximately: 13H/s
-	Result: 3772181f69503516,35f7633eb816624c,fe88b1a570524040,e20a76ee8b500fcb
+        Calculation of 65536 hashes took: 5588s                                 
+	Hashrate is approximately: 11H/s
+	Result: 8aaa9e8635dffb8e,f75da003635e2ed4,460a2360c9c773b6,3ba08a8ff82b518c
 ```
 
 The results below were achieved on a [Raspberry Pi 3b+](https://www.raspberrypi.org/magpi/raspberry-pi-specs-benchmarks/).
