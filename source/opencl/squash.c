@@ -1,11 +1,11 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
 #include "aes.h"
-#include "pow.h"
-#include "error.h"
+#include "clbuild.h"
 
-#define ACCESSES 1024
+#ifdef MAC
+#include <OpenCL/cl.h>
+#else
+#include <CL/cl.h>
+#endif
 
 uint32_t crc32c_table[256] = {
 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
@@ -115,7 +115,6 @@ uint64_t swap(uint64_t v) {
 	return v;
 }
 
-
 void squash_0(uint8_t* data, uint8_t* out){
 	uint8_t   shift[4]   = {0};
 	uint64_t  key[2][2]  = {0};
@@ -146,52 +145,7 @@ void squash_0(uint8_t* data, uint8_t* out){
 	return;
 }
 
-// Squash_1 uses a lookup in addition to the previous operations
-// to force a hasher to have 256B read-only scratchpad in L1 cache
-void squash_1(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
-	uint8_t   shift[4]   = {0};
-	uint64_t  key[2][2]  = {0};
-	uint64_t  divr[2]    = {0};
-	uint64_t  crc_64[4]  = {0};
-	uint32_t* crc_32     = (uint32_t*)crc_64;
-	uint8_t*  crc_8      = (uint8_t*)crc_64;
-	uint32_t* data_32    = (uint32_t*)data;
-	uint64_t* data_64    = (uint64_t*)data;
-	uint16_t* out_16     = (uint16_t*)out;
-	uint64_t* out_64     = (uint64_t*)out;
-	crc_32[0] = crc32(data_32[0]);
-	crc_32[1] = crc32(data_32[1]);
-	crc_32[2] = crc32(data_32[2]);
-	crc_32[3] = crc32(data_32[3]);
-	crc_32[4] = ((uint32_t*)&scratchpad[crc_8[ 0]])[0];
-	crc_32[5] = ((uint32_t*)&scratchpad[crc_8[ 4]])[0];
-	crc_32[6] = ((uint32_t*)&scratchpad[crc_8[ 8]])[0];
-	crc_32[7] = ((uint32_t*)&scratchpad[crc_8[12]])[0];
-	crc_32[0] = reverse(crc_32[0]);
-	crc_32[1] = reverse(crc_32[1]);
-	crc_32[6] = reverse(crc_32[6]);
-	crc_32[7] = reverse(crc_32[7]);
-	crc_64[1] = swap(crc_64[1]);
-	crc_64[2] = swap(crc_64[2]);
-	divr[0] = (data_64[2] + crc_64[2]) ^ (data_64[2] / crc_64[0]);
-	divr[1] = (data_64[3] + crc_64[3]) ^ (data_64[3] / crc_64[1]);
-	out_64[0] = crc_64[0]^divr[0]; out_64[1] = crc_64[1]^divr[0];
-	out_64[2] = crc_64[2]^divr[1]; out_64[3] = crc_64[3]^divr[1];
-	shift[0] = out_16[15]&0x3f;
-	shift[2] = out_16[ 0]&0x3f;
-	shift[1] = 64-shift[0];
-	shift[3] = 64-shift[2];
-	key[1][0] = (out_64[0]>>shift[0]) | (out_64[0]<<(shift[1]));
-	key[1][1] = (out_64[1]>>shift[0]) | (out_64[1]<<(shift[1]));
-	key[0][0] = (out_64[2]<<shift[2]) | (out_64[2]>>(shift[3]));
-	key[0][1] = (out_64[3]<<shift[2]) | (out_64[3]>>(shift[3]));
-	aes(out     , (uint8_t*)key[0]);
-	aes(&out[16], (uint8_t*)key[1]);
-	return;
-}
 
-// Difference from Squash_1 is a 16bit integer is used to obtain the
-// data from the scratchpad. (64KiB scratchpad)
 void squash_2(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	uint8_t   shift[4]   = {0};
 	uint64_t  key[2][2]  = {0};
@@ -233,131 +187,135 @@ void squash_2(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	aes(&out[16], (uint8_t*)key[1]);
 	return;
 }
+ 
+ 
+int squash_opencl(uint32_t block_number)
+{
+	// Initialise host variables
+	uint64_t* seed_64;
+	uint64_t* scratchpad_64;
+	uint64_t* cache_64;
+	uint64_t* dataset_64;
+	uint64_t* blake_r;
+	uint64_t* blake_r_temp;
+	uint64_t* result;
 
-// Difference from Squash_2 is a 32bit integer is used to obtain the
-// data from the dataset. (4 GiB dataset)
-void squash_3_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
-	uint8_t   shift[4]      = {0};
-	uint64_t  key[2][2]     = {0};
-	uint64_t  divr[2]       = {0};
-	uint64_t  crc_64[4]     = {0};
-	uint32_t* crc_32        = (uint32_t*)crc_64;
-	uint16_t* crc_16        = (uint16_t*)crc_64;
-	uint32_t* data_32       = (uint32_t*)data;
-	uint64_t* data_64       = (uint64_t*)data;
-	uint16_t* out_16        = (uint16_t*)out;
-	uint64_t* out_64        = (uint64_t*)out;
-	uint16_t  temp_storage  = 0;
-	crc_32[0] = crc32(data_32[0]);
-	crc_32[1] = crc32(data_32[1]);
-	crc_32[2] = crc32(data_32[2]);
-	crc_32[3] = crc32(data_32[3]);
-	crc_32[4] = ((uint32_t*)&dataset[(crc_32[0]&0xffffff80)])[0];
-	crc_32[5] = ((uint32_t*)&dataset[(crc_32[1]&0xffffff80)])[1];
-	crc_32[6] = ((uint32_t*)&dataset[(crc_32[2]&0xffffff80)])[2];
-	crc_32[7] = ((uint32_t*)&dataset[(crc_32[3]&0xffffff80)])[3];
-	for(uint16_t i=1;i<ACCESSES;i++){
-		crc_32[4] = ((uint32_t*)&dataset[(crc_32[5]&0xffffff80)])[0];
-		crc_32[5] = ((uint32_t*)&dataset[(crc_32[6]&0xffffff80)])[1];
-		crc_32[6] = ((uint32_t*)&dataset[(crc_32[7]&0xffffff80)])[2];
-		crc_32[7] = ((uint32_t*)&dataset[(crc_32[4]&0xffffff80)])[3];
-		temp_storage = crc_16[10];
-		crc_16[10]   = crc_16[ 9];
-		crc_16[ 9]   = temp_storage;
-		temp_storage = crc_16[13];
-		crc_16[13]   = crc_16[14];
-		crc_16[14]   = temp_storage;
+	// Initialise variables for OpenCL
+	size_t localSize  = 64;
+	size_t globalSize = ceil(134217728/(float)localSize)*localSize;
+
+	cl_mem cl_cache;
+	cl_mem cl_dataset;
+	cl_mem cl_blake_r;
+	cl_mem cl_result;
+ 
+	cl_platform_id cpPlatform;
+	cl_device_id device_id;
+	cl_context context;
+	cl_command_queue queue;	
+	cl_program program;
+	cl_kernel kernel;
+
+	cl_int err;
+	// Allocate memory on host
+	seed_64       = (uint64_t*)calloc(4,8);
+	scratchpad_64 = (uint64_t*)calloc(8192,8);
+	cache_64      = (uint64_t*)calloc(8388608,8);
+	dataset_64    = (uint64_t*)calloc(536870912,8);
+	blake_r       = (uint64_t*)calloc(16384,8);
+	blake_r_temp  = (uint64_t*)calloc(16384,8);
+	result        = (uint64_t*)calloc(16384,8);
+	if(!seed_64 || !scratchpad_64 || !cache_64 || !dataset_64 || !blake_r || !blake_r_temp || !result) return(1);
+
+	// Get byte-pointers of 8-byte pointers
+	uint8_t*  seed       = (uint8_t*)seed_64;
+	uint8_t*  scratchpad = (uint8_t*)scratchpad_64;
+	uint8_t*  cache      = (uint8_t*)cache_64;
+	uint8_t*  dataset    = (uint8_t*)dataset_64;
+
+	// Calculate seed for scratchpad
+	for(uint64_t i=0;i<block_number/60;i++) squash_0(seed, seed);
+
+	// Calculate scratchpad
+	squash_0(seed, scratchpad);
+	for(uint32_t i=32; i<65536;i+=32) squash_0(&scratchpad[i-32], &scratchpad[i]);
+	free(seed);
+
+	// Initialise cache on host
+	uint64_t* temp_cache = (uint64_t*)calloc(4,8);
+	uint64_t* index     = (uint64_t*)calloc(4,8);
+	for(uint32_t i=0;i<2097152;i++) squash_2((uint8_t*)&cache_64[i*4], scratchpad, (uint8_t*)&cache_64[(i+1)*4]);
+	for(uint8_t j=0;j<4;j++){
+		for(uint32_t i=0;i<2097152;i++){
+			index[0] = cache_64[i*4]&2097151;
+			index[1] = i; 
+			for(uint8_t k=0;k<4;k++)
+				temp_cache[k] = ((uint64_t*)&cache[index[0]+k])[0]^((uint64_t*)&cache[index[1]+k])[0];
+			squash_2((uint8_t*)temp_cache, scratchpad, &cache[i*32]);
+		}
 	}
-	crc_32[0] = reverse(crc_32[0]);
-	crc_32[1] = reverse(crc_32[1]);
-	crc_32[6] = reverse(crc_32[6]);
-	crc_32[7] = reverse(crc_32[7]);
-	crc_64[1] = swap(crc_64[1]);
-	crc_64[2] = swap(crc_64[2]);
-	divr[0]  = (data_64[2] + crc_64[2]);
-	divr[1]  = (data_64[3] + crc_64[3]);
-	divr[0] ^= (data_64[2] / crc_64[0]);
-	divr[1] ^= (data_64[3] / crc_64[1]);
-	out_64[0] = crc_64[0]^divr[0]; out_64[1] = crc_64[1]^divr[0];
-	out_64[2] = crc_64[2]^divr[1]; out_64[3] = crc_64[3]^divr[1];
-	shift[0] = out_16[15]&0x3f;
-	shift[2] = out_16[ 0]&0x3f;
-	shift[1] = 64-shift[0];
-	shift[3] = 64-shift[2];
-	key[1][0] = (out_64[0]>>shift[0]) | (out_64[0]<<(shift[1]));
-	key[1][1] = (out_64[1]>>shift[0]) | (out_64[1]<<(shift[1]));
-	key[0][0] = (out_64[2]<<shift[2]) | (out_64[2]>>(shift[3]));
-	key[0][1] = (out_64[3]<<shift[2]) | (out_64[3]>>(shift[3]));
-	aes(out     , (uint8_t*)key[0]);
-	aes(&out[16], (uint8_t*)key[1]);
-	return;
+	free(temp_cache);
+	free(index);
+	free(scratchpad);
+
+	// Calculate dataset (via OpenCL device)
+	err        = clGetPlatformIDs(1, &cpPlatform, NULL);
+	err        = clGetDeviceIDs(cpPlatform, CL_DEVICE_TYPE_GPU, 1, &device_id, NULL);
+	context    = clCreateContext(0, 1, &device_id, NULL, NULL, &err);
+	queue      = clCreateCommandQueueWithProperties(context, device_id, 0, &err);
+	program    = build_program(context, device_id, "squash.cl");
+	kernel     = clCreateKernel(program, "calc_item", &err);
+	cl_cache   = clCreateBuffer(context, CL_MEM_READ_ONLY, 67108864, NULL, NULL);
+	cl_dataset = clCreateBuffer(context, CL_MEM_READ_WRITE, 4294967296, NULL, NULL);
+	err        = clEnqueueWriteBuffer(queue, cl_cache, CL_TRUE, 0, 67108864, cache_64, 0, NULL, NULL);
+	err        = clSetKernelArg(kernel, 0, sizeof(cl_mem), &cl_cache);
+	err       |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &cl_dataset);
+	err        = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &globalSize, &localSize, 0, NULL, NULL);
+	clFinish(queue);
+	free(cache_64);
+	clReleaseMemObject(cl_cache);
+	clReleaseKernel(kernel);
+
+	/* Calculate squash_pow results, in 4096-hash bulks
+	 * Exit once a result fitting difficulty was found.
+	 * Blake2b hashes are preprocessed within this loop. 
+	 */
+	while(1){
+		kernel = clCreateKernel(program, "squash_pow", &err);
+		cl_blake_r   = clCreateBuffer(context, CL_MEM_READ_ONLY,  131072, NULL, NULL);
+		cl_result    = clCreateBuffer(context, CL_MEM_WRITE_ONLY, 131072, NULL, NULL);
+		err = clEnqueueWriteBuffer(queue, cl_blake_r, CL_TRUE, 0, 131072, blake_r, 0, NULL, NULL);
+		err  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &cl_dataset);
+		err |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &cl_blake_r);
+		err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &cl_result);
+		globalSize = ceil(4096/(float)localSize)*localSize;
+		err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &globalSize, &localSize, 0, NULL, NULL);
+		/* Calculate 4096 blake2b hashes */
+		clFinish(queue);
+		clEnqueueReadBuffer(queue, cl_result, CL_TRUE, 0, 131072, result, 0, NULL, NULL );
+		/* Analyse hashes (if they meet the diff) 
+		   if good hash, break.		
+		*/
+	}
+
+	// Release Resources
+	clReleaseMemObject(cl_dataset);
+	clReleaseMemObject(cl_blake_r);
+	clReleaseMemObject(cl_result);
+	clReleaseProgram(program);
+	clReleaseCommandQueue(queue);
+	clReleaseContext(context);
+	free(dataset_64);
+	free(blake_r);
+	free(blake_r_temp);
+	free(result);
+ 
+	return 2;
 }
 
-// Difference from Squash_2 is a 32bit integer is used to obtain the
-// data from the scratchpad. (4 GiB scratchpad)
-void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
-	uint8_t   shift[4]        = {0};
-	uint64_t  key[2][2]       = {0};
-	uint64_t  divr[2]         = {0};
-	uint64_t  crc_64[4]       = {0};
-	uint32_t* crc_32          = (uint32_t*)crc_64;
-	uint16_t* crc_16          = (uint16_t*)crc_64;
-	uint32_t* data_32         = (uint32_t*)data;
-	uint64_t* data_64         = (uint64_t*)data;
-	uint16_t* out_16          = (uint16_t*)out;
-	uint64_t* out_64          = (uint64_t*)out;
-	uint64_t  dataset_item[4] = {0};
-	uint32_t* dataset_item_32 = (uint32_t*)dataset_item;
-	uint16_t  temp_storage  = 0;
-	crc_32[0] = crc32(data_32[0]);
-	crc_32[1] = crc32(data_32[1]);
-	crc_32[2] = crc32(data_32[2]);
-	crc_32[3] = crc32(data_32[3]);
-	calc_dataset_item(cache, (crc_32[0]&0xffffff80), dataset_item);
-	crc_32[4] = dataset_item_32[0];
-	calc_dataset_item(cache, (crc_32[1]&0xffffff80), dataset_item);
-	crc_32[5] = dataset_item_32[1];
-	calc_dataset_item(cache, (crc_32[2]&0xffffff80), dataset_item);
-	crc_32[6] = dataset_item_32[2];
-	calc_dataset_item(cache, (crc_32[3]&0xffffff80), dataset_item);
-	crc_32[7] = dataset_item_32[3];
-	for(uint16_t i=1;i<ACCESSES;i++){
-		calc_dataset_item(cache, (crc_32[5]&0xffffff80), dataset_item);
-		crc_32[4] = dataset_item_32[0];
-		calc_dataset_item(cache, (crc_32[6]&0xffffff80), dataset_item);
-		crc_32[5] = dataset_item_32[1];
-		calc_dataset_item(cache, (crc_32[7]&0xffffff80), dataset_item);
-		crc_32[6] = dataset_item_32[2];
-		calc_dataset_item(cache, (crc_32[4]&0xffffff80), dataset_item);
-		crc_32[7] = dataset_item_32[3];
-		temp_storage = crc_16[10];
-		crc_16[10]   = crc_16[ 9];
-		crc_16[ 9]   = temp_storage;
-		temp_storage = crc_16[13];
-		crc_16[13]   = crc_16[14];
-		crc_16[14]   = temp_storage;
-	}
-	crc_32[0] = reverse(crc_32[0]);
-	crc_32[1] = reverse(crc_32[1]);
-	crc_32[6] = reverse(crc_32[6]);
-	crc_32[7] = reverse(crc_32[7]);
-	crc_64[1] = swap(crc_64[1]);
-	crc_64[2] = swap(crc_64[2]);
-	divr[0]  = (data_64[2] + crc_64[2]);
-	divr[1]  = (data_64[3] + crc_64[3]);
-	divr[0] ^= (data_64[2] / crc_64[0]);
-	divr[1] ^= (data_64[3] / crc_64[1]);
-	out_64[0] = crc_64[0]^divr[0]; out_64[1] = crc_64[1]^divr[0];
-	out_64[2] = crc_64[2]^divr[1]; out_64[3] = crc_64[3]^divr[1];
-	shift[0] = out_16[15]&0x3f;
-	shift[2] = out_16[ 0]&0x3f;
-	shift[1] = 64-shift[0];
-	shift[3] = 64-shift[2];
-	key[1][0] = (out_64[0]>>shift[0]) | (out_64[0]<<(shift[1]));
-	key[1][1] = (out_64[1]>>shift[0]) | (out_64[1]<<(shift[1]));
-	key[0][0] = (out_64[2]<<shift[2]) | (out_64[2]>>(shift[3]));
-	key[0][1] = (out_64[3]<<shift[2]) | (out_64[3]>>(shift[3]));
-	aes(out     , (uint8_t*)key[0]);
-	aes(&out[16], (uint8_t*)key[1]);
-	return;
+int main(){
+	int result = 0;
+	result = squash_opencl(10);
+	printf("%d\n",result);
+	return 0;
 }
