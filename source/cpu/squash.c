@@ -5,7 +5,7 @@
 #include "pow.h"
 #include "error.h"
 
-#define ACCESSES 1024
+#define ACCESSES 256
 
 uint32_t crc32c_table[256] = {
 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
@@ -236,7 +236,7 @@ void squash_2(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 
 // Difference from Squash_2 is a 32bit integer is used to obtain the
 // data from the dataset. (4 GiB dataset)
-void squash_3_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
+void squash_3_full(uint8_t* data, uint64_t* dataset, uint8_t* out){
 	uint8_t   shift[4]      = {0};
 	uint64_t  key[2][2]     = {0};
 	uint64_t  divr[2]       = {0};
@@ -248,19 +248,23 @@ void squash_3_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	uint16_t* out_16        = (uint16_t*)out;
 	uint64_t* out_64        = (uint64_t*)out;
 	uint16_t  temp_storage  = 0;
+	uint8_t   j             = 0;
 	crc_32[0] = crc32(data_32[0]);
 	crc_32[1] = crc32(data_32[1]);
 	crc_32[2] = crc32(data_32[2]);
 	crc_32[3] = crc32(data_32[3]);
-	crc_32[4] = ((uint32_t*)&dataset[(crc_32[0]&0xffffff80)])[0];
-	crc_32[5] = ((uint32_t*)&dataset[(crc_32[1]&0xffffff80)])[1];
-	crc_32[6] = ((uint32_t*)&dataset[(crc_32[2]&0xffffff80)])[2];
-	crc_32[7] = ((uint32_t*)&dataset[(crc_32[3]&0xffffff80)])[3];
+	crc_32[4] = ((uint32_t*)&dataset[crc_32[0]&0x1ffffffc])[0];
+	printf("%08x,%016jx,%016jx,%016jx,%016jx\n",crc_32[0]&0x1ffffffc,(&dataset[crc_32[0]&0x1ffffffc])[0],(&dataset[crc_32[0]&0x1ffffffc])[1],(&dataset[crc_32[0]&0x1ffffffc])[2],(&dataset[crc_32[0]&0x1ffffffc])[3]);
+	crc_32[5] = ((uint32_t*)&dataset[crc_32[1]&0x1ffffffc])[2];
+	crc_32[6] = ((uint32_t*)&dataset[crc_32[2]&0x1ffffffc])[4];
+	crc_32[7] = ((uint32_t*)&dataset[crc_32[3]&0x1ffffffc])[6];
+	printf("%016jx,%016jx,%016jx,%016jx\n",crc_64[0],crc_64[1],crc_64[2],crc_64[3]);
 	for(uint16_t i=1;i<ACCESSES;i++){
-		crc_32[4] = ((uint32_t*)&dataset[(crc_32[5]&0xffffff80)])[0];
-		crc_32[5] = ((uint32_t*)&dataset[(crc_32[6]&0xffffff80)])[1];
-		crc_32[6] = ((uint32_t*)&dataset[(crc_32[7]&0xffffff80)])[2];
-		crc_32[7] = ((uint32_t*)&dataset[(crc_32[4]&0xffffff80)])[3];
+		j = i&7;
+		crc_32[4] = ((uint32_t*)&dataset[crc_32[4]&0x1ffffffc])[j];
+		crc_32[5] = ((uint32_t*)&dataset[crc_32[5]&0x1ffffffc])[j];
+		crc_32[6] = ((uint32_t*)&dataset[crc_32[6]&0x1ffffffc])[j];
+		crc_32[7] = ((uint32_t*)&dataset[crc_32[7]&0x1ffffffc])[j];
 		temp_storage = crc_16[10];
 		crc_16[10]   = crc_16[ 9];
 		crc_16[ 9]   = temp_storage;
@@ -268,6 +272,7 @@ void squash_3_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 		crc_16[13]   = crc_16[14];
 		crc_16[14]   = temp_storage;
 	}
+	printf("%016jx,%016jx,%016jx,%016jx\n",crc_64[0],crc_64[1],crc_64[2],crc_64[3]);
 	crc_32[0] = reverse(crc_32[0]);
 	crc_32[1] = reverse(crc_32[1]);
 	crc_32[6] = reverse(crc_32[6]);
@@ -309,27 +314,30 @@ void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
 	uint64_t  dataset_item[4] = {0};
 	uint32_t* dataset_item_32 = (uint32_t*)dataset_item;
 	uint16_t  temp_storage  = 0;
+	uint8_t   j             = 0;
 	crc_32[0] = crc32(data_32[0]);
 	crc_32[1] = crc32(data_32[1]);
 	crc_32[2] = crc32(data_32[2]);
 	crc_32[3] = crc32(data_32[3]);
-	calc_dataset_item(cache, (crc_32[0]&0xffffff80), dataset_item);
+	calc_dataset_item(cache, (crc_32[0]&0x1ffffffc), dataset_item);
+	printf("%08x,%016jx,%016jx,%016jx,%016jx\n",crc_32[0]&0x1ffffffc,dataset_item[0],dataset_item[1],dataset_item[2],dataset_item[3]);
 	crc_32[4] = dataset_item_32[0];
-	calc_dataset_item(cache, (crc_32[1]&0xffffff80), dataset_item);
-	crc_32[5] = dataset_item_32[1];
-	calc_dataset_item(cache, (crc_32[2]&0xffffff80), dataset_item);
-	crc_32[6] = dataset_item_32[2];
-	calc_dataset_item(cache, (crc_32[3]&0xffffff80), dataset_item);
-	crc_32[7] = dataset_item_32[3];
+	calc_dataset_item(cache, (crc_32[1]&0x1ffffffc), dataset_item);
+	crc_32[5] = dataset_item_32[2];
+	calc_dataset_item(cache, (crc_32[2]&0x1ffffffc), dataset_item);
+	crc_32[6] = dataset_item_32[4];
+	calc_dataset_item(cache, (crc_32[3]&0x1ffffffc), dataset_item);
+	crc_32[7] = dataset_item_32[6];
 	for(uint16_t i=1;i<ACCESSES;i++){
-		calc_dataset_item(cache, (crc_32[5]&0xffffff80), dataset_item);
-		crc_32[4] = dataset_item_32[0];
-		calc_dataset_item(cache, (crc_32[6]&0xffffff80), dataset_item);
-		crc_32[5] = dataset_item_32[1];
-		calc_dataset_item(cache, (crc_32[7]&0xffffff80), dataset_item);
-		crc_32[6] = dataset_item_32[2];
-		calc_dataset_item(cache, (crc_32[4]&0xffffff80), dataset_item);
-		crc_32[7] = dataset_item_32[3];
+		j = i&7;
+		calc_dataset_item(cache, (crc_32[4]&0x1ffffffc), dataset_item);
+		crc_32[4] = dataset_item_32[j];
+		calc_dataset_item(cache, (crc_32[5]&0x1ffffffc), dataset_item);
+		crc_32[5] = dataset_item_32[j];
+		calc_dataset_item(cache, (crc_32[6]&0x1ffffffc), dataset_item);
+		crc_32[6] = dataset_item_32[j];
+		calc_dataset_item(cache, (crc_32[7]&0x1ffffffc), dataset_item);
+		crc_32[7] = dataset_item_32[j];
 		temp_storage = crc_16[10];
 		crc_16[10]   = crc_16[ 9];
 		crc_16[ 9]   = temp_storage;
