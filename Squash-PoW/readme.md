@@ -1,5 +1,5 @@
 # SquashPoW
-A cryptocurrency hash algorithm derived from squash and the [ethash](https://github.com/ethereum/wiki/wiki/Ethash) design, to further increase resistance against ASICs and FPGAs.
+A cryptocurrency hash algorithm derived from squash and the [ethash](https://github.com/ethereum/wiki/wiki/Ethash) design, to provide strong resistance against ASICs and FPGAs.
 
 **Contents**
 - [General](#General)

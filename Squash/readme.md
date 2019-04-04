@@ -1,5 +1,5 @@
 # Squash
-A hash algorithm built to be as ASIC resistant as possible while maintining lightweightness and speed.
+A fast and lightweight hashing algorithm with built-in ASIC resistance.
 
 **Contents**
 - [General](#General)
@@ -13,7 +13,7 @@ A hash algorithm built to be as ASIC resistant as possible while maintining ligh
 
 ## General
 ### Tests
-Tests and sample results can be found in the [Tests Branch](https://github.com/ClashLuke/Squash-Hash/tree/testing). Head over there for further instructions.
+Tests and sample results can be found in the [Tests Branch](https://github.com/ClashLuke/CCLib/tree/testing). Head over there for further instructions.
 
 ### Speed
 On a [Xeon E3-1225v2](https://ark.intel.com/content/www/us/en/ark/products/65733/intel-xeon-processor-e3-1225-v2-8m-cache-3-20-ghz.html), the algorithm has an average speed of 58.5ns. For comparision, keccak takes about 800ns on average. Which results in 5.8 cpb for squash, 80 cpb for keccak - on an Ivy Bridge CPU.<br>
@@ -29,7 +29,7 @@ Squash 2 and 3 are variations of squash 1 with a larger scratchpad, hence we wil
 ### Squash_0
 
 #### Step 1 - CRC32
-Assuming that there is a perfect CRC, a 32bit redundancy check (with random 32bit inputs) has 2^16 collisions. We calculate the CRC four times to have delays according to the inner-CPU delays. [1](https://github.com/JuliaLang/julia/blob/master/src/crc32c.c#L111) Now 128bit of the input are processed, resulting in 128bit output with 64bit collision-resistance. Code: `crc_32[0] = crc32(data_32[0]);` CRCs are heavily optimised on ARM CPUs since they are an addition to the instructionset. They are relatively expensive for ASICs to implement. [2](https://www.slideshare.net/bschn2/the-rainforest-algorithm)
+Assuming that there is a perfect CRC, a 32bit redundancy check (with random 32bit inputs) has 2^16 collisions. We calculate the CRC four times to have delays according to the inner-CPU delays, as seen [here](https://github.com/JuliaLang/julia/blob/master/src/crc32c.c#L111). Now 128bit of the input are processed, resulting in 128bit output with 64bit collision-resistance. Code: `crc_32[0] = crc32(data_32[0]);` CRCs are heavily optimised on ARM CPUs since they are an addition to the instructionset. They are relatively expensive for ASICs to implement, according to [this](https://www.slideshare.net/bschn2/the-rainforest-algorithm) post.
 
 #### Step 2 - Integer Math
 The next 128bit are calculated using two times two 64bit integer arithmetics. First, the next 64bit of input data are used to be added to the first two CRCs. Since an addition is a XOR with carry, it can be assumed that the first bit is a casual XOR, all following bits are a doubled XOR. This results in a slightly increased probability for high results - which, since the highest bit is cut off, does not matter. To even the first few bits out, a division of the previous data (3rd 64bit of the input, 1st 64bit of the CRC results) is added to the previous result using a XOR. The resulting expression looks like this `crc_64[2] = (data_64[2] + crc_64[0]) ^ (data_64[2] / crc_64[0]);`. This results in another 128bit with 64bit collision-resistance (assuming that the ADD operator is cryptographically insecure). While those 64bit operations are easy for a modern CPU, it is difficult for ASICs to implement those [2](https://www.slideshare.net/bschn2/the-rainforest-algorithm)
