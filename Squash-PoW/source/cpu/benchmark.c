@@ -6,7 +6,7 @@
 #include "pow.h"
 #include "error.h"
 
-#define ITERATIONS 1024 // iterations are multiplied with 64
+#define ITERATIONS 1 // iterations are multiplied with 64
 
 void benchmark_dataset_generation(uint8_t* seed, uint64_t* dataset){
 	char      buffer[65] = {0};
@@ -67,7 +67,7 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 		}
 		printf("\r%*s\r",80,"");
 	} else {
-		for(uint32_t i=0;i<(iterations)<<6;i++){
+		for(uint32_t i=0;i<(iterations);i++){
 			squash_pow_full(header, i, dataset_64, result);
 			temp[0] ^= result_64[0]; temp[1] ^= result_64[1];
 			temp[2] ^= result_64[2]; temp[3] ^= result_64[3];
@@ -76,7 +76,7 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 	free(dataset);
 	uint32_t end_time = (uint32_t)time(NULL);
 	printf("\tCalculation of %u hashes took: %us\n",iterations<<6, end_time-current_time);
-	printf("\tHashrate is approximately: %uH/s\n", (iterations<<6)/(end_time-current_time));
+	//printf("\tHashrate is approximately: %uH/s\n", (iterations<<6)/(end_time-current_time));
 	printf("\tResult: %016jx,%016jx,%016jx,%016jx\n",temp[0],temp[1],temp[2],temp[3]);
 	return 0;
 }
@@ -114,7 +114,7 @@ uint64_t benchmark_validation(uint64_t block_height, uint8_t printing){
 		}
 		printf("\r%*s\r",80,"");
 	} else {
-		for(uint32_t i=0;i<(iterations)<<6;i++){
+		for(uint32_t i=0;i<(iterations);i++){
 			squash_pow_light(header, i, cache, result);
 			temp[0] ^= result_64[0]; temp[1] ^= result_64[1];
 			temp[2] ^= result_64[2]; temp[3] ^= result_64[3];
@@ -123,7 +123,7 @@ uint64_t benchmark_validation(uint64_t block_height, uint8_t printing){
 	free(cache);
 	uint32_t end_time = (uint32_t)time(NULL);
 	printf("\tCalculation of %u hashes took: %us\n",ITERATIONS<<6, end_time-current_time);
-	printf("\tHashrate is approximately: %uH/s\n", iterations/(end_time-current_time));
+	//printf("\tHashrate is approximately: %uH/s\n", iterations/(end_time-current_time));
 	printf("\tResult: %016jx,%016jx,%016jx,%016jx\n",temp[0],temp[1],temp[2],temp[3]);
 	return 0;
 }
