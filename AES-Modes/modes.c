@@ -23,7 +23,7 @@ void iec(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
     uint64_t* iv_64_1      = &iv_64_0[1];
     uint64_t* iv_64_2      = &iv_64_0[2];
     uint64_t* iv_64_3      = &iv_64_0[3];
-    for(uint32_t j=0;j<len;j+=8){
+    for(uint32_t j=0;j<len;j+=4){
         aesSingleRound(iv, key);
         out_64_0[j] = in_64_0[j]^*iv_64_0;
         out_64_1[j] = in_64_1[j]^*iv_64_1;
@@ -31,7 +31,7 @@ void iec(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
         out_64_3[j] = in_64_3[j]^*iv_64_3;
     }
     for(uint8_t i=0;i<ROUNDS;i++){
-        for(uint32_t j=0;j<len;j+=8){
+        for(uint32_t j=0;j<len;j+=4){
             aesSingleRound(iv, key);
             out_64_0[j] ^= *iv_64_0;
             out_64_1[j] ^= *iv_64_1;
@@ -62,7 +62,7 @@ void cec(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
     *prev_iv_0 = *iv_64_0; *prev_iv_1 = *iv_64_1; 
     *prev_iv_2 = *iv_64_2; *prev_iv_3 = *iv_64_3; 
     aesSingleRound(iv, key);
-    for(uint64_t j=0;j<len;j+=8){
+    for(uint64_t j=0;j<len;j+=4){
         *iv_64_0 = j; *iv_64_1 = j; 
         *iv_64_2 = j; *iv_64_3 = j; 
         aesSingleRound(iv, prev_iv_byte);
@@ -74,7 +74,7 @@ void cec(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
         out_64_3[j] = in_64_3[j]^*iv_64_3;
     }
     for(uint8_t i=0;i<ROUNDS;i++){
-        for(uint64_t j=0;j<len;j+=8){
+        for(uint64_t j=0;j<len;j+=4){
             *iv_64_0 = j; *iv_64_1 = j; 
             *iv_64_2 = j; *iv_64_3 = j; 
             aesSingleRound(iv, prev_iv_byte);
@@ -106,11 +106,11 @@ void ccc(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
     uint64_t* prev_iv_2    = &prev_iv_0[2];
     uint64_t* prev_iv_3    = &prev_iv_0[3];
     uint8_t*  prev_iv_byte = (uint8_t*)prev_iv_0;
-	uint8_t   rounds       = ROUNDS-1;
+    uint8_t   rounds       = ROUNDS-1;
     *prev_iv_0 = *iv_64_0; *prev_iv_1 = *iv_64_1; 
     *prev_iv_2 = *iv_64_2; *prev_iv_3 = *iv_64_3; 
     aesSingleRound(iv, key);
-    for(uint64_t j=0;j<len;j+=8){
+    for(uint64_t j=0;j<len;j+=4){
         *iv_64_0 = j; *iv_64_1 = j; 
         *iv_64_2 = j; *iv_64_3 = j; 
         aesSingleRound(iv, prev_iv_byte);
@@ -120,26 +120,26 @@ void ccc(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
         *prev_iv_3 = out_64_3[j] = in_64_3[j]^*iv_64_3;
     }
     for(uint8_t i=0;i<rounds;i++){
-        for(uint64_t j=0;j<len;j+=8){
-		    *iv_64_0 = j; *iv_64_1 = j; 
-		    *iv_64_2 = j; *iv_64_3 = j; 
-		    aesSingleRound(iv, prev_iv_byte); 
-		    *prev_iv_0 = out_64_0[j] ^= *iv_64_0;
-		    *prev_iv_1 = out_64_1[j] ^= *iv_64_1;
-		    *prev_iv_2 = out_64_2[j] ^= *iv_64_2;
-		    *prev_iv_3 = out_64_3[j] ^= *iv_64_3;
+        for(uint64_t j=0;j<len;j+=4){
+            *iv_64_0 = j; *iv_64_1 = j; 
+            *iv_64_2 = j; *iv_64_3 = j; 
+            aesSingleRound(iv, prev_iv_byte); 
+            *prev_iv_0 = out_64_0[j] ^= *iv_64_0;
+            *prev_iv_1 = out_64_1[j] ^= *iv_64_1;
+            *prev_iv_2 = out_64_2[j] ^= *iv_64_2;
+            *prev_iv_3 = out_64_3[j] ^= *iv_64_3;
         }
     }
-    for(uint64_t j=0;j<len;j+=8){
-		*iv_64_0 = j; *iv_64_1 = j; 
-		*iv_64_2 = j; *iv_64_3 = j; 
-		aesSingleRound(iv, prev_iv_byte); 
+    for(uint64_t j=0;j<len;j+=4){
+        *iv_64_0 = j; *iv_64_1 = j; 
+        *iv_64_2 = j; *iv_64_3 = j; 
+        aesSingleRound(iv, prev_iv_byte); 
         *prev_iv_0 = *iv_64_0; *prev_iv_1 = *iv_64_1; 
         *prev_iv_2 = *iv_64_2; *prev_iv_3 = *iv_64_3; 
-		out_64_0[j] ^= *iv_64_0;
-		out_64_1[j] ^= *iv_64_1;
-		out_64_2[j] ^= *iv_64_2;
-		out_64_3[j] ^= *iv_64_3;
+        out_64_0[j] ^= *iv_64_0;
+        out_64_1[j] ^= *iv_64_1;
+        out_64_2[j] ^= *iv_64_2;
+        out_64_3[j] ^= *iv_64_3;
     }
 }
 
