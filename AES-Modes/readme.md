@@ -1,4 +1,5 @@
 # AES-Modes
+Various new, fast and reliable AES modes.
 
 - [IEC](#IEC)
 	- [Algorithm](#Algorithm)
