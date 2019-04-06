@@ -104,7 +104,7 @@ void aesSingleRound(uint8_t* state, uint8_t* key) {
 	"movups %%xmm0, (%0)     \n"
 	:
 	: "r"(state), "r" (key)
-	: "xmm0", "xmm1", "xmm2", "xmm3", "cc", "memory");
+	: "xmm0", "xmm1", "xmm2", "cc", "memory");
 
 #else
 	uint8_t* state_2 = &state[16];
