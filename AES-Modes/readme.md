@@ -1,4 +1,5 @@
 # AES-Modes
+Various new, fast and reliable AES modes.
 
 - [IEC](#IEC)
 	- [Algorithm](#Algorithm)
@@ -24,10 +25,10 @@ The IV encryption chain mode is a new, super fast AES mode.
 AES-IEC is designed to iterate by iteself instead of relying on the predefined AES iterations. Therefore a key expansion algorithm is not necessary which saves many cycles and allows faster procesing. The IEC mode takes in a 256bit key, 256bit IV and a message with a lenght dividable by 32 byte. This is needed to process the message in 256bit blocks, more exact, two 128bit blocks in parallel on one CPU core. Therefore by utilising the natural CPU delays AES-IEC is naturally twice as fast as other encryption algorithms. Instead of encrypting the message blocks in a chain dependant on the previous block (like the CBC mode does), IEC encrypts the IV many times and XORes it with the current message block. This allows an optimised usage of the AES-NI aswell as optimisation of the CPU delays. After one iteration over the current message, it jumps back to the start and performs another encryption round over the entire message. Therefore the entire message is encrypted 16 times with different keys and one AES round, which differentiates this mode from other modes.
 
 ### Speed
-As mentioned above, by utilising two sequential optimised encryptions, the encoding speed doubles. Additionally a key generation is not necessary which additionaly halves the time needed. In combination with the optimised XORing. On a [Xeon E3-1225v2](https://ark.intel.com/content/www/us/en/ark/products/65733/intel-xeon-processor-e3-1225-v2-8m-cache-3-20-ghz.html) using the 256 bit encryption, its 16 rounds and one core, the following speeds can be achieved:
+As mentioned above, by utilising two sequential optimised encryptions, the encoding speed doubles. Additionally a key generation is not necessary which additionaly reduces the time needed. In combination with the optimised XORing, the results speak for themselves. On a [Xeon E3-1225v2](https://ark.intel.com/content/www/us/en/ark/products/65733/intel-xeon-processor-e3-1225-v2-8m-cache-3-20-ghz.html) using the 256 bit encryption, its 16 rounds and one core, the following speeds can be achieved:
 ```
-Calculation of 256 iterations of encrypting 2147483648 bytes took: 1093s
-Average throughput: 502.978787MB/s
+Calculation of 16 iterations of encrypting 2147483648 bytes took: 98s
+Average throughput: 350.609575MB/s
 ```
 For comparision, this is what the results from the OpenSSL speed test look like:
 ```
@@ -36,7 +37,7 @@ aes-128 cbc     120770.69k   132570.88k   135177.62k   136638.80k   137251.43k  
 aes-192 cbc     104438.74k   111237.49k   112918.61k   113265.12k   113962.34k   113673.21k
 aes-256 cbc      89156.66k    95723.47k    96961.02k    97594.37k    97230.85k    97326.42k
 ```
-This results in 6.36 cycles per byte on an Ivy Bridge CPU for IEC, 23.33 cycles per byte (16KiB blocks, 128 bit security) for AES CBC.
+This results in 9.13 cycles per byte on an Ivy Bridge CPU for IEC, 32.88 cycles per byte (16KiB blocks, 256 bit security) for AES CBC.
 
 ### Analysis
 #### Security
@@ -58,10 +59,10 @@ The Counter Encryption Chain mode is similar to [IEC](#IEC). The speed optimisat
 ### Velocity
 Thorough benchmarks show that when encrypting 256 blocks of 2GiB each (totalling in 512GiB), the following speeds apply:
 ```
-Calculation of 256 iterations of encrypting 2147483648 bytes took: 1160s
-Average throughput: 473.927426MB/s
+Calculation of 16 iterations of encrypting 2147483648 bytes took: 129s
+Average throughput: 266.354561MB/s
 ```
-This results in 6.75 cycles per byte. For comparision, the results from AES using the CBC mode can be seen in [#speed](#speed).
+This results in 12.01 cycles per byte. For comparision, the results from AES using the CBC mode can be seen in [#speed](#speed).
 
 ## CCC
 ### Algorithm
@@ -70,10 +71,10 @@ The CCC mode might be the closest to AES CBC. Out of all the three modes mention
 ### Throughput
 The following output is the result of the test which can be executed using modes.c.
 ```
-Calculation of 256 iterations of encrypting 2147483648 bytes took: 1097s
-Average throughput: 501.144771MB/s
+Calculation of 16 iterations of encrypting 2147483648 bytes took: 99s
+Average throughput: 347.068064MB/s
 ```
-Therefore the speed is at 6.38 cycles per byte, which still is 3.65 times faster than AES CBC with 128bit keys or 5.15 times faster than AES CBC with 256bit keys.
+Therefore the speed is at 9.22 cycles per byte, which still is 3.57 times faster than AES CBC with 256bit keys.
 
 ### Safety
 In the CCC mode, an encrypted message depends on lenght, input, IV and key. Since there currently are no known tradeoffs or attacks, this mode provides increased security compared to AES CBC aswell as increased speeds and increased security against attackers since those need the entire message to encrypt any given part of it. This also implies that the CCC mode does not allow parallelisation or preprocessing in any form.

@@ -6,4 +6,5 @@ ClashCryptoLib. A simple crypto library containing various new crypto algorithms
 * **[SquashPoW](https://github.com/ClashLuke/CCLib/tree/master/Squash-PoW)**: A cryptocurrency hash algorithm derived from Squash and the [Ethash](https://github.com/ethereum/wiki/wiki/Ethash) design, to provide strong resistance against ASICs and FPGAs.
 * **[CRC256](https://github.com/ClashLuke/CCLib/tree/master/CRC256)**: A secure 256 bit cyclic redundancy check, faster than Blake2.
 * **[AES-Modes](https://github.com/ClashLuke/CCLib/tree/master/AES-Modes)**: Various new, fast and reliable AES modes.
+* **[AES-Hash](https://github.com/ClashLuke/CCLib/tree/master/AES-Hash)**: The simplest of all hashes, the AES hash.
 
