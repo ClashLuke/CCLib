@@ -12,6 +12,10 @@
 	- [Design](#Design)
 	- [Velocity](#Velocity)
 	- [Summary](#Summary)
+- [CCC](#CCC)
+	- [Changes](#Changes)
+	- [Throughput](#Throughput)
+	- [Safety](#Safety)
 
 ## IEC
 The IV encryption chain mode is a new, super fast AES mode.
@@ -58,3 +62,18 @@ Calculation of 256 iterations of encrypting 2147483648 bytes took: 1160s
 Average throughput: 473.927426MB/s
 ```
 This results in 6.75 cycles per byte. For comparision, the results from AES using the CBC mode can be seen in [#speed](#speed).
+
+## CCC
+### Algorithm
+The CCC mode might be the closest to AES CBC. Out of all the three modes mentioned here, it has the highest security, but also the lowest speed aswell as no optimisations for messages of continous lenght. While the previous two algorithms created an encryption string to encrypt the input with, which can be used for heavy speed optimisations, this algorithm also depends on the previous block. It is the same as the [CEC](#CEC) mode, just that it uses the result of `previousIV XOR previousBlock` as the key for the next round of encryption. This ofcourse is the same as the previous message block. This means an attacker knows the key used for encryption (the previous block) in the last round and the counter which is encrypted, which means that the rounds can be traversed backwords. This is not wanted, so the last round is calculated differently. More exact, its calculated using one round of the [CEC mode](#CEC).
+
+### Throughput
+The following output is the result of the test which can be executed using modes.c.
+```
+Calculation of 256 iterations of encrypting 2147483648 bytes took: 1097s
+Average throughput: 501.144771MB/s
+```
+Therefore the speed is at 6.38 cycles per byte, which still is 3.65 times faster than AES CBC with 128bit keys or 5.15 times faster than AES CBC with 256bit keys.
+
+### Safety
+In the CCC mode, an encrypted message depends on lenght, input, IV and key. Since there currently are no known tradeoffs or attacks, this mode provides increased security compared to AES CBC aswell as increased speeds and increased security against attackers since those need the entire message to encrypt any given part of it. This also implies that the CCC mode does not allow parallelisation or preprocessing in any form.
