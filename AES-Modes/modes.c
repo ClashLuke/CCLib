@@ -151,7 +151,7 @@ void ccc(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
 #include <time.h>
 
 #define SIZE  268435456 // SIZE * 8 = allocated bytes
-#define ITER  256       // Number of iterations to encrypt
+#define ITER  64        // Number of iterations to encrypt
 #define MB              // Comment if you want the
                         // throughput to be in B/s, not MB/s
 #define IEC             // Comment either of those two lines
