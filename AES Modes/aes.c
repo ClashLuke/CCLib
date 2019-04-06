@@ -80,8 +80,8 @@ static void mix_columns(uint8_t * state) {
 void aesSingleRound(uint8_t* state, uint8_t* key) {
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRYPTO)
 	__asm__ volatile(
-	"ld1   {v0.16b,v1.16b},[%0]		\n"
-	"ld1   {v2.16b,v3.16b},[%1]  \n"
+	"ld1   {v0.16b,v1.16b},[%0]     \n"
+	"ld1   {v2.16b,v3.16b},[%1]     \n"
 	"aese  v0.16b,v2.16b		\n" // round1: add_round_key,sub_bytes,shift_rows
 	"aesmc v0.16b,v0.16b		\n" // round1: mix_columns
 	"aese  v1.16b,v3.16b		\n" // round1: add_round_key,sub_bytes,shift_rows
@@ -95,21 +95,28 @@ void aesSingleRound(uint8_t* state, uint8_t* key) {
 	__asm__ volatile(
 	"movups (%0),  %%xmm0	 \n"
 	"movups (%1),  %%xmm1	 \n"
+	"movups 16(%0),%%xmm2	 \n"
+	"movups 16(%1),%%xmm3	 \n"
 	"pxor   %%xmm1,%%xmm0	 \n" // add_round_key(state, key)
-	"movups 16(%1),%%xmm2	 \n"
-	"movups 32(%1),%%xmm1	 \n"
-	"aesenc %%xmm2,%%xmm0	 \n" // first round
-	"movups %%xmm0, (%0)  \n"
+	"pxor   %%xmm2,%%xmm3	 \n" // add_round_key(state, key)
+	"aesenc %%xmm1,%%xmm0	 \n" // first round
+	"aesenc %%xmm3,%%xmm2	 \n" // first round
+	"movups %%xmm0, (%0)     \n"
 	:
 	: "r"(state), "r" (key)
-	: "xmm0", "xmm1", "xmm2", "cc", "memory");
+	: "xmm0", "xmm1", "xmm2", "xmm3", "cc", "memory");
 
 #else
-	/* first round of the algorithm */
+	uint8_t* state_2 = &state[16];
+	uint8_t* key_2 = &key[16];
 	add_round_key(state, key);
 	sub_bytes(state);
 	shift_rows(state);
 	mix_columns(state);
+	add_round_key(state_2, key_2);
+	sub_bytes(state_2);
+	shift_rows(state_2);
+	mix_columns(state_2);
 #endif
 }
 
