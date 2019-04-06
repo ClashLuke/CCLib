@@ -41,6 +41,53 @@ void icc(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
     }
 }
 
+void ccc(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
+    uint64_t* out_64_0     = (uint64_t*)out;
+    uint64_t* out_64_1     = &out_64_0[1];
+    uint64_t* out_64_2     = &out_64_0[2];
+    uint64_t* out_64_3     = &out_64_0[3];
+    uint64_t* in_64_0      = (uint64_t*)in;
+    uint64_t* in_64_1      = &in_64_0[1];
+    uint64_t* in_64_2      = &in_64_0[2];
+    uint64_t* in_64_3      = &in_64_0[3];
+    uint64_t* iv_64_0      = &((uint64_t*)iv)[0];
+    uint64_t* iv_64_1      = &iv_64_0[1];
+    uint64_t* iv_64_2      = &iv_64_0[2];
+    uint64_t* iv_64_3      = &iv_64_0[3];
+	uint64_t  prev_iv_0[4] = {0};
+    uint64_t* prev_iv_1    = &prev_iv_0[1];
+    uint64_t* prev_iv_2    = &prev_iv_0[2];
+    uint64_t* prev_iv_3    = &prev_iv_0[3];
+    uint8_t*  prev_iv_byte = (uint8_t*)prev_iv_0;
+	*prev_iv_0 = *iv_64_0; *prev_iv_1 = *iv_64_1; 
+	*prev_iv_2 = *iv_64_2; *prev_iv_3 = *iv_64_3; 
+    aesSingleRound(iv, key);
+    for(uint64_t j=0;j<len;j+=8){
+		*iv_64_0 = j; *iv_64_1 = j; 
+		*iv_64_2 = j; *iv_64_3 = j; 
+        aesSingleRound(iv, prev_iv_byte);
+		*prev_iv_0 = *iv_64_0; *prev_iv_1 = *iv_64_1; 
+		*prev_iv_2 = *iv_64_2; *prev_iv_3 = *iv_64_3; 
+        out_64_0[j] = in_64_0[j]^*iv_64_0;
+        out_64_1[j] = in_64_1[j]^*iv_64_1;
+        out_64_2[j] = in_64_2[j]^*iv_64_2;
+        out_64_3[j] = in_64_3[j]^*iv_64_3;
+    }
+    for(uint8_t i=0;i<ROUNDS;i++){
+        for(uint64_t j=0;j<len;j+=8){
+			*iv_64_0 = j; *iv_64_1 = j; 
+			*iv_64_2 = j; *iv_64_3 = j; 
+            aesSingleRound(iv, key);
+			*prev_iv_0 = *iv_64_0; *prev_iv_1 = *iv_64_1; 
+			*prev_iv_2 = *iv_64_2; *prev_iv_3 = *iv_64_3; 
+            out_64_0[j] ^= *iv_64_0;
+            out_64_1[j] ^= *iv_64_1;
+            out_64_2[j] ^= *iv_64_2;
+            out_64_3[j] ^= *iv_64_3;
+        }
+    }
+}
+
 #ifdef AES_TEST
 
 #include <stdlib.h>
@@ -51,6 +98,9 @@ void icc(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
 #define ITER  256       // Number of iterations to encrypt
 #define MB              // Comment if you want the
                         // throughput to be in B/s, not MB/s
+#define CCC             // Comment either of those two lines
+#define ICC             // to disable the test corresponding
+                        // to it.
 
 uint32_t crc32c_table[256] = {
     0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
@@ -152,6 +202,26 @@ int main(){
     init(msg_32);
     size = size * 8;
 
+#ifdef CCC
+    stime = (uint32_t)time(NULL);
+    for(uint32_t i=0;i<ITER;i++) ccc(msg, SIZE, key, iv, msg);
+    etime = (uint32_t)time(NULL);
+    etime = etime-stime;
+
+    printf("\t[CCC Mode]\nCalculation of %u iterations of encrypting %u bytes took: %us\n",ITER,size,etime);
+
+    throughput = (double)ITER*size/etime;
+# ifdef MB
+    throughput = throughput/1000000;
+    printf("Average throughput: %fMB/s\n",throughput);
+# else
+    printf("Average throughput: %fB/s\n",throughput);
+# endif
+    printf("1st  element: %016jx\n",msg_64[0]);
+    printf("Last element: %016jx\n\n",msg_64[SIZE-16]);
+#endif
+
+#ifdef ICC
     stime = (uint32_t)time(NULL);
     for(uint32_t i=0;i<ITER;i++) icc(msg, SIZE, key, iv, msg);
     etime = (uint32_t)time(NULL);
@@ -168,5 +238,6 @@ int main(){
 # endif
     printf("1st  element: %016jx\n",msg_64[0]);
     printf("Last element: %016jx\n\n",msg_64[SIZE-16]);
+#endif
 }
 #endif
