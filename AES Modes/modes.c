@@ -10,7 +10,7 @@
 
 // lenght is dividable by 256bit (rest will be ignored)
 // IV has to be 256 bit
-void icc(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
+void iec(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
     uint64_t* out_64_0     = (uint64_t*)out;
     uint64_t* out_64_1     = &out_64_0[1];
     uint64_t* out_64_2     = &out_64_0[2];
@@ -41,7 +41,7 @@ void icc(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
     }
 }
 
-void ccc(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
+void cec(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
     uint64_t* out_64_0     = (uint64_t*)out;
     uint64_t* out_64_1     = &out_64_0[1];
     uint64_t* out_64_2     = &out_64_0[2];
@@ -54,20 +54,20 @@ void ccc(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
     uint64_t* iv_64_1      = &iv_64_0[1];
     uint64_t* iv_64_2      = &iv_64_0[2];
     uint64_t* iv_64_3      = &iv_64_0[3];
-	uint64_t  prev_iv_0[4] = {0};
+    uint64_t  prev_iv_0[4] = {0};
     uint64_t* prev_iv_1    = &prev_iv_0[1];
     uint64_t* prev_iv_2    = &prev_iv_0[2];
     uint64_t* prev_iv_3    = &prev_iv_0[3];
     uint8_t*  prev_iv_byte = (uint8_t*)prev_iv_0;
-	*prev_iv_0 = *iv_64_0; *prev_iv_1 = *iv_64_1; 
-	*prev_iv_2 = *iv_64_2; *prev_iv_3 = *iv_64_3; 
+    *prev_iv_0 = *iv_64_0; *prev_iv_1 = *iv_64_1; 
+    *prev_iv_2 = *iv_64_2; *prev_iv_3 = *iv_64_3; 
     aesSingleRound(iv, key);
     for(uint64_t j=0;j<len;j+=8){
-		*iv_64_0 = j; *iv_64_1 = j; 
-		*iv_64_2 = j; *iv_64_3 = j; 
+        *iv_64_0 = j; *iv_64_1 = j; 
+        *iv_64_2 = j; *iv_64_3 = j; 
         aesSingleRound(iv, prev_iv_byte);
-		*prev_iv_0 = *iv_64_0; *prev_iv_1 = *iv_64_1; 
-		*prev_iv_2 = *iv_64_2; *prev_iv_3 = *iv_64_3; 
+        *prev_iv_0 = *iv_64_0; *prev_iv_1 = *iv_64_1; 
+        *prev_iv_2 = *iv_64_2; *prev_iv_3 = *iv_64_3; 
         out_64_0[j] = in_64_0[j]^*iv_64_0;
         out_64_1[j] = in_64_1[j]^*iv_64_1;
         out_64_2[j] = in_64_2[j]^*iv_64_2;
@@ -75,11 +75,11 @@ void ccc(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
     }
     for(uint8_t i=0;i<ROUNDS;i++){
         for(uint64_t j=0;j<len;j+=8){
-			*iv_64_0 = j; *iv_64_1 = j; 
-			*iv_64_2 = j; *iv_64_3 = j; 
-            aesSingleRound(iv, key);
-			*prev_iv_0 = *iv_64_0; *prev_iv_1 = *iv_64_1; 
-			*prev_iv_2 = *iv_64_2; *prev_iv_3 = *iv_64_3; 
+            *iv_64_0 = j; *iv_64_1 = j; 
+            *iv_64_2 = j; *iv_64_3 = j; 
+            aesSingleRound(iv, prev_iv_byte);
+            *prev_iv_0 = *iv_64_0; *prev_iv_1 = *iv_64_1; 
+            *prev_iv_2 = *iv_64_2; *prev_iv_3 = *iv_64_3; 
             out_64_0[j] ^= *iv_64_0;
             out_64_1[j] ^= *iv_64_1;
             out_64_2[j] ^= *iv_64_2;
@@ -88,6 +88,8 @@ void ccc(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
     }
 }
 
+
+#define AES_TEST
 #ifdef AES_TEST
 
 #include <stdlib.h>
@@ -98,8 +100,8 @@ void ccc(uint8_t* in, uint32_t len, uint8_t* key, uint8_t* iv, uint8_t* out){
 #define ITER  256       // Number of iterations to encrypt
 #define MB              // Comment if you want the
                         // throughput to be in B/s, not MB/s
-#define CCC             // Comment either of those two lines
-#define ICC             // to disable the test corresponding
+#define IEC             // Comment either of those two lines
+#define CEC             // to disable the test corresponding
                         // to it.
 
 uint32_t crc32c_table[256] = {
@@ -202,42 +204,42 @@ int main(){
     init(msg_32);
     size = size * 8;
 
-#ifdef CCC
+# ifdef IEC
     stime = (uint32_t)time(NULL);
-    for(uint32_t i=0;i<ITER;i++) ccc(msg, SIZE, key, iv, msg);
+    for(uint32_t i=0;i<ITER;i++) iec(msg, SIZE, key, iv, msg);
     etime = (uint32_t)time(NULL);
     etime = etime-stime;
 
-    printf("\t[CCC Mode]\nCalculation of %u iterations of encrypting %u bytes took: %us\n",ITER,size,etime);
+    printf("\t[IEC Mode]\nCalculation of %u iterations of encrypting %u bytes took: %us\n",ITER,size,etime);
 
     throughput = (double)ITER*size/etime;
-# ifdef MB
+#  ifdef MB
     throughput = throughput/1000000;
     printf("Average throughput: %fMB/s\n",throughput);
-# else
+#  else
     printf("Average throughput: %fB/s\n",throughput);
-# endif
+#  endif
     printf("1st  element: %016jx\n",msg_64[0]);
     printf("Last element: %016jx\n\n",msg_64[SIZE-16]);
-#endif
+# endif
 
-#ifdef ICC
+# ifdef CEC
     stime = (uint32_t)time(NULL);
-    for(uint32_t i=0;i<ITER;i++) icc(msg, SIZE, key, iv, msg);
+    for(uint32_t i=0;i<ITER;i++) cec(msg, SIZE, key, iv, msg);
     etime = (uint32_t)time(NULL);
     etime = etime-stime;
 
-    printf("\t[ICC Mode]\nCalculation of %u iterations of encrypting %u bytes took: %us\n",ITER,size,etime);
+    printf("\t[CEC Mode]\nCalculation of %u iterations of encrypting %u bytes took: %us\n",ITER,size,etime);
 
     throughput = (double)ITER*size/etime;
-# ifdef MB
+#  ifdef MB
     throughput = throughput/1000000;
     printf("Average throughput: %fMB/s\n",throughput);
-# else
+#  else
     printf("Average throughput: %fB/s\n",throughput);
-# endif
+#  endif
     printf("1st  element: %016jx\n",msg_64[0]);
     printf("Last element: %016jx\n\n",msg_64[SIZE-16]);
-#endif
+# endif
 }
 #endif
