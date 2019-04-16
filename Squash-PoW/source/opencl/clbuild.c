@@ -1,3 +1,7 @@
+// Copyright (c) 2019, The CCLib Developers
+//
+// Please see the included LICENSE file for more information.
+
 // Source: https://github.com/rsnemmen/OpenCL-examples/blob/master/square_array/clbuild.c
 
 #include "clbuild.h"

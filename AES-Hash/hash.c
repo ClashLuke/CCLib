@@ -1,3 +1,7 @@
+// Copyright (c) 2019, The CCLib Developers
+//
+// Please see the included LICENSE file for more information.
+
 #include <stdint.h>
 #include <stdio.h>
 #include "aes.h"

@@ -8,3 +8,10 @@ ClashCryptoLib. A simple crypto library containing various new crypto algorithms
 * **[AES-Modes](https://github.com/ClashLuke/CCLib/tree/master/AES-Modes)**: Various new, fast and reliable AES modes.
 * **[AES-Hash](https://github.com/ClashLuke/CCLib/tree/master/AES-Hash)**: The simplest of all hashes, the AES hash.
 
+#### License
+When submiting a pull request make sure to include the following license header
+```
+// Copyright (c) 2019, The CCLib Developers
+//
+// Please see the included LICENSE file for more information.
+```

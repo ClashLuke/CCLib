@@ -1,3 +1,7 @@
+// Copyright (c) 2019, The CCLib Developers
+//
+// Please see the included LICENSE file for more information.
+
 // Parts taken from https://github.com/bschn2/rainforest/blob/master/rainforest.cl
 #pragma OPENCL EXTENSION cl_amd_printf : enable
 

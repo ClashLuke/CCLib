@@ -1,3 +1,7 @@
+// Copyright (c) 2019, The CCLib Developers
+//
+// Please see the included LICENSE file for more information.
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -25,16 +29,15 @@ void make_scratchpad(uint8_t* seed, uint8_t* scratchpad){
 void make_cache(uint8_t* scratchpad, uint8_t* cache){
 	/* 64MiB cache is allocated before executing
 	   this function */
-	uint32_t  iterations    = 67108864/HASH_BYTES;
-	uint32_t  mask          = iterations-1;
+	uint32_t  mask          = 67108864/HASH_BYTES-1;
 	uint64_t* cache_64      = (uint64_t*)cache; 
 	uint64_t  temp_cache[4] = {0};
 	uint64_t  index[2]      = {0};
-	for(uint32_t i=0;i<iterations;i++) squash_2(&cache[i*32], scratchpad, &cache[(i+1)*32]);
+	for(uint32_t i=0;i<mask;i++) squash_2(&cache[i*32], scratchpad, &cache[(i+1)*32]);
 	for(uint8_t j=0;j<CACHE_ROUNDS;j++){
-		for(uint32_t i=0;i<iterations;i++){
+		for(uint32_t i=0;i<mask;i++){
 			index[0] = cache_64[i*4]&mask;
-			index[1] = (i-1+iterations)&mask; 
+			index[1] = (i-1+mask)&mask; 
 			for(uint8_t k=0;k<4;k++)
 				temp_cache[k] = ((uint64_t*)&cache[index[0]+k])[0]^((uint64_t*)&cache[index[1]+k])[0];
 			squash_2((uint8_t*)temp_cache, scratchpad, &cache[i*32]);
