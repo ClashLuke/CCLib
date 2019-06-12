@@ -10,7 +10,7 @@
 #include "pow.h"
 #include "error.h"
 
-#define ITERATIONS 1 // iterations are multiplied with 64
+#define ITERATIONS 65536 // iterations are multiplied with 64
 
 void benchmark_dataset_generation(uint8_t* seed, uint64_t* dataset){
 	char      buffer[65] = {0};
@@ -80,7 +80,7 @@ uint64_t benchmark_mine(uint64_t block_height, uint8_t printing){
 	free(dataset);
 	uint32_t end_time = (uint32_t)time(NULL);
 	printf("\tCalculation of %u hashes took: %us\n",iterations<<6, end_time-current_time);
-	//printf("\tHashrate is approximately: %uH/s\n", (iterations<<6)/(end_time-current_time));
+	printf("\tHashrate is approximately: %uH/s\n", (iterations<<6)/(end_time-current_time));
 	printf("\tResult: %016jx,%016jx,%016jx,%016jx\n",temp[0],temp[1],temp[2],temp[3]);
 	return 0;
 }
@@ -127,7 +127,7 @@ uint64_t benchmark_validation(uint64_t block_height, uint8_t printing){
 	free(cache);
 	uint32_t end_time = (uint32_t)time(NULL);
 	printf("\tCalculation of %u hashes took: %us\n",ITERATIONS<<6, end_time-current_time);
-	//printf("\tHashrate is approximately: %uH/s\n", iterations/(end_time-current_time));
+	printf("\tHashrate is approximately: %uH/s\n", iterations/(end_time-current_time));
 	printf("\tResult: %016jx,%016jx,%016jx,%016jx\n",temp[0],temp[1],temp[2],temp[3]);
 	return 0;
 }
