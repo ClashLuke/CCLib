@@ -2,6 +2,10 @@
 //
 // Please see the included LICENSE file for more information.
 
+#if defined(__x86_64__)
+#include <x86intrin.h>
+#endif
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
