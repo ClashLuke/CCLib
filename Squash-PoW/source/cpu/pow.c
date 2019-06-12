@@ -67,14 +67,18 @@ void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
 	mix_32[6] ^= item_number; mix_32[7] ^= item_number;
 	for(uint16_t j=0;j<DATASET_PARENTS;j++){
 		x = j^item_number;
-		mix_32[0] = ((uint32_t*)&cache[mix_32[0]])[0];
-		mix_32[1] = ((uint32_t*)&cache[mix_32[1]])[0];
-		mix_32[2] = ((uint32_t*)&cache[mix_32[2]])[0];
-		mix_32[3] = ((uint32_t*)&cache[mix_32[3]])[0];
-		mix_32[4] = ((uint32_t*)&cache[mix_32[4]])[0];
-		mix_32[5] = ((uint32_t*)&cache[mix_32[5]])[0];
-		mix_32[6] = ((uint32_t*)&cache[mix_32[6]])[0];
-		mix_32[7] = ((uint32_t*)&cache[mix_32[7]])[0];
+		mix_32[0] &= 0x1fffff; mix_32[1] &= 0x1fffff;
+		mix_32[2] &= 0x1fffff; mix_32[3] &= 0x1fffff;
+		mix_32[4] &= 0x1fffff; mix_32[5] &= 0x1fffff;
+		mix_32[6] &= 0x1fffff; mix_32[7] &= 0x1fffff;
+		mix_32[0] = cache_32[mix_32[0]];
+		mix_32[1] = cache_32[mix_32[1]];
+		mix_32[2] = cache_32[mix_32[2]];
+		mix_32[3] = cache_32[mix_32[3]];
+		mix_32[4] = cache_32[mix_32[4]];
+		mix_32[5] = cache_32[mix_32[5]];
+		mix_32[6] = cache_32[mix_32[6]];
+		mix_32[7] = cache_32[mix_32[7]];
 		mix_32[0] ^= x; mix_32[1] ^= x;
 		mix_32[2] ^= x; mix_32[3] ^= x;
 		mix_32[4] ^= x; mix_32[5] ^= x;
