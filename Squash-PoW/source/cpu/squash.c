@@ -78,18 +78,17 @@ uint32_t crc32c_table[256] = {
 	0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
 };
 
-uint32_t crc32(uint32_t msg) {
-	uint32_t crc = 0xFFFFFFFF;
+void crc32p(uint32_t* in, uint32_t* out) { // CRC32-Pointer
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
-	__asm__("crc32w %w0,%w0,%w1\n":"+r"(crc):"r"(msg));
+	__asm__("crc32w %w0,%w0,%w1\n":"+r"(*out):"r"(*in));
+#elif defined(__x86_64__)
+	*out = _mm_crc32_u32(0, *in);
 #else
-	crc=crc^msg;
-	crc=crc32c_table[crc&0xff]^(crc>>8);
-	crc=crc32c_table[crc&0xff]^(crc>>8);
-	crc=crc32c_table[crc&0xff]^(crc>>8);
-	crc=crc32c_table[crc&0xff]^(crc>>8);
+	*out=crc32c_table[(*in )&0xff]^((*in )>>8);
+	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
+	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
+	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
 #endif
-	return crc^0xFFFFFFFF;
 }
 
 uint32_t reverse(uint32_t x){
