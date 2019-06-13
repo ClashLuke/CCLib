@@ -109,10 +109,10 @@ void reverse(uint32_t* x){
 #if defined(__aarch64__) && !defined(__x86_64__)
 	  __asm__("rbit %0":"+r"(*x));
 #else
-	*x = ((*x & 0x55555555) << 1) | ((*x & 0xAAAAAAAA) >> 1);
-	*x = ((*x & 0x33333333) << 2) | ((*x & 0xCCCCCCCC) >> 2);
-	*x = ((*x & 0x0F0F0F0F) << 4) | ((*x & 0xF0F0F0F0) >> 4);
-	*x = ((*x & 0x00FF00FF) << 8) | ((*x & 0xFF00FF00) >> 8);
+	*x = ((*x & 0x55555555) << 1)  | ((*x & 0xAAAAAAAA) >> 1);
+	*x = ((*x & 0x33333333) << 2)  | ((*x & 0xCCCCCCCC) >> 2);
+	*x = ((*x & 0x0F0F0F0F) << 4)  | ((*x & 0xF0F0F0F0) >> 4);
+	*x = ((*x & 0x00FF00FF) << 8)  | ((*x & 0xFF00FF00) >> 8);
 	*x = ((*x & 0x0000FFFF) << 16) | ((*x & 0xFFFF0000) >> 16);
 #endif
 }
@@ -166,7 +166,6 @@ void squash_0(uint8_t* data, uint8_t* out){
 	*key_1 = (out_64[3]<<shift_2) | (out_64[3]>>(shift_3));
 	aes(out     , (uint8_t*)key_0);
 	aes(&out[16], (uint8_t*)key_1);
-	return;
 }
 
 // Squash_1 uses a lookup in addition to the previous operations
@@ -217,7 +216,6 @@ void squash_1(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	*key_1 = (out_64[3]<<shift_2) | (out_64[3]>>(shift_3));
 	aes(out     , (uint8_t*)key_0);
 	aes(&out[16], (uint8_t*)key_1);
-	return;
 }
 
 // Difference from Squash_1 is a 16bit integer is used to obtain the
@@ -268,7 +266,6 @@ void squash_2(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
 	*key_1 = (out_64[3]<<shift_2) | (out_64[3]>>(shift_3));
 	aes(out     , (uint8_t*)key_0);
 	aes(&out[16], (uint8_t*)key_1);
-	return;
 }
 
 // Difference from Squash_2 is a 32bit integer is used to obtain the
@@ -336,7 +333,6 @@ void squash_3_full(uint8_t* data, uint64_t* dataset, uint8_t* out){
 	*key_1 = (out_64[3]<<shift_2) | (out_64[3]>>(shift_3));
 	aes(out     , (uint8_t*)key_0);
 	aes(&out[16], (uint8_t*)key_1);
-	return;
 }
 
 // Difference from Squash_2 is a 32bit integer is used to obtain the
@@ -414,5 +410,4 @@ void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
 	*key_1 = (out_64[3]<<shift_2) | (out_64[3]>>(shift_3));
 	aes(out     , (uint8_t*)key_0);
 	aes(&out[16], (uint8_t*)key_1);
-	return;
 }
