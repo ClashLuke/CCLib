@@ -93,6 +93,17 @@ void crc32p(uint32_t* in, uint32_t* out) { // CRC32-Pointer
 #endif
 }
 
+void crc32i(uint32_t* in) { // CRC32-Inplace
+#if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
+	__asm__("crc32w %w0,%w0,%w1\n":"+r"(*in):"r"(*in));
+#else
+	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
+	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
+	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
+	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
+#endif
+}
+
 
 void reverse(uint32_t* x){
 #if defined(__aarch64__) && !defined(__x86_64__)
@@ -270,18 +281,18 @@ void squash_3_full(uint8_t* data, uint64_t* dataset, uint8_t* out){
 	crc_32[5] = ((uint32_t*)&dataset[crc_32[1]&0x1ffffffc])[2];
 	crc_32[6] = ((uint32_t*)&dataset[crc_32[2]&0x1ffffffc])[4];
 	crc_32[7] = ((uint32_t*)&dataset[crc_32[3]&0x1ffffffc])[6];
-	crc32p(crc_32_s_0, crc_32_s_0);
-	crc32p(crc_32_s_1, crc_32_s_1);
-	crc32p(crc_32_s_2, crc_32_s_2);
+	crc32i(crc_32_s_0);
+	crc32i(crc_32_s_1);
+	crc32i(crc_32_s_2);
 	for(uint16_t i=1;i<ACCESSES;i++){
 		j = i&7;
 		crc_32[4] = ((uint32_t*)&dataset[crc_32[4]&0x1ffffffc])[j];
 		crc_32[5] = ((uint32_t*)&dataset[crc_32[5]&0x1ffffffc])[j];
 		crc_32[6] = ((uint32_t*)&dataset[crc_32[6]&0x1ffffffc])[j];
 		crc_32[7] = ((uint32_t*)&dataset[crc_32[7]&0x1ffffffc])[j];
-		crc32p(crc_32_s_0, crc_32_s_0);
-		crc32p(crc_32_s_1, crc_32_s_1);
-		crc32p(crc_32_s_2, crc_32_s_2);
+			crc32i(crc_32_s_0);
+			crc32i(crc_32_s_1);
+			crc32i(crc_32_s_2);
 	}
 	reverse(crc_32);
 	reverse(&crc_32[1]);
@@ -340,9 +351,9 @@ void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
 	crc_32[6] = dataset_item_32[4];
 	calc_dataset_item(cache, (crc_32[3]&0x1ffffffc), dataset_item);
 	crc_32[7] = dataset_item_32[6];
-	crc32p(crc_32_s_0, crc_32_s_0);
-	crc32p(crc_32_s_1, crc_32_s_1);
-	crc32p(crc_32_s_2, crc_32_s_2);
+	crc32i(crc_32_s_0);
+	crc32i(crc_32_s_1);
+	crc32i(crc_32_s_2);
 	for(uint16_t i=1;i<ACCESSES;i++){
 		j = i&7;
 		calc_dataset_item(cache, (crc_32[4]&0x1ffffffc), dataset_item);
@@ -353,9 +364,9 @@ void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
 		crc_32[6] = dataset_item_32[j];
 		calc_dataset_item(cache, (crc_32[7]&0x1ffffffc), dataset_item);
 		crc_32[7] = dataset_item_32[j];
-		crc32p(crc_32_s_0, crc_32_s_0);
-		crc32p(crc_32_s_1, crc_32_s_1);
-		crc32p(crc_32_s_2, crc_32_s_2);
+			crc32i(crc_32_s_0);
+			crc32i(crc_32_s_1);
+			crc32i(crc_32_s_2);
 	}
 	reverse(crc_32);
 	reverse(&crc_32[1]);
