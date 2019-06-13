@@ -85,8 +85,6 @@ uint32_t crc32c_table[256] = {
 void crc32p(uint32_t* in, uint32_t* out) { // CRC32-Pointer
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
 	__asm__("crc32w %w0,%w0,%w1\n":"+r"(*out):"r"(*in));
-#elif defined(__x86_64__)
-	*out = _mm_crc32_u32(0, *in);
 #else
 	*out=crc32c_table[(*in )&0xff]^((*in )>>8);
 	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
