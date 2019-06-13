@@ -297,9 +297,9 @@ void squash_3_full(uint8_t* data, uint64_t* dataset, uint8_t* out){
 	crc32p(&data_32[2], &crc_32[2]);
 	crc32p(&data_32[3], &crc_32[3]);
 	crc_32[4] = *((uint32_t*)&dataset[*crc_32&0x1ffffffc]);
-	crc_32[5] = ((uint32_t*)&dataset[crc_32[1]&0x1ffffffc])[2];
-	crc_32[6] = ((uint32_t*)&dataset[crc_32[2]&0x1ffffffc])[4];
-	crc_32[7] = ((uint32_t*)&dataset[crc_32[3]&0x1ffffffc])[6];
+	crc_32[5] = *((uint32_t*)&dataset[crc_32[1]&0x1ffffffc]);
+	crc_32[6] = *((uint32_t*)&dataset[crc_32[2]&0x1ffffffc]);
+	crc_32[7] = *((uint32_t*)&dataset[crc_32[3]&0x1ffffffc]);
 	crc32i(crc_32_s_0);
 	crc32i(crc_32_s_1);
 	crc32i(crc_32_s_2);
@@ -369,11 +369,11 @@ void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
 	calc_dataset_item(cache, (*crc_32&0x1ffffffc), dataset_item);
 	crc_32[4] = *dataset_item_32;
 	calc_dataset_item(cache, (crc_32[1]&0x1ffffffc), dataset_item);
-	crc_32[5] = dataset_item_32[2];
+	crc_32[5] = *dataset_item_32;
 	calc_dataset_item(cache, (crc_32[2]&0x1ffffffc), dataset_item);
-	crc_32[6] = dataset_item_32[4];
+	crc_32[6] = *dataset_item_32;
 	calc_dataset_item(cache, (crc_32[3]&0x1ffffffc), dataset_item);
-	crc_32[7] = dataset_item_32[6];
+	crc_32[7] = *dataset_item_32;
 	crc32i(crc_32_s_0);
 	crc32i(crc_32_s_1);
 	crc32i(crc_32_s_2);
