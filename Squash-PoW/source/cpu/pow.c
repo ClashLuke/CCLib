@@ -51,7 +51,6 @@ void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
 	uint64_t  mix[4]   = {0};
 	uint32_t* mix_32   = (uint32_t*)mix;
 	uint32_t  x        = 0;
-	uint8_t   i        = 0;
 	item_number = item_number >> 2;
 	mix_32[0]  = cache_32[(item_number  )%mask];
 	mix_32[1]  = cache_32[(item_number+1)%mask];
@@ -83,14 +82,14 @@ void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
 		mix_32[2] ^= x; mix_32[3] ^= x;
 		mix_32[4] ^= x; mix_32[5] ^= x;
 		mix_32[6] ^= x; mix_32[7] ^= x;
-		crc32p(mix_32, mix_32);
-		crc32p(&mix_32[1], &mix_32[1]);
-		crc32p(&mix_32[2], &mix_32[2]);
-		crc32p(&mix_32[3], &mix_32[3]);
-		crc32p(&mix_32[4], &mix_32[4]);
-		crc32p(&mix_32[5], &mix_32[5]);
-		crc32p(&mix_32[6], &mix_32[6]);
-		crc32p(&mix_32[7], &mix_32[7]);
+		crc32i(mix_32);
+		crc32i(&mix_32[1]);
+		crc32i(&mix_32[2]);
+		crc32i(&mix_32[3]);
+		crc32i(&mix_32[4]);
+		crc32i(&mix_32[5]);
+		crc32i(&mix_32[6]);
+		crc32i(&mix_32[7]);
 	}
 	out[0]=mix[0]; out[1]=mix[1];
 	out[2]=mix[2]; out[3]=mix[3];
