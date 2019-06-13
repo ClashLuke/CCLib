@@ -13,7 +13,7 @@
 #include "pow.h"
 #include "error.h"
 
-#define ACCESSES 64
+#define ACCESSES 8 // Accesses are multiplied with 8
 
 uint32_t crc32c_table[256] = {
 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
@@ -285,14 +285,15 @@ void squash_3_full(uint8_t* data, uint64_t* dataset, uint8_t* out){
 	crc32i(crc_32_s_1);
 	crc32i(crc_32_s_2);
 	for(uint16_t i=1;i<ACCESSES;i++){
-		j = i&7;
-		crc_32[4] = ((uint32_t*)&dataset[crc_32[4]&0x1ffffffc])[j];
-		crc_32[5] = ((uint32_t*)&dataset[crc_32[5]&0x1ffffffc])[j];
-		crc_32[6] = ((uint32_t*)&dataset[crc_32[6]&0x1ffffffc])[j];
-		crc_32[7] = ((uint32_t*)&dataset[crc_32[7]&0x1ffffffc])[j];
+		for(uint8_t j=0;j<8;j++){
+			crc_32[4] = ((uint32_t*)&dataset[crc_32[4]&0x1ffffffc])[j];
+			crc_32[5] = ((uint32_t*)&dataset[crc_32[5]&0x1ffffffc])[j];
+			crc_32[6] = ((uint32_t*)&dataset[crc_32[6]&0x1ffffffc])[j];
+			crc_32[7] = ((uint32_t*)&dataset[crc_32[7]&0x1ffffffc])[j];
 			crc32i(crc_32_s_0);
 			crc32i(crc_32_s_1);
 			crc32i(crc_32_s_2);
+		}
 	}
 	reverse(crc_32);
 	reverse(&crc_32[1]);
@@ -355,18 +356,19 @@ void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
 	crc32i(crc_32_s_1);
 	crc32i(crc_32_s_2);
 	for(uint16_t i=1;i<ACCESSES;i++){
-		j = i&7;
-		calc_dataset_item(cache, (crc_32[4]&0x1ffffffc), dataset_item);
-		crc_32[4] = dataset_item_32[j];
-		calc_dataset_item(cache, (crc_32[5]&0x1ffffffc), dataset_item);
-		crc_32[5] = dataset_item_32[j];
-		calc_dataset_item(cache, (crc_32[6]&0x1ffffffc), dataset_item);
-		crc_32[6] = dataset_item_32[j];
-		calc_dataset_item(cache, (crc_32[7]&0x1ffffffc), dataset_item);
-		crc_32[7] = dataset_item_32[j];
+		for(uint8_t j=0;j<8;j++){
+			calc_dataset_item(cache, (crc_32[4]&0x1ffffffc), dataset_item);
+			crc_32[4] = dataset_item_32[j];
+			calc_dataset_item(cache, (crc_32[5]&0x1ffffffc), dataset_item);
+			crc_32[5] = dataset_item_32[j];
+			calc_dataset_item(cache, (crc_32[6]&0x1ffffffc), dataset_item);
+			crc_32[6] = dataset_item_32[j];
+			calc_dataset_item(cache, (crc_32[7]&0x1ffffffc), dataset_item);
+			crc_32[7] = dataset_item_32[j];
 			crc32i(crc_32_s_0);
 			crc32i(crc_32_s_1);
 			crc32i(crc_32_s_2);
+		}
 	}
 	reverse(crc_32);
 	reverse(&crc_32[1]);
