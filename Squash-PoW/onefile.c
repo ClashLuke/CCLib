@@ -211,282 +211,202 @@ uint32_t crc32c_table[256] = {
 	0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
 };
 
-uint32_t crc32(uint32_t msg) {
-	uint32_t crc = 0xFFFFFFFF;
+void crc32p(uint32_t* in, uint32_t* out) { // CRC32-Pointer
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
-	__asm__("crc32w %w0,%w0,%w1\n":"+r"(crc):"r"(msg));
+	__asm__("crc32w %w0,%w0,%w1\n":"+r"(*out):"r"(*in));
 #else
-	crc=crc^msg;
-	crc=crc32c_table[crc&0xff]^(crc>>8);
-	crc=crc32c_table[crc&0xff]^(crc>>8);
-	crc=crc32c_table[crc&0xff]^(crc>>8);
-	crc=crc32c_table[crc&0xff]^(crc>>8);
+	*out=crc32c_table[(*in )&0xff]^((*in )>>8);
+	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
+	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
+	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
 #endif
-	return crc^0xFFFFFFFF;
 }
 
-uint32_t reverse(uint32_t x){
-#if defined(__aarch64__) && !defined(__x86_64__)
-	  __asm__("rbit %0":"+r"(v));
+void crc32i(uint32_t* in) { // CRC32-Inplace
+#if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
+	__asm__("crc32w %w0,%w0,%w1\n":"+r"(*in):"r"(*in));
 #else
-	x = ((x & 0x55555555) << 1) | ((x & 0xAAAAAAAA) >> 1);
-	x = ((x & 0x33333333) << 2) | ((x & 0xCCCCCCCC) >> 2);
-	x = ((x & 0x0F0F0F0F) << 4) | ((x & 0xF0F0F0F0) >> 4);
-	x = ((x & 0x00FF00FF) << 8) | ((x & 0xFF00FF00) >> 8);
-	x = ((x & 0x0000FFFF) << 16) | ((x & 0xFFFF0000) >> 16);
+	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
+	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
+	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
+	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
 #endif
-	return x;
+}
+
+
+void reverse(uint32_t* x){
+#if defined(__aarch64__) && !defined(__x86_64__)
+	  __asm__("rbit %0":"+r"(*x));
+#else
+	*x = ((*x & 0x55555555) << 1)  | ((*x & 0xAAAAAAAA) >> 1);
+	*x = ((*x & 0x33333333) << 2)  | ((*x & 0xCCCCCCCC) >> 2);
+	*x = ((*x & 0x0F0F0F0F) << 4)  | ((*x & 0xF0F0F0F0) >> 4);
+	*x = ((*x & 0x00FF00FF) << 8)  | ((*x & 0xFF00FF00) >> 8);
+	*x = ((*x & 0x0000FFFF) << 16) | ((*x & 0xFFFF0000) >> 16);
+#endif
 }
 
 // reverse all bytes in the word _v_
-uint64_t swap(uint64_t v) {
+void swap(uint64_t* v) {
 #if defined(__x86_64__)
-	__asm__("bswap %0":"+r"(v));
+	__asm__("bswap %0":"+r"(*v));
 #elif defined(__aarch64__)
-	__asm__("rev %0,%0\n":"+r"(v));
+	__asm__("rev %0,%0\n":"+r"(*v));
 #else
-	v=((v&0xff00ff00ff00ff00ULL)>>8)|((v&0x00ff00ff00ff00ffULL)<<8);
-	v=((v&0xffff0000ffff0000ULL)>>16)|((v&0x0000ffff0000ffffULL)<<16);
-	v=(v>>32)|(v<<32);
+	*v=((*v&0xff00ff00ff00ff00ULL)>>8)|((*v&0x00ff00ff00ff00ffULL)<<8);
+	*v=((*v&0xffff0000ffff0000ULL)>>16)|((*v&0x0000ffff0000ffffULL)<<16);
+	*v=(*v>>32)|(*v<<32);
 #endif
-	return v;
 }
 
 void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
-	uint32_t  mask     = 2097119; // Hashcount - 1 
 	uint32_t* cache_32 = (uint32_t*)cache; 
 	uint64_t  mix[4]   = {0};
 	uint32_t* mix_32   = (uint32_t*)mix;
+	uint32_t* mix_32_s = (uint32_t*)&(((uint16_t*)mix)[1]);
 	uint32_t  x        = 0;
-	uint8_t   i        = 0;
-	uint32_t  temp[8]  = {0};
 	item_number = item_number >> 2;
-	mix_32[0]  = cache_32[(item_number  )%mask];
-	mix_32[1]  = cache_32[(item_number+1)%mask];
-	mix_32[2]  = cache_32[(item_number+2)%mask];
-	mix_32[3]  = cache_32[(item_number+3)%mask];
-	mix_32[4]  = cache_32[(item_number+4)%mask];
-	mix_32[5]  = cache_32[(item_number+5)%mask];
-	mix_32[6]  = cache_32[(item_number+6)%mask];
-	mix_32[7]  = cache_32[(item_number+7)%mask];
-	mix_32[0] ^= item_number; mix_32[1] ^= item_number;
+	*mix_32    = cache_32[(item_number  )&0x1fffff];
+	mix_32[1]  = cache_32[(item_number+1)&0x1fffff];
+	mix_32[2]  = cache_32[(item_number+2)&0x1fffff];
+	mix_32[3]  = cache_32[(item_number+3)&0x1fffff];
+	mix_32[4]  = cache_32[(item_number+4)&0x1fffff];
+	mix_32[5]  = cache_32[(item_number+5)&0x1fffff];
+	mix_32[6]  = cache_32[(item_number+6)&0x1fffff];
+	mix_32[7]  = cache_32[(item_number+7)&0x1fffff];
+	*mix_32   ^= item_number; mix_32[1] ^= item_number;
 	mix_32[2] ^= item_number; mix_32[3] ^= item_number;
 	mix_32[4] ^= item_number; mix_32[5] ^= item_number;
 	mix_32[6] ^= item_number; mix_32[7] ^= item_number;
 	for(uint16_t j=0;j<DATASET_PARENTS;j++){
-		i = j&7;
 		x = j^item_number;
-		temp[0]  = cache_32[mix_32[0]%mask];
-		temp[1]  = cache_32[mix_32[1]%mask];
-		temp[2]  = cache_32[mix_32[2]%mask];
-		temp[3]  = cache_32[mix_32[3]%mask];
-		temp[4]  = cache_32[mix_32[4]%mask];
-		temp[5]  = cache_32[mix_32[5]%mask];
-		temp[6]  = cache_32[mix_32[6]%mask];
-		temp[7]  = cache_32[mix_32[7]%mask];
-		temp[0] ^= x; temp[1] ^= x;
-		temp[2] ^= x; temp[3] ^= x;
-		temp[4] ^= x; temp[5] ^= x;
-		temp[6] ^= x; temp[7] ^= x;
-		mix_32[i  ] = crc32(temp[0]);
-		mix_32[i^1] = crc32(temp[1]);
-		mix_32[i^2] = crc32(temp[2]);
-		mix_32[i^3] = crc32(temp[3]);
-		mix_32[i^4] = crc32(temp[4]);
-		mix_32[i^5] = crc32(temp[5]);
-		mix_32[i^6] = crc32(temp[6]);
-		mix_32[i^7] = crc32(temp[7]);
+		*mix_32 &= 0x1fffff; mix_32[1] &= 0x1fffff;
+		mix_32[2] &= 0x1fffff; mix_32[3] &= 0x1fffff;
+		mix_32[4] &= 0x1fffff; mix_32[5] &= 0x1fffff;
+		mix_32[6] &= 0x1fffff; mix_32[7] &= 0x1fffff;
+		*mix_32   = cache_32[*mix_32];
+		mix_32[1] = cache_32[mix_32[1]];
+		mix_32[2] = cache_32[mix_32[2]];
+		mix_32[3] = cache_32[mix_32[3]];
+		mix_32[4] = cache_32[mix_32[4]];
+		mix_32[5] = cache_32[mix_32[5]];
+		mix_32[6] = cache_32[mix_32[6]];
+		mix_32[7] = cache_32[mix_32[7]];
+		*mix_32   ^= x; mix_32[1] ^= x;
+		mix_32[2] ^= x; mix_32[3] ^= x;
+		mix_32[4] ^= x; mix_32[5] ^= x;
+		mix_32[6] ^= x; mix_32[7] ^= x;
+		crc32i(mix_32_s);
+		crc32i(&mix_32_s[1]);
+		crc32i(&mix_32_s[2]);
+		crc32i(&mix_32_s[3]);
+		crc32i(&mix_32_s[4]);
+		crc32i(&mix_32_s[5]);
+		crc32i(&mix_32_s[6]);
 	}
-	out[0]=mix[0]; out[1]=mix[1];
-	out[2]=mix[2]; out[3]=mix[3];
+	*out  =*mix;    out[1]=mix[1];
+	out[2]= mix[2]; out[3]=mix[3];
 }
 
 
 void squash_0(uint8_t* data, uint8_t* out){
-	uint8_t   shift[4]   = {0};
-	uint64_t  key[2][2]  = {0};
-	uint64_t  crc_64[4]  = {0};
-	uint32_t* crc_32     = (uint32_t*)crc_64;
-	uint32_t* data_32    = (uint32_t*)data;
-	uint64_t* data_64    = (uint64_t*)data;
-	uint16_t* out_16     = (uint16_t*)out;
-	uint64_t* out_64     = (uint64_t*)out;
-	crc_32[0] = crc32(data_32[0]);
-	crc_32[1] = crc32(data_32[1]);
-	crc_32[2] = crc32(data_32[2]);
-	crc_32[3] = crc32(data_32[3]);
-	crc_64[2] = (data_64[2] + crc_64[0]) ^ (data_64[2] / crc_64[0]);
+	uint8_t   shift_0         = 0;
+	uint8_t   shift_1         = 0;
+	uint8_t   shift_2         = 0;
+	uint8_t   shift_3         = 0;
+	uint64_t  key_0[2]        = {0};
+	uint64_t  key_1[2]        = {0};
+	uint64_t  divr_0          = 0;
+	uint64_t  divr_1          = 0;
+	uint64_t  crc_64[4]       = {0};
+	uint32_t* crc_32          = (uint32_t*)crc_64;
+	uint32_t* data_32         = (uint32_t*)data;
+	uint64_t* data_64         = (uint64_t*)data;
+	uint16_t* out_16          = (uint16_t*)out;
+	uint64_t* out_64          = (uint64_t*)out;
+	crc32p(data_32, crc_32);
+	crc32p(&data_32[1], &crc_32[1]);
+	crc32p(&data_32[2], &crc_32[2]);
+	crc32p(&data_32[3], &crc_32[3]);
+	*crc_64 ^= 0xFFFFFFFF;
+	crc_64[1] ^= 0xFFFFFFFF;
+	crc_64[2] = (data_64[2] + *crc_64) ^ (data_64[2] / *crc_64);
 	crc_64[3] = (data_64[3] + crc_64[1]) ^ (data_64[3] / crc_64[1]);
-	out_64[0] = crc_64[0]; out_64[1] = crc_64[1];
-	out_64[2] = crc_64[2]; out_64[3] = crc_64[3];
-	shift[0] = out_16[15]&0x3f;
-	shift[2] = out_16[ 0]&0x3f;
-	shift[1] = 64-shift[0];
-	shift[3] = 64-shift[2];
-	key[1][0] = (out_64[0]>>shift[0]) | (out_64[0]<<(shift[1]));
-	key[1][1] = (out_64[1]>>shift[0]) | (out_64[1]<<(shift[1]));
-	key[0][0] = (out_64[2]<<shift[2]) | (out_64[2]>>(shift[3]));
-	key[0][1] = (out_64[3]<<shift[2]) | (out_64[3]>>(shift[3]));
-	aes(out     , (uint8_t*)key[0]);
-	aes(&out[16], (uint8_t*)key[1]);
-	return;
+	*out_64   = *crc_64^divr_0; out_64[1] = crc_64[1]^divr_0;
+	out_64[2] = crc_64[2]^divr_1; out_64[3] = crc_64[3]^divr_1;
+	shift_0 = out_16[15]&0x3f;
+	shift_2 = (*out_16)&0x3f;
+	shift_1 = 64-shift_0;
+	shift_3 = 64-shift_2;
+	key_0[1] = (*out_64>>shift_0) | (*out_64<<(shift_1));
+	key_1[1] = (out_64[1]>>shift_0) | (out_64[1]<<(shift_1));
+	*key_0 = (out_64[2]<<shift_2) | (out_64[2]>>(shift_3));
+	*key_1 = (out_64[3]<<shift_2) | (out_64[3]>>(shift_3));
+	aes(out     , (uint8_t*)key_0);
+	aes(&out[16], (uint8_t*)key_1);
 }
 
 // Squash_1 uses a lookup in addition to the previous operations
 // to force a hasher to have 256B read-only scratchpad in L1 cache
 void squash_1(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
-	uint8_t   shift[4]   = {0};
-	uint64_t  key[2][2]  = {0};
-	uint64_t  divr[2]    = {0};
-	uint64_t  crc_64[4]  = {0};
-	uint32_t* crc_32     = (uint32_t*)crc_64;
-	uint8_t*  crc_8      = (uint8_t*)crc_64;
-	uint32_t* data_32    = (uint32_t*)data;
-	uint64_t* data_64    = (uint64_t*)data;
-	uint16_t* out_16     = (uint16_t*)out;
-	uint64_t* out_64     = (uint64_t*)out;
-	crc_32[0] = crc32(data_32[0]);
-	crc_32[1] = crc32(data_32[1]);
-	crc_32[2] = crc32(data_32[2]);
-	crc_32[3] = crc32(data_32[3]);
-	crc_32[4] = ((uint32_t*)&scratchpad[crc_8[ 0]])[0];
-	crc_32[5] = ((uint32_t*)&scratchpad[crc_8[ 4]])[0];
-	crc_32[6] = ((uint32_t*)&scratchpad[crc_8[ 8]])[0];
-	crc_32[7] = ((uint32_t*)&scratchpad[crc_8[12]])[0];
-	crc_32[0] = reverse(crc_32[0]);
-	crc_32[1] = reverse(crc_32[1]);
-	crc_32[6] = reverse(crc_32[6]);
-	crc_32[7] = reverse(crc_32[7]);
-	crc_64[1] = swap(crc_64[1]);
-	crc_64[2] = swap(crc_64[2]);
-	divr[0] = (data_64[2] + crc_64[2]) ^ (data_64[2] / crc_64[0]);
-	divr[1] = (data_64[3] + crc_64[3]) ^ (data_64[3] / crc_64[1]);
-	out_64[0] = crc_64[0]^divr[0]; out_64[1] = crc_64[1]^divr[0];
-	out_64[2] = crc_64[2]^divr[1]; out_64[3] = crc_64[3]^divr[1];
-	shift[0] = out_16[15]&0x3f;
-	shift[2] = out_16[ 0]&0x3f;
-	shift[1] = 64-shift[0];
-	shift[3] = 64-shift[2];
-	key[1][0] = (out_64[0]>>shift[0]) | (out_64[0]<<(shift[1]));
-	key[1][1] = (out_64[1]>>shift[0]) | (out_64[1]<<(shift[1]));
-	key[0][0] = (out_64[2]<<shift[2]) | (out_64[2]>>(shift[3]));
-	key[0][1] = (out_64[3]<<shift[2]) | (out_64[3]>>(shift[3]));
-	aes(out     , (uint8_t*)key[0]);
-	aes(&out[16], (uint8_t*)key[1]);
-	return;
+	uint8_t   shift_0         = 0;
+	uint8_t   shift_1         = 0;
+	uint8_t   shift_2         = 0;
+	uint8_t   shift_3         = 0;
+	uint64_t  key_0[2]        = {0};
+	uint64_t  key_1[2]        = {0};
+	uint64_t  divr_0          = 0;
+	uint64_t  divr_1          = 0;
+	uint64_t  crc_64[4]       = {0};
+	uint32_t* crc_32          = (uint32_t*)crc_64;
+	uint8_t*  crc_8           = (uint8_t*)crc_64;
+	uint32_t* data_32         = (uint32_t*)data;
+	uint64_t* data_64         = (uint64_t*)data;
+	uint16_t* out_16          = (uint16_t*)out;
+	uint64_t* out_64          = (uint64_t*)out;
+	crc32p(data_32, crc_32);
+	crc32p(&data_32[1], &crc_32[1]);
+	crc32p(&data_32[2], &crc_32[2]);
+	crc32p(&data_32[3], &crc_32[3]);
+	crc_32[4] = *((uint32_t*)&scratchpad[*crc_8]);
+	crc_32[5] = *((uint32_t*)&scratchpad[crc_8[ 4]]);
+	crc_32[6] = *((uint32_t*)&scratchpad[crc_8[ 8]]);
+	crc_32[7] = *((uint32_t*)&scratchpad[crc_8[12]]);
+	reverse(crc_32);
+	reverse(&crc_32[1]);
+	reverse(&crc_32[6]);
+	reverse(&crc_32[7]);
+	swap(&crc_64[1]);
+	swap(&crc_64[2]);
+	divr_0  = (data_64[2] + *crc_64);
+	divr_1  = (data_64[3] + crc_64[1]);
+	divr_0 ^= (data_64[2] / crc_64[2]);
+	divr_1 ^= (data_64[3] / crc_64[3]);
+	*out_64   = *crc_64^divr_0; out_64[1] = crc_64[1]^divr_0;
+	out_64[2] = crc_64[2]^divr_1; out_64[3] = crc_64[3]^divr_1;
+	shift_0 = out_16[15]&0x3f;
+	shift_2 = (*out_16)&0x3f;
+	shift_1 = 64-shift_0;
+	shift_3 = 64-shift_2;
+	key_0[1] = (*out_64>>shift_0) | (*out_64<<(shift_1));
+	key_1[1] = (out_64[1]>>shift_0) | (out_64[1]<<(shift_1));
+	*key_0 = (out_64[2]<<shift_2) | (out_64[2]>>(shift_3));
+	*key_1 = (out_64[3]<<shift_2) | (out_64[3]>>(shift_3));
+	aes(out     , (uint8_t*)key_0);
+	aes(&out[16], (uint8_t*)key_1);
 }
 
 // Difference from Squash_1 is a 16bit integer is used to obtain the
 // data from the scratchpad. (64KiB scratchpad)
 void squash_2(uint8_t* data, uint8_t* scratchpad, uint8_t* out){
-	uint8_t   shift[4]   = {0};
-	uint64_t  key[2][2]  = {0};
-	uint64_t  divr[2]    = {0};
-	uint64_t  crc_64[4]  = {0};
-	uint32_t* crc_32     = (uint32_t*)crc_64;
-	uint16_t* crc_16     = (uint16_t*)crc_64;
-	uint32_t* data_32    = (uint32_t*)data;
-	uint64_t* data_64    = (uint64_t*)data;
-	uint16_t* out_16     = (uint16_t*)out;
-	uint64_t* out_64     = (uint64_t*)out;
-	crc_32[0] = crc32(data_32[0]);
-	crc_32[1] = crc32(data_32[1]);
-	crc_32[2] = crc32(data_32[2]);
-	crc_32[3] = crc32(data_32[3]);
-	crc_32[4] = ((uint32_t*)&scratchpad[crc_16[0]])[0];
-	crc_32[5] = ((uint32_t*)&scratchpad[crc_16[2]])[0];
-	crc_32[6] = ((uint32_t*)&scratchpad[crc_16[4]])[0];
-	crc_32[7] = ((uint32_t*)&scratchpad[crc_16[6]])[0];
-	crc_32[0] = reverse(crc_32[0]);
-	crc_32[1] = reverse(crc_32[1]);
-	crc_32[6] = reverse(crc_32[6]);
-	crc_32[7] = reverse(crc_32[7]);
-	crc_64[1] = swap(crc_64[1]);
-	crc_64[2] = swap(crc_64[2]);
-	divr[0] = (data_64[2] + crc_64[2]) ^ (data_64[2] / crc_64[0]);
-	divr[1] = (data_64[3] + crc_64[3]) ^ (data_64[3] / crc_64[1]);
-	out_64[0] = crc_64[0]^divr[0]; out_64[1] = crc_64[1]^divr[0];
-	out_64[2] = crc_64[2]^divr[1]; out_64[3] = crc_64[3]^divr[1];
-	shift[0] = out_16[15]&0x3f;
-	shift[2] = out_16[ 0]&0x3f;
-	shift[1] = 64-shift[0];
-	shift[3] = 64-shift[2];
-	key[1][0] = (out_64[0]>>shift[0]) | (out_64[0]<<(shift[1]));
-	key[1][1] = (out_64[1]>>shift[0]) | (out_64[1]<<(shift[1]));
-	key[0][0] = (out_64[2]<<shift[2]) | (out_64[2]>>(shift[3]));
-	key[0][1] = (out_64[3]<<shift[2]) | (out_64[3]>>(shift[3]));
-	aes(out     , (uint8_t*)key[0]);
-	aes(&out[16], (uint8_t*)key[1]);
-	return;
-}
-
-// Difference from Squash_2 is a 32bit integer is used to obtain the
-// data from the dataset. (4 GiB dataset)
-void squash_3_full(uint8_t* data, uint64_t* dataset, uint8_t* out){
-	uint8_t   shift[4]      = {0};
-	uint64_t  key[2][2]     = {0};
-	uint64_t  divr[2]       = {0};
-	uint64_t  crc_64[4]     = {0};
-	uint32_t* crc_32        = (uint32_t*)crc_64;
-	uint16_t* crc_16        = (uint16_t*)crc_64;
-	uint32_t* data_32       = (uint32_t*)data;
-	uint64_t* data_64       = (uint64_t*)data;
-	uint16_t* out_16        = (uint16_t*)out;
-	uint64_t* out_64        = (uint64_t*)out;
-	uint16_t  temp_storage  = 0;
-	uint8_t   j             = 0;
-	crc_32[0] = crc32(data_32[0]);
-	crc_32[1] = crc32(data_32[1]);
-	crc_32[2] = crc32(data_32[2]);
-	crc_32[3] = crc32(data_32[3]);
-	crc_32[4] = ((uint32_t*)&dataset[crc_32[0]&0x1ffffffc])[0];
-	crc_32[5] = ((uint32_t*)&dataset[crc_32[1]&0x1ffffffc])[2];
-	crc_32[6] = ((uint32_t*)&dataset[crc_32[2]&0x1ffffffc])[4];
-	crc_32[7] = ((uint32_t*)&dataset[crc_32[3]&0x1ffffffc])[6];
-	for(uint16_t i=1;i<ACCESSES;i++){
-		j = i&7;
-		crc_32[4] = ((uint32_t*)&dataset[crc_32[4]&0x1ffffffc])[j];
-		crc_32[5] = ((uint32_t*)&dataset[crc_32[5]&0x1ffffffc])[j];
-		crc_32[6] = ((uint32_t*)&dataset[crc_32[6]&0x1ffffffc])[j];
-		crc_32[7] = ((uint32_t*)&dataset[crc_32[7]&0x1ffffffc])[j];
-		temp_storage = crc_16[10];
-		crc_16[10]   = crc_16[ 9];
-		crc_16[ 9]   = temp_storage;
-		temp_storage = crc_16[13];
-		crc_16[13]   = crc_16[14];
-		crc_16[14]   = temp_storage;
-	}
-	crc_32[0] = reverse(crc_32[0]);
-	crc_32[1] = reverse(crc_32[1]);
-	crc_32[6] = reverse(crc_32[6]);
-	crc_32[7] = reverse(crc_32[7]);
-	crc_64[1] = swap(crc_64[1]);
-	crc_64[2] = swap(crc_64[2]);
-	divr[0]  = (data_64[2] + crc_64[2]);
-	divr[1]  = (data_64[3] + crc_64[3]);
-	divr[0] ^= (data_64[2] / crc_64[0]);
-	divr[1] ^= (data_64[3] / crc_64[1]);
-	out_64[0] = crc_64[0]^divr[0]; out_64[1] = crc_64[1]^divr[0];
-	out_64[2] = crc_64[2]^divr[1]; out_64[3] = crc_64[3]^divr[1];
-	shift[0] = out_16[15]&0x3f;
-	shift[2] = out_16[ 0]&0x3f;
-	shift[1] = 64-shift[0];
-	shift[3] = 64-shift[2];
-	key[1][0] = (out_64[0]>>shift[0]) | (out_64[0]<<(shift[1]));
-	key[1][1] = (out_64[1]>>shift[0]) | (out_64[1]<<(shift[1]));
-	key[0][0] = (out_64[2]<<shift[2]) | (out_64[2]>>(shift[3]));
-	key[0][1] = (out_64[3]<<shift[2]) | (out_64[3]>>(shift[3]));
-	aes(out     , (uint8_t*)key[0]);
-	aes(&out[16], (uint8_t*)key[1]);
-	return;
-}
-
-// Difference from Squash_2 is a 32bit integer is used to obtain the
-// data from the scratchpad. (4 GiB scratchpad)
-void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
-	uint8_t   shift[4]        = {0};
-	uint64_t  key[4]          = {0};
-	uint64_t  divr[2]         = {0};
+	uint8_t   shift_0         = 0;
+	uint8_t   shift_1         = 0;
+	uint8_t   shift_2         = 0;
+	uint8_t   shift_3         = 0;
+	uint64_t  key_0[2]        = {0};
+	uint64_t  key_1[2]        = {0};
+	uint64_t  divr_0          = 0;
+	uint64_t  divr_1          = 0;
 	uint64_t  crc_64[4]       = {0};
 	uint32_t* crc_32          = (uint32_t*)crc_64;
 	uint16_t* crc_16          = (uint16_t*)crc_64;
@@ -494,62 +414,180 @@ void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
 	uint64_t* data_64         = (uint64_t*)data;
 	uint16_t* out_16          = (uint16_t*)out;
 	uint64_t* out_64          = (uint64_t*)out;
+	crc32p(data_32, crc_32);
+	crc32p(&data_32[1], &crc_32[1]);
+	crc32p(&data_32[2], &crc_32[2]);
+	crc32p(&data_32[3], &crc_32[3]);
+	crc_32[4] = *((uint32_t*)&scratchpad[*crc_16]);
+	crc_32[5] = *((uint32_t*)&scratchpad[crc_16[2]]);
+	crc_32[6] = *((uint32_t*)&scratchpad[crc_16[4]]);
+	crc_32[7] = *((uint32_t*)&scratchpad[crc_16[6]]);
+	reverse(crc_32);
+	reverse(&crc_32[1]);
+	reverse(&crc_32[6]);
+	reverse(&crc_32[7]);
+	swap(&crc_64[1]);
+	swap(&crc_64[2]);
+	divr_0  = (data_64[2] + *crc_64);
+	divr_1  = (data_64[3] + crc_64[1]);
+	divr_0 ^= (data_64[2] / crc_64[2]);
+	divr_1 ^= (data_64[3] / crc_64[3]);
+	*out_64   = *crc_64^divr_0; out_64[1] = crc_64[1]^divr_0;
+	out_64[2] = crc_64[2]^divr_1; out_64[3] = crc_64[3]^divr_1;
+	shift_0 = out_16[15]&0x3f;
+	shift_2 = (*out_16)&0x3f;
+	shift_1 = 64-shift_0;
+	shift_3 = 64-shift_2;
+	key_0[1] = (*out_64>>shift_0) | (*out_64<<(shift_1));
+	key_1[1] = (out_64[1]>>shift_0) | (out_64[1]<<(shift_1));
+	*key_0 = (out_64[2]<<shift_2) | (out_64[2]>>(shift_3));
+	*key_1 = (out_64[3]<<shift_2) | (out_64[3]>>(shift_3));
+	aes(out     , (uint8_t*)key_0);
+	aes(&out[16], (uint8_t*)key_1);
+}
+
+// Difference from Squash_2 is a 32bit integer is used to obtain the
+// data from the dataset. (4 GiB dataset)
+void squash_3_full(uint8_t* data, uint64_t* dataset, uint8_t* out){
+	uint8_t   shift_0         = 0;
+	uint8_t   shift_1         = 0;
+	uint8_t   shift_2         = 0;
+	uint8_t   shift_3         = 0;
+	uint64_t  key_0[2]        = {0};
+	uint64_t  key_1[2]        = {0};
+	uint64_t  divr_0          = 0;
+	uint64_t  divr_1          = 0;
+	uint64_t  crc_64[4]       = {0};
+	uint32_t* crc_32          = (uint32_t*)crc_64;
+	uint16_t* crc_16          = (uint16_t*)crc_64;
+	uint32_t* crc_32_s_0      = (uint32_t*)&crc_16[9];
+	uint32_t* crc_32_s_1      = (uint32_t*)&crc_16[11];
+	uint32_t* crc_32_s_2      = (uint32_t*)&crc_16[13];
+	uint32_t* data_32         = (uint32_t*)data;
+	uint64_t* data_64         = (uint64_t*)data;
+	uint16_t* out_16          = (uint16_t*)out;
+	uint64_t* out_64          = (uint64_t*)out;
+	crc32p(data_32, crc_32);
+	crc32p(&data_32[1], &crc_32[1]);
+	crc32p(&data_32[2], &crc_32[2]);
+	crc32p(&data_32[3], &crc_32[3]);
+	crc_32[4] = *((uint32_t*)&dataset[*crc_32&0x1ffffffc]);
+	crc_32[5] = *((uint32_t*)&dataset[crc_32[1]&0x1ffffffc]);
+	crc_32[6] = *((uint32_t*)&dataset[crc_32[2]&0x1ffffffc]);
+	crc_32[7] = *((uint32_t*)&dataset[crc_32[3]&0x1ffffffc]);
+	crc32i(crc_32_s_0);
+	crc32i(crc_32_s_1);
+	crc32i(crc_32_s_2);
+	for(uint16_t i=1;i<ACCESSES;i++){
+		for(uint8_t j=0;j<8;j++){
+			crc_32[4] = ((uint32_t*)&dataset[crc_32[4]&0x1ffffffc])[j];
+			crc_32[5] = ((uint32_t*)&dataset[crc_32[5]&0x1ffffffc])[j];
+			crc_32[6] = ((uint32_t*)&dataset[crc_32[6]&0x1ffffffc])[j];
+			crc_32[7] = ((uint32_t*)&dataset[crc_32[7]&0x1ffffffc])[j];
+			crc32i(crc_32_s_0);
+			crc32i(crc_32_s_1);
+			crc32i(crc_32_s_2);
+		}
+	}
+	reverse(crc_32);
+	reverse(&crc_32[1]);
+	reverse(&crc_32[6]);
+	reverse(&crc_32[7]);
+	swap(&crc_64[1]);
+	swap(&crc_64[2]);
+	divr_0  = (data_64[2] + *crc_64);
+	divr_1  = (data_64[3] + crc_64[1]);
+	divr_0 ^= (data_64[2] / crc_64[2]);
+	divr_1 ^= (data_64[3] / crc_64[3]);
+	*out_64   = *crc_64^divr_0; out_64[1] = crc_64[1]^divr_0;
+	out_64[2] = crc_64[2]^divr_1; out_64[3] = crc_64[3]^divr_1;
+	shift_0 = out_16[15]&0x3f;
+	shift_2 = (*out_16)&0x3f;
+	shift_1 = 64-shift_0;
+	shift_3 = 64-shift_2;
+	key_0[1] = (*out_64>>shift_0) | (*out_64<<(shift_1));
+	key_1[1] = (out_64[1]>>shift_0) | (out_64[1]<<(shift_1));
+	*key_0 = (out_64[2]<<shift_2) | (out_64[2]>>(shift_3));
+	*key_1 = (out_64[3]<<shift_2) | (out_64[3]>>(shift_3));
+	aes(out     , (uint8_t*)key_0);
+	aes(&out[16], (uint8_t*)key_1);
+}
+
+// Difference from Squash_2 is a 32bit integer is used to obtain the
+// data from the scratchpad. (4 GiB scratchpad)
+void squash_3_light(uint8_t* data, uint8_t* cache, uint8_t* out){
+	uint8_t   shift_0         = 0;
+	uint8_t   shift_1         = 0;
+	uint8_t   shift_2         = 0;
+	uint8_t   shift_3         = 0;
+	uint64_t  key_0[2]        = {0};
+	uint64_t  key_1[2]        = {0};
+	uint64_t  divr_0          = 0;
+	uint64_t  divr_1          = 0;
+	uint64_t  crc_64[4]       = {0};
+	uint32_t* crc_32          = (uint32_t*)crc_64;
+	uint16_t* crc_16          = (uint16_t*)crc_64;
+	uint32_t* crc_32_s_0      = (uint32_t*)&crc_16[9];
+	uint32_t* crc_32_s_1      = (uint32_t*)&crc_16[11];
+	uint32_t* crc_32_s_2      = (uint32_t*)&crc_16[13];
+	uint32_t* data_32         = (uint32_t*)data;
+	uint64_t* data_64         = (uint64_t*)data;
+	uint16_t* out_16          = (uint16_t*)out;
+	uint64_t* out_64          = (uint64_t*)out;
 	uint64_t  dataset_item[4] = {0};
 	uint32_t* dataset_item_32 = (uint32_t*)dataset_item;
-	uint16_t  temp_storage  = 0;
-	uint8_t   j             = 0;
-	crc_32[0] = crc32(data_32[0]);
-	crc_32[1] = crc32(data_32[1]);
-	crc_32[2] = crc32(data_32[2]);
-	crc_32[3] = crc32(data_32[3]);
-	calc_dataset_item(cache, (crc_32[0]&0x1ffffffc), dataset_item);
-	crc_32[4] = dataset_item_32[0];
+	crc32p(data_32, crc_32);
+	crc32p(&data_32[1], &crc_32[1]);
+	crc32p(&data_32[2], &crc_32[2]);
+	crc32p(&data_32[3], &crc_32[3]);
+	calc_dataset_item(cache, (*crc_32&0x1ffffffc), dataset_item);
+	crc_32[4] = *dataset_item_32;
 	calc_dataset_item(cache, (crc_32[1]&0x1ffffffc), dataset_item);
-	crc_32[5] = dataset_item_32[2];
+	crc_32[5] = *dataset_item_32;
 	calc_dataset_item(cache, (crc_32[2]&0x1ffffffc), dataset_item);
-	crc_32[6] = dataset_item_32[4];
+	crc_32[6] = *dataset_item_32;
 	calc_dataset_item(cache, (crc_32[3]&0x1ffffffc), dataset_item);
-	crc_32[7] = dataset_item_32[6];
+	crc_32[7] = *dataset_item_32;
+	crc32i(crc_32_s_0);
+	crc32i(crc_32_s_1);
+	crc32i(crc_32_s_2);
 	for(uint16_t i=1;i<ACCESSES;i++){
-		j = i&7;
-		calc_dataset_item(cache, (crc_32[4]&0x1ffffffc), dataset_item);
-		crc_32[4] = dataset_item_32[j];
-		calc_dataset_item(cache, (crc_32[5]&0x1ffffffc), dataset_item);
-		crc_32[5] = dataset_item_32[j];
-		calc_dataset_item(cache, (crc_32[6]&0x1ffffffc), dataset_item);
-		crc_32[6] = dataset_item_32[j];
-		calc_dataset_item(cache, (crc_32[7]&0x1ffffffc), dataset_item);
-		crc_32[7] = dataset_item_32[j];
-		temp_storage = crc_16[10];
-		crc_16[10]   = crc_16[ 9];
-		crc_16[ 9]   = temp_storage;
-		temp_storage = crc_16[13];
-		crc_16[13]   = crc_16[14];
-		crc_16[14]   = temp_storage;
+		for(uint8_t j=0;j<8;j++){
+			calc_dataset_item(cache, (crc_32[4]&0x1ffffffc), dataset_item);
+			crc_32[4] = dataset_item_32[j];
+			calc_dataset_item(cache, (crc_32[5]&0x1ffffffc), dataset_item);
+			crc_32[5] = dataset_item_32[j];
+			calc_dataset_item(cache, (crc_32[6]&0x1ffffffc), dataset_item);
+			crc_32[6] = dataset_item_32[j];
+			calc_dataset_item(cache, (crc_32[7]&0x1ffffffc), dataset_item);
+			crc_32[7] = dataset_item_32[j];
+			crc32i(crc_32_s_0);
+			crc32i(crc_32_s_1);
+			crc32i(crc_32_s_2);
+		}
 	}
-	crc_32[0] = reverse(crc_32[0]);
-	crc_32[1] = reverse(crc_32[1]);
-	crc_32[6] = reverse(crc_32[6]);
-	crc_32[7] = reverse(crc_32[7]);
-	crc_64[1] = swap(crc_64[1]);
-	crc_64[2] = swap(crc_64[2]);
-	divr[0]  = (data_64[2] + crc_64[2]);
-	divr[1]  = (data_64[3] + crc_64[3]);
-	divr[0] ^= (data_64[2] / crc_64[0]);
-	divr[1] ^= (data_64[3] / crc_64[1]);
-	out_64[0] = crc_64[0]^divr[0]; out_64[1] = crc_64[1]^divr[0];
-	out_64[2] = crc_64[2]^divr[1]; out_64[3] = crc_64[3]^divr[1];
-	shift[0] = out_16[15]&0x3f;
-	shift[2] = out_16[ 0]&0x3f;
-	shift[1] = 64-shift[0];
-	shift[3] = 64-shift[2];
-	key[2] = (out_64[0]>>shift[0]) | (out_64[0]<<(shift[1]));
-	key[3] = (out_64[1]>>shift[0]) | (out_64[1]<<(shift[1]));
-	key[0] = (out_64[2]<<shift[2]) | (out_64[2]>>(shift[3]));
-	key[1] = (out_64[3]<<shift[2]) | (out_64[3]>>(shift[3]));
-	aes(out     , (uint8_t*)key);
-	aes(&out[16], (uint8_t*)key);
-	return;
+	reverse(crc_32);
+	reverse(&crc_32[1]);
+	reverse(&crc_32[6]);
+	reverse(&crc_32[7]);
+	swap(&crc_64[1]);
+	swap(&crc_64[2]);
+	divr_0  = (data_64[2] + *crc_64);
+	divr_1  = (data_64[3] + crc_64[1]);
+	divr_0 ^= (data_64[2] / crc_64[2]);
+	divr_1 ^= (data_64[3] / crc_64[3]);
+	*out_64   = *crc_64^divr_0; out_64[1] = crc_64[1]^divr_0;
+	out_64[2] = crc_64[2]^divr_1; out_64[3] = crc_64[3]^divr_1;
+	shift_0 = out_16[15]&0x3f;
+	shift_2 = (*out_16)&0x3f;
+	shift_1 = 64-shift_0;
+	shift_3 = 64-shift_2;
+	key_0[1] = (*out_64>>shift_0) | (*out_64<<(shift_1));
+	key_1[1] = (out_64[1]>>shift_0) | (out_64[1]<<(shift_1));
+	*key_0 = (out_64[2]<<shift_2) | (out_64[2]>>(shift_3));
+	*key_1 = (out_64[3]<<shift_2) | (out_64[3]>>(shift_3));
+	aes(out     , (uint8_t*)key_0);
+	aes(&out[16], (uint8_t*)key_1);
 }
 
 
@@ -564,14 +602,15 @@ void make_cache(uint8_t* scratchpad, uint8_t* cache){
 	uint32_t  mask          = 67108864/HASH_BYTES-1;
 	uint64_t* cache_64      = (uint64_t*)cache; 
 	uint64_t  temp_cache[4] = {0};
-	uint64_t  index[2]      = {0};
+	uint64_t  index_0       = 0;
+	uint64_t  index_1       = 0;
 	for(uint32_t i=0;i<mask;i++) squash_2(&cache[i*32], scratchpad, &cache[(i+1)*32]);
 	for(uint8_t j=0;j<CACHE_ROUNDS;j++){
 		for(uint32_t i=0;i<mask;i++){
-			index[0] = cache_64[i*4]&mask;
-			index[1] = (i-1+mask)&mask; 
+			index_0   = cache_64[i*4]&mask;
+			index_1 = (i-1+mask)&mask; 
 			for(uint8_t k=0;k<4;k++)
-				temp_cache[k] = ((uint64_t*)&cache[index[0]+k])[0]^((uint64_t*)&cache[index[1]+k])[0];
+				temp_cache[k] = *((uint64_t*)&cache[index_0+k])^*((uint64_t*)&cache[index_1+k]);
 			squash_2((uint8_t*)temp_cache, scratchpad, &cache[i*32]);
 		}
 	}
