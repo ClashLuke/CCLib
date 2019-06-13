@@ -47,21 +47,20 @@ void make_cache(uint8_t* scratchpad, uint8_t* cache){
 }
 
 void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
-	uint32_t  mask     = 2097119; // Hashcount - 1 
 	uint32_t* cache_32 = (uint32_t*)cache; 
 	uint64_t  mix[4]   = {0};
 	uint32_t* mix_32   = (uint32_t*)mix;
 	uint32_t* mix_32_s = (uint32_t*)&(((uint16_t*)mix)[1]);
 	uint32_t  x        = 0;
 	item_number = item_number >> 2;
-	*mix_32    = cache_32[(item_number  )%mask];
-	mix_32[1]  = cache_32[(item_number+1)%mask];
-	mix_32[2]  = cache_32[(item_number+2)%mask];
-	mix_32[3]  = cache_32[(item_number+3)%mask];
-	mix_32[4]  = cache_32[(item_number+4)%mask];
-	mix_32[5]  = cache_32[(item_number+5)%mask];
-	mix_32[6]  = cache_32[(item_number+6)%mask];
-	mix_32[7]  = cache_32[(item_number+7)%mask];
+	*mix_32    = cache_32[(item_number  )&0x1fffff];
+	mix_32[1]  = cache_32[(item_number+1)&0x1fffff];
+	mix_32[2]  = cache_32[(item_number+2)&0x1fffff];
+	mix_32[3]  = cache_32[(item_number+3)&0x1fffff];
+	mix_32[4]  = cache_32[(item_number+4)&0x1fffff];
+	mix_32[5]  = cache_32[(item_number+5)&0x1fffff];
+	mix_32[6]  = cache_32[(item_number+6)&0x1fffff];
+	mix_32[7]  = cache_32[(item_number+7)&0x1fffff];
 	*mix_32   ^= item_number; mix_32[1] ^= item_number;
 	mix_32[2] ^= item_number; mix_32[3] ^= item_number;
 	mix_32[4] ^= item_number; mix_32[5] ^= item_number;
