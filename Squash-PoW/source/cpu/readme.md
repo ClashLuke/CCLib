@@ -26,10 +26,10 @@ The executables can then be double-clicked or run via `miner.exe`, `validator.ex
 * Benchmark: `gcc -O3 -march=native squash.c blockchain.c aes.c benchmark.c blake2/neon/blake2b.c pow.c error.c -marm -mfpu=neon -o benchmark.exe`
 The executables can then be double-clicked or run via `miner.exe`, `validator.exe` or `benchmark.exe` respectively.
 
-#### Windows, x86
-* Miner: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c error.c mine.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o miner.exe`
-* Validator: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c error.c validate.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o validator.exe`
-* Benchmark: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c error.c benchmark.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o benchmark.exe`
+#### Unix, x86
+* Miner: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c error.c mine.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o miner`
+* Validator: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c error.c validate.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o validator`
+* Benchmark: `gcc -O3 -march=native squash.c blockchain.c aes.c pow.c error.c benchmark.c blake2/sse/blake2b.c -maes -msse2 -msse4.2 -mavx -o benchmark`
 The executables can then be run via `./miner`, `./validator` or `./benchmark` respectively.
 
 #### Unix, ARM
@@ -44,24 +44,16 @@ The following results were achieved on an [Xeon E3-1225v2](https://ark.intel.com
 ```
 Mining
 	Seed calculation took: 0s
-        Dataset generation took: 2433s                                          
-        Calculation of 67108864 hashes took: 695s                               
-	Hashrate is approximately: 96559H/s
-	Result: 49b6a650a4c2ae52,5b76a8fefbf57036,eb1ed6d0dc1eda0e,803f57daaa6cc653
+        Dataset generation took: 223s                                           
+        Calculation of 4194304 hashes took: 54s                                 
+	Hashrate is approximately: 77672H/s
+	Result: 94a55636a697eb81,cf652685a31b4b0c,696f04e6e4537de0,3b4af5133d0ad00e
 Validation
 	Seed calculation took: 0s
-	Cache generation took: 1s
-        Calculation of 65536 hashes took: 5588s                                 
-	Hashrate is approximately: 11H/s
-	Result: 8aaa9e8635dffb8e,f75da003635e2ed4,460a2360c9c773b6,3ba08a8ff82b518c
+	Cache generation took: 0s
+        Calculation of 4194304 hashes took: 1621s                               
+	Hashrate is approximately: 40H/s
+	Result: 94a55636a697eb81,cf652685a31b4b0c,696f04e6e4537de0,3b4af5133d0ad00e
+
 ```
 
-The results below were achieved on a [Raspberry Pi 3b+](https://www.raspberrypi.org/magpi/raspberry-pi-specs-benchmarks/).
-```
-Validation
-	Seed calculation took: 0s
-	Cache generation took: 29s
-        Calculation of 2048 hashes took: 2334s                                  
-	Hashrate is approximately: 0H/s
-	Result: b7554ca31cf5016a,e530d84c6ab15dbe,7851bb9095ff613f,356eccbf5c0cc93d
-```
