@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdio.h>
 #include "pow.h"
 #include "random.h"
 
@@ -8,7 +9,7 @@
 #include "blake2/sse/blake2.h"
 #endif
 
-uint64_t equihashimoto_full(uint8_t* hash, uint8_t* dataset, uint64_t difficulty){
+uint64_t equihashimoto_full(uint8_t* hash, uint8_t* dataset, uint64_t difficulty, uint64_t nonce){
 	// Equihashimoto takes a hash as input
 	// and returns a nonce which, when added to the hash,
 	// can be used to perform a calculation inspired by equihash
@@ -61,7 +62,6 @@ uint64_t equihashimoto_full(uint8_t* hash, uint8_t* dataset, uint64_t difficulty
 	uint64_t* hash64_5  = &((uint64_t*)hash)[5];
 	uint64_t* hash64_6  = &((uint64_t*)hash)[6];
 	uint64_t* hash64_7  = &((uint64_t*)hash)[7];
-	uint64_t  nonce     = urand64();
 	*hash64_0 += nonce; *hash64_1 += nonce;
 	*hash64_2 += nonce; *hash64_3 += nonce;
 	*hash64_4 += nonce; *hash64_5 += nonce;
@@ -83,14 +83,14 @@ uint64_t equihashimoto_full(uint8_t* hash, uint8_t* dataset, uint64_t difficulty
 		*item_13  = dataset[*hash32_13];
 		*item_14  = dataset[*hash32_14];
 		*item_15  = dataset[*hash32_15];
-		*item64_0 = *(uint64_t*)&dataset[*item32_0];
-		*item64_1 = *(uint64_t*)&dataset[*item32_1];
-		*item64_2 = *(uint64_t*)&dataset[*item32_2];
-		*item64_3 = *(uint64_t*)&dataset[*item32_3];
+		*item64_0 = *((uint64_t*)&(dataset[*item32_0]));
+		*item64_1 = *((uint64_t*)&(dataset[*item32_1]));
+		*item64_2 = *((uint64_t*)&(dataset[*item32_2]));
+		*item64_3 = *((uint64_t*)&(dataset[*item32_3]));
 		*item64_0 ^= *item64_1 ^ *item64_2 ^ *item64_3;
 		*item64_1 = *item64_0;
-		*item64_0*= difficulty;
-		*item64_0/= difficulty;
+		*item64_0 *= difficulty;
+		*item64_0 /= difficulty;
 		if(*item64_0 == *item64_1) return(nonce);
 		(*hash64_0)++; (*hash64_1)++;
 		(*hash64_2)++; (*hash64_3)++;
@@ -98,7 +98,7 @@ uint64_t equihashimoto_full(uint8_t* hash, uint8_t* dataset, uint64_t difficulty
 	}
 }
 
-uint64_t equihashimoto_light(uint8_t* hash, uint8_t* cache, uint64_t difficulty){
+uint64_t equihashimoto_light(uint8_t* hash, uint8_t* cache, uint64_t difficulty, uint64_t nonce){
 	// Equihashimoto takes a hash as input
 	// and returns a nonce which, when added to the hash,
 	// can be used to perform a calculation inspired by equihash
@@ -153,7 +153,7 @@ uint64_t equihashimoto_light(uint8_t* hash, uint8_t* cache, uint64_t difficulty)
 	uint64_t* hash64_5  = &((uint64_t*)hash)[5];
 	uint64_t* hash64_6  = &((uint64_t*)hash)[6];
 	uint64_t* hash64_7  = &((uint64_t*)hash)[7];
-	uint64_t  nonce     = urand64();
+	
 	*hash64_0 += nonce; *hash64_1 += nonce;
 	*hash64_2 += nonce; *hash64_3 += nonce;
 	*hash64_4 += nonce; *hash64_5 += nonce;

@@ -17,7 +17,7 @@
 #define HASH_BYTES      32                // hash length in bytes
 #define CACHE_ROUNDS    1                 // number of rounds in cache production
 #define EPOCH_LENGTH    1                 // blocks per epoch
-#define DATASET_PARENTS 16                // number of hashes before calculating dataset entry
+#define DATASET_PARENTS 1                 // number of hashes before calculating dataset entry
 // Assuming 4 blocks per second, an epoch estimates 15 minutes
 
 uint32_t crc32c_table[256] = {
@@ -124,7 +124,7 @@ void make_cache(uint8_t* seed, uint8_t* cache){
 	crc32p(&se32[5],  &cache_32[5]);
 	crc32p(&se32[6],  &cache_32[6]);
 	crc32p(&se32[7],  &cache_32[7]);
-	for(uint32_t i=0;i<0x4000000;i+=8){
+	for(uint32_t i=0;i<0xfffff7;i+=8){
 		i64 >>= 1;
 		crc32p(&cache_32[i  ],  &cache_32[i+ 8]);
 		crc32p(&cache_32[i+1],  &cache_32[i+ 9]);
@@ -161,10 +161,10 @@ void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
 	mix_32[6] ^= item_number; mix_32[7] ^= item_number;
 	for(uint16_t j=0;j<DATASET_PARENTS;j++){
 		x = j^item_number;
-		*mix_32 &= 0x7fffff; mix_32[1] &= 0x7fffff;
-		mix_32[2] &= 0x7fffff; mix_32[3] &= 0x7fffff;
-		mix_32[4] &= 0x7fffff; mix_32[5] &= 0x7fffff;
-		mix_32[6] &= 0x7fffff; mix_32[7] &= 0x7fffff;
+		*mix_32 &= 0x7ffffa;   mix_32[1] &= 0x7ffffa;
+		mix_32[2] &= 0x7ffffa; mix_32[3] &= 0x7ffffa;
+		mix_32[4] &= 0x7ffffa; mix_32[5] &= 0x7ffffa;
+		mix_32[6] &= 0x7ffffa; mix_32[7] &= 0x7ffffa;
 		*mix_32   = *(uint32_t*)&cache[*mix_32];
 		mix_32[1] = *(uint32_t*)&cache[mix_32[1]];
 		mix_32[2] = *(uint32_t*)&cache[mix_32[2]];
@@ -190,8 +190,9 @@ void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
 }
 
 void calc_dataset(uint8_t* cache, uint64_t* out){
+	uint8_t* o8 = (uint8_t*)out;
 	for(uint64_t i=0;i<0x100000000;i+=32){
-		calc_dataset_item(cache, i, &out[i]);
+		calc_dataset_item(cache, i, (uint64_t*)&o8[i]);
 	}
 }
 
