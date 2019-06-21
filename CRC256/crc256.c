@@ -85,7 +85,7 @@ uint32_t crc32r(uint32_t msg) { //CRC32-return
 	return crc^0xFFFFFFFF;
 }
 
-uint32_t crc32p(uint32_t* in, uint32_t* out) { // CRC32-Pointer
+void crc32p(uint32_t* in, uint32_t* out) { // CRC32-Pointer
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
 	__asm__("crc32w %w0,%w0,%w1\n":"+r"(*out):"r"(*in));
 #else
@@ -102,7 +102,6 @@ void crc256(uint8_t* in, uint32_t len, uint8_t* out){
 	uint64_t* temp_64  = (uint64_t*)temp;
 	uint32_t* in_32    = (uint32_t*)in;
 	uint64_t* out_64   = (uint64_t*)out;
-
 	for(uint32_t i=0;i<len;i+=32){
 		crc32p(&in_32[i  ],&temp_32[0]);
 		crc32p(&in_32[i+1],&temp_32[1]);
@@ -114,6 +113,22 @@ void crc256(uint8_t* in, uint32_t len, uint8_t* out){
 		crc32p(&in_32[i+7],&temp_32[7]);
 		out_64[0] ^= temp_64[0]; out_64[1] ^= temp_64[1];
 		out_64[2] ^= temp_64[2]; out_64[3] ^= temp_64[3];
+	}
+	for(uint32_t i=0;i<(len&0x1f);i+=16){
+		crc32p(&in_32[i  ],&temp_32[0]);
+		crc32p(&in_32[i+1],&temp_32[1]);
+		crc32p(&in_32[i+2],&temp_32[2]);
+		crc32p(&in_32[i+3],&temp_32[3]);
+		out_64[0] ^= temp_64[0]; out_64[1] ^= temp_64[1];
+	}
+	for(uint32_t i=0;i<(len&0xf);i+=8){
+		crc32p(&in_32[i  ],&temp_32[0]);
+		crc32p(&in_32[i+1],&temp_32[1]);
+		out_64[0] ^= temp_64[0];
+	}
+	for(uint32_t i=0;i<(len&0x7);i+=4){
+		crc32p(&in_32[i  ],&temp_32[0]);
+		out_64[0] ^= temp_64[0];
 	}
 }
 
