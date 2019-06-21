@@ -3,6 +3,13 @@
 // Please see the included LICENSE file for more information.
 
 #include <stdint.h>
+// Comment these to improve performance but remove the feature associated with it
+//#define MIXING     // Mix CRC32s, when enabled, every bit of the output is dependent on every bit of the input
+//#define PROCESS16  // Process 16 byte blocks in addition to 32 byte blocks
+//#define PROCESS8   // Process 8  byte blocks in addition to 32 byte blocks
+//#define PROCESS4   // Process 4  byte blocks in addition to 32 byte blocks
+	           // to process 4 byte, 8 byte, 16 byte and 32 byte blocks, all have to be enabled.
+
 
 
 uint32_t crc32c_table[256] = {
@@ -96,40 +103,104 @@ void crc32p(uint32_t* in, uint32_t* out) { // CRC32-Pointer
 #endif
 }
 
+void crc32i(uint32_t* out) { // CRC32-Inplace
+#if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
+	__asm__("crc32w %w0,%w0,%w1\n":"+r"(*out):"r"(*in));
+#else
+	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
+	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
+	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
+	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
+#endif
+}
+
 void crc256(uint8_t* in, uint32_t len, uint8_t* out){
 	uint8_t   temp[32] = {0};
-	uint32_t* temp_32  = (uint32_t*)temp;
-	uint64_t* temp_64  = (uint64_t*)temp;
 	uint32_t* in_32    = (uint32_t*)in;
-	uint64_t* out_64   = (uint64_t*)out;
-	for(uint32_t i=0;i<len;i+=32){
-		crc32p(&in_32[i  ],&temp_32[0]);
-		crc32p(&in_32[i+1],&temp_32[1]);
-		crc32p(&in_32[i+2],&temp_32[2]);
-		crc32p(&in_32[i+3],&temp_32[3]);
-		crc32p(&in_32[i+4],&temp_32[4]);
-		crc32p(&in_32[i+5],&temp_32[5]);
-		crc32p(&in_32[i+6],&temp_32[6]);
-		crc32p(&in_32[i+7],&temp_32[7]);
-		out_64[0] ^= temp_64[0]; out_64[1] ^= temp_64[1];
-		out_64[2] ^= temp_64[2]; out_64[3] ^= temp_64[3];
+	uint32_t  i        = 0;
+
+	uint64_t* tmp_64_0 = (uint64_t*)temp;
+	uint64_t* tmp_64_1 = (uint64_t*)&temp[8];
+	uint64_t* tmp_64_2 = (uint64_t*)&temp[16];
+	uint64_t* tmp_64_3 = (uint64_t*)&temp[24];
+
+	uint32_t* tmp_32_0 = (uint32_t*)temp;
+	uint32_t* tmp_32_1 = (uint32_t*)&temp[8];
+	uint32_t* tmp_32_2 = (uint32_t*)&temp[16];
+	uint32_t* tmp_32_3 = (uint32_t*)&temp[24];
+	uint32_t* tmp_32_4 = (uint32_t*)temp;
+	uint32_t* tmp_32_5 = (uint32_t*)&temp[8];
+	uint32_t* tmp_32_6 = (uint32_t*)&temp[16];
+	uint32_t* tmp_32_7 = (uint32_t*)&temp[24];
+	#ifdef MIXING
+	uint32_t* out_32_0 = (uint32_t*)&out[ 2];
+	uint32_t* out_32_1 = (uint32_t*)&out[ 6];
+	uint32_t* out_32_2 = (uint32_t*)&out[10];
+	uint32_t* out_32_3 = (uint32_t*)&out[14];
+	uint32_t* out_32_4 = (uint32_t*)&out[18];
+	uint32_t* out_32_5 = (uint32_t*)&out[22];
+	uint32_t* out_32_6 = (uint32_t*)&out[26];
+	#endif
+	uint64_t* out_64_0 = (uint64_t*)&out;
+	uint64_t* out_64_1 = (uint64_t*)&out[8];
+	uint64_t* out_64_2 = (uint64_t*)&out[16];
+	uint64_t* out_64_3 = (uint64_t*)&out[24];
+
+	len>>=2;
+
+	for(;i<len;i+=8){
+		crc32p(&in_32[i  ],tmp_32_0);
+		crc32p(&in_32[i+1],tmp_32_1);
+		crc32p(&in_32[i+2],tmp_32_2);
+		crc32p(&in_32[i+3],tmp_32_3);
+		crc32p(&in_32[i+4],tmp_32_4);
+		crc32p(&in_32[i+5],tmp_32_5);
+		crc32p(&in_32[i+6],tmp_32_6);
+		crc32p(&in_32[i+7],tmp_32_7);
+		*out_64_0 ^= *tmp_64_0; *out_64_1 ^= *tmp_64_1;
+		*out_64_2 ^= *tmp_64_2; *out_64_3 ^= *tmp_64_3;
+		#ifdef MIXING
+		crc32i(out_32_0);
+		crc32i(out_32_1);
+		crc32i(out_32_2);
+		crc32i(out_32_3);
+		crc32i(out_32_4);
+		crc32i(out_32_5);
+		crc32i(out_32_6);
+		#endif
 	}
-	for(uint32_t i=0;i<(len&0x1f);i+=16){
-		crc32p(&in_32[i  ],&temp_32[0]);
-		crc32p(&in_32[i+1],&temp_32[1]);
-		crc32p(&in_32[i+2],&temp_32[2]);
-		crc32p(&in_32[i+3],&temp_32[3]);
-		out_64[0] ^= temp_64[0]; out_64[1] ^= temp_64[1];
+	#ifdef PROCESS16
+	if(len&4){
+		crc32p(&in_32[i  ],tmp_32_0);
+		crc32p(&in_32[i+1],tmp_32_1);
+		crc32p(&in_32[i+2],tmp_32_2);
+		crc32p(&in_32[i+3],tmp_32_3);
+		*out_64_0 ^= *tmp_64_0; *out_64_1 ^= *tmp_64_1;
+		# ifdef MIXING
+		crc32i(out_32_0);
+		crc32i(out_32_1);
+		crc32i(out_32_2);
+		# endif
+		i+=4;
 	}
-	for(uint32_t i=0;i<(len&0xf);i+=8){
-		crc32p(&in_32[i  ],&temp_32[0]);
-		crc32p(&in_32[i+1],&temp_32[1]);
-		out_64[0] ^= temp_64[0];
+	#endif
+	#ifdef PROCESS8
+	if(len&2){
+		crc32p(&in_32[i  ],tmp_32_0);
+		crc32p(&in_32[i+1],tmp_32_1);
+		*out_64_0 ^= *tmp_64_0;
+		# ifdef MIXING
+		crc32i(out_32_0);
+		# endif
+		i+=2;
 	}
-	for(uint32_t i=0;i<(len&0x7);i+=4){
-		crc32p(&in_32[i  ],&temp_32[0]);
-		out_64[0] ^= temp_64[0];
+	#endif
+	#ifdef PROCESS4
+	if(len&1){
+		crc32p(&in_32[i  ],tmp_32_0);
+		*out_64_0 ^= *tmp_64_0;
 	}
+	#endif
 }
 
 #define TEST_CRC256
@@ -156,7 +227,7 @@ int main(){
 	uint64_t* out_64   = (uint64_t*)cache;
 
 	cache_64[0] = 0x8ccc5467f6bd9249; cache_64[1] = 0xddaadef338d9fdc7;
-	cache_64[0] = 0x39720ddd40fd8a32; cache_64[1] = 0x8473643dec63477e;
+	cache_64[2] = 0x39720ddd40fd8a32; cache_64[3] = 0x8473643dec63477e;
 	for(uint32_t x=0;x<32;x++)
 		for(uint32_t i=32;i<SIZE_32_32;i++) cache[i+(x<<LOG_S_32_32)] = (cache[i-32+(x<<LOG_S_32_32)]<<x)^i^crc32r(cache[i-32+(x<<LOG_S_32_32)]);
 
