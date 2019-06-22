@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "hash.h"
+#include "benchmark_hash.h"
 #include "pow.h"
 #include "error.h"
 #include "random.h"
@@ -36,9 +36,8 @@ void benchmark_dataset_generation(uint8_t* seed, uint64_t* dataset){
 
 }
 
-uint64_t benchmark_mine(uint8_t* seed, uint64_t block_height, uint8_t printing, uint64_t difficulty){
+uint64_t benchmark_mine(uint8_t* seed, uint64_t block_height, uint8_t printing, uint64_t iterations){
 	uint64_t  nonce        = urand64();
-	uint64_t  prevNonce    = nonce;
 	uint64_t* dataset_64   = (uint64_t*)calloc(536870912,8);
 	if (!dataset_64) error_exit(1);
 	uint8_t*  dataset      = (uint8_t*)dataset_64;
@@ -48,21 +47,20 @@ uint64_t benchmark_mine(uint8_t* seed, uint64_t block_height, uint8_t printing, 
 	} else {
 		dataset_from_seed(seed, dataset_64);
 	}
-	//printf("\tDataset generation took: %us\n",(uint32_t)time(NULL)-current_time);
+	printf("\tDataset generation took: %us\n",(uint32_t)time(NULL)-current_time);
 	current_time = (uint32_t)time(NULL);
-	nonce = equihashimoto_full(seed, dataset, difficulty, nonce);
-	nonce-=prevNonce;
-	printf("\n2\n");
+	uint64_t retValue = equihashimoto_full(seed, dataset, nonce, iterations);
 	free(dataset_64);
 	uint32_t end_time = (uint32_t)time(NULL);
-	printf("\tCalculation of %lu hashes took: %us\n",nonce, end_time-current_time);
-	//printf("\tHashrate is approximately: %luH/s\n", nonce/(end_time-current_time));
+	printf("\tCalculation of %lu hashes took: %us\n",iterations, end_time-current_time);
+	//printf("\tHashrate is approximately: %luH/s\n", iterations/(end_time-current_time));
+	printf("\tReturn Value is: %016jx\n", retValue);
 	return 0;
 }
 
-uint64_t benchmark_validation(uint8_t* seed, uint64_t block_height, uint8_t printing, uint64_t difficulty){
+uint64_t benchmark_validation(uint8_t* seed, uint64_t block_height, uint8_t printing, uint64_t iterations){
+	iterations >>= 10;
 	uint64_t  nonce        = urand64();
-	uint64_t  prevNonce    = nonce;
 	uint64_t* cache_64     = (uint64_t*)calloc(8388608,8);
 	if (!cache_64) error_exit(1);
 	uint8_t*  cache        = (uint8_t*)cache_64;
@@ -70,12 +68,12 @@ uint64_t benchmark_validation(uint8_t* seed, uint64_t block_height, uint8_t prin
 	cache_from_seed(seed, cache);
 	printf("\tCache generation took: %us\n",(uint32_t)time(NULL)-current_time);
 	current_time = (uint32_t)time(NULL);
-	nonce = equihashimoto_light(seed, cache, difficulty, nonce);
-	nonce-=prevNonce;
+	uint64_t retValue = equihashimoto_light(seed, cache, nonce, iterations);
 	free(cache);
 	uint32_t end_time = (uint32_t)time(NULL);
-	printf("\tCalculation of %lu hashes took: %us\n",nonce, end_time-current_time);
-	//printf("\tHashrate is approximately: %luH/s\n", nonce/(end_time-current_time));
+	printf("\tCalculation of %lu hashes took: %us\n",iterations, end_time-current_time);
+	//printf("\tHashrate is approximately: %luH/s\n", iterations/(end_time-current_time));
+	printf("\tReturn Value is: %016jx\n", retValue);
 	return 0;
 }
 
@@ -84,12 +82,14 @@ uint64_t benchmark_validation(uint8_t* seed, uint64_t block_height, uint8_t prin
 int main(int argc, char *argv[]){
 	uint8_t* seed = urand(64);
 	uint8_t printing = argc<2?0:atoi(argv[1]);
-	uint64_t difficulty = argc<3?0xffff:atoi(argv[2]);
+	uint8_t iterShifts = argc<3?10:atoi(argv[2]);
+	uint64_t iterations = 1;
+	for(uint8_t i=0; i<iterShifts; i++) iterations<<=1;	
 	printf("\e[?25l"); // Hide cursor
 	printf("Mining\n");
-	benchmark_mine(seed, 10, printing, difficulty);
+	benchmark_mine(seed, 10, printing, iterations);
 	printf("Validation\n");
-	benchmark_validation(seed, 10, printing, difficulty);
+	benchmark_validation(seed, 10, printing, iterations);
 	printf("\e[?25h");
 	free(seed);
 	return 1;
