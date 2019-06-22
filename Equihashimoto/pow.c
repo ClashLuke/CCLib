@@ -143,10 +143,11 @@ void make_cache(uint8_t* seed, uint8_t* cache){
 
 void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
 	uint64_t  mix[4]   = {0};
+	uint8_t*  mix_8    = (uint8_t*)mix;
 	uint32_t* mix_32   = (uint32_t*)mix;
-	uint32_t* mix_32_s = (uint32_t*)&(((uint16_t*)mix)[1]);
+	uint32_t* mix_32_s = (uint32_t*)&mix_8[2];
 	uint32_t  x        = 0;
-	item_number >>= 5;
+	item_number >>= 2;
 	*mix_32    = *(uint32_t*)&cache[(item_number  )&0x7fffff];
 	mix_32[1]  = *(uint32_t*)&cache[(item_number+1)&0x7fffff];
 	mix_32[2]  = *(uint32_t*)&cache[(item_number+2)&0x7fffff];
@@ -185,6 +186,7 @@ void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
 		crc32i(&mix_32_s[5]);
 		crc32i(&mix_32_s[6]);
 	}
+	//printf("%016jx.%016jx.%016jx.%016jx\n",*mix,mix[1],mix[2],mix[3]);
 	*out  =*mix;    out[1]=mix[1];
 	out[2]= mix[2]; out[3]=mix[3];
 }
