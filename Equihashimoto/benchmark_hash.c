@@ -9,7 +9,7 @@
 #include "blake2/sse/blake2.h"
 #endif
 
-uint64_t equihashimoto_full(uint8_t* hash, uint8_t* dataset, uint64_t nonce, uint64_t iterations){
+void equihashimoto_full(uint8_t* hash, uint8_t* dataset, uint64_t nonce, uint64_t iterations, uint64_t* output){
 	// Equihashimoto takes a hash as input
 	// and returns a nonce which, when added to the hash,
 	// can be used to perform a calculation inspired by equihash
@@ -62,7 +62,6 @@ uint64_t equihashimoto_full(uint8_t* hash, uint8_t* dataset, uint64_t nonce, uin
 	uint64_t* hash64_5  = &((uint64_t*)hash)[5];
 	uint64_t* hash64_6  = &((uint64_t*)hash)[6];
 	uint64_t* hash64_7  = &((uint64_t*)hash)[7];
-	uint64_t  retValue  = 0;
 	*hash64_0 += nonce; *hash64_1 += nonce;
 	*hash64_2 += nonce; *hash64_3 += nonce;
 	*hash64_4 += nonce; *hash64_5 += nonce;
@@ -80,16 +79,14 @@ uint64_t equihashimoto_full(uint8_t* hash, uint8_t* dataset, uint64_t nonce, uin
 		*item64_1 = *((uint64_t*)&(dataset[*item32_1]));
 		*item64_2 = *((uint64_t*)&(dataset[*item32_2]));
 		*item64_3 = *((uint64_t*)&(dataset[*item32_3]));
-		retValue  ^= *item64_0 ^ *item64_1 ^ *item64_2 ^ *item64_3;
+		*output ^= *item64_0 ^ *item64_1 ^ *item64_2 ^ *item64_3;
 		nonce++;
 		(*hash64_0)++; (*hash64_1)++;
 		(*hash64_2)++; (*hash64_3)++;
 	}
-	printf("\tReturn Value is: %016jx\n", nonce);
-	return(retValue);
 }
 
-uint64_t equihashimoto_light(uint8_t* hash, uint8_t* cache, uint64_t nonce, uint64_t iterations){
+void equihashimoto_light(uint8_t* hash, uint8_t* cache, uint64_t nonce, uint64_t iterations, uint64_t* output){
 	// Equihashimoto takes a hash as input
 	// and returns a nonce which, when added to the hash,
 	// can be used to perform a calculation inspired by equihash
@@ -144,7 +141,6 @@ uint64_t equihashimoto_light(uint8_t* hash, uint8_t* cache, uint64_t nonce, uint
 	uint64_t* hash64_5  = &((uint64_t*)hash)[5];
 	uint64_t* hash64_6  = &((uint64_t*)hash)[6];
 	uint64_t* hash64_7  = &((uint64_t*)hash)[7];
-	uint64_t  retValue  = 0;	
 	*hash64_0 += nonce; *hash64_1 += nonce;
 	*hash64_2 += nonce; *hash64_3 += nonce;
 	*hash64_4 += nonce; *hash64_5 += nonce;
@@ -190,11 +186,9 @@ uint64_t equihashimoto_light(uint8_t* hash, uint8_t* cache, uint64_t nonce, uint
 		*item64_2  = out64_0[(*item32_2)&0x18];
 		calc_dataset_item(cache, (*item32_3)&0xffffffffffffffe0, out64_0);
 		*item64_3  = out64_0[(*item32_3)&0x18];
-		*item64_0 ^= *item64_1 ^ *item64_2 ^ *item64_3;
-		retValue  ^= *item64_0;
+		*output ^= *item64_0 ^ *item64_1 ^ *item64_2 ^ *item64_3;
 		nonce++;
 		(*hash64_0)++; (*hash64_1)++;
 		(*hash64_2)++; (*hash64_3)++;
 	}
-	return(retValue);
 }
