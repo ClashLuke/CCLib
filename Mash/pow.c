@@ -7,15 +7,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "error.h"
-#if !defined(HAVE_SSE2)
-#include "blake2/neon/blake2.h"
-#else
-#include "blake2/sse/blake2.h"
-#endif
 
 
 #define HASH_BYTES      32                // hash length in bytes
-#define CACHE_ROUNDS    1                 // number of rounds in cache production
 #define EPOCH_LENGTH    1                 // blocks per epoch
 #define DATASET_PARENTS 1                 // number of hashes before calculating dataset entry
 // Assuming 4 blocks per second, an epoch estimates 15 minutes
@@ -98,14 +92,14 @@ void crc32p(uint32_t* in, uint32_t* out) { // CRC32-Pointer
 #endif
 }
 
-void crc32i(uint32_t* out) { // CRC32-Pointer
+void crc32i(uint32_t* in) { // CRC32-Inplace
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
-	__asm__("crc32w %w0,%w0,%w1\n":"+r"(*out):"r"(*in));
+	__asm__("crc32w %w0,%w0,%w1\n":"+r"(*in):"r"(*in));
 #else
-	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
-	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
-	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
-	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
+	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
+	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
+	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
+	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
 #endif
 }
 
@@ -135,45 +129,45 @@ void make_cache(uint8_t* seed, uint8_t* cache){
 		crc32p(&cache_32[i+6],  &cache_32[i+14]);
 		crc32p(&cache_32[i+7],  &cache_32[i+15]);
 		cache_64[i64  ] += cache_64[i64+1];
-		cache_64[i64+1] += cache_64[i64+2];
 		cache_64[i64+2] += cache_64[i64+3];
+		cache_64[i64+1] += cache_64[i64+2];
 		cache_64[i64+3] += cache_64[i64  ];
 	}
 }
 
-void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
+void calcDatasetItem(uint8_t* cache, uint32_t item_number, uint64_t* out){
+	uint32_t* cache_32 = (uint32_t*)cache; 
 	uint64_t  mix[4]   = {0};
-	uint8_t*  mix_8    = (uint8_t*)mix;
 	uint32_t* mix_32   = (uint32_t*)mix;
-	uint32_t* mix_32_s = (uint32_t*)&mix_8[2];
+	uint32_t* mix_32_s = (uint32_t*)&(((uint16_t*)mix)[1]);
 	uint32_t  x        = 0;
-	item_number >>= 2;
-	*mix_32    = *(uint32_t*)&cache[(item_number  )&0x7fffff];
-	mix_32[1]  = *(uint32_t*)&cache[(item_number+1)&0x7fffff];
-	mix_32[2]  = *(uint32_t*)&cache[(item_number+2)&0x7fffff];
-	mix_32[3]  = *(uint32_t*)&cache[(item_number+3)&0x7fffff];
-	mix_32[4]  = *(uint32_t*)&cache[(item_number+4)&0x7fffff];
-	mix_32[5]  = *(uint32_t*)&cache[(item_number+5)&0x7fffff];
-	mix_32[6]  = *(uint32_t*)&cache[(item_number+6)&0x7fffff];
-	mix_32[7]  = *(uint32_t*)&cache[(item_number+7)&0x7fffff];
+	item_number = item_number >> 2;
+	*mix_32    = cache_32[(item_number  )&0x1fffff];
+	mix_32[1]  = cache_32[(item_number+1)&0x1fffff];
+	mix_32[2]  = cache_32[(item_number+2)&0x1fffff];
+	mix_32[3]  = cache_32[(item_number+3)&0x1fffff];
+	mix_32[4]  = cache_32[(item_number+4)&0x1fffff];
+	mix_32[5]  = cache_32[(item_number+5)&0x1fffff];
+	mix_32[6]  = cache_32[(item_number+6)&0x1fffff];
+	mix_32[7]  = cache_32[(item_number+7)&0x1fffff];
 	*mix_32   ^= item_number; mix_32[1] ^= item_number;
 	mix_32[2] ^= item_number; mix_32[3] ^= item_number;
 	mix_32[4] ^= item_number; mix_32[5] ^= item_number;
 	mix_32[6] ^= item_number; mix_32[7] ^= item_number;
 	for(uint16_t j=0;j<DATASET_PARENTS;j++){
 		x = j^item_number;
-		*mix_32 &= 0x7ffffa;   mix_32[1] &= 0x7ffffa;
-		mix_32[2] &= 0x7ffffa; mix_32[3] &= 0x7ffffa;
-		mix_32[4] &= 0x7ffffa; mix_32[5] &= 0x7ffffa;
-		mix_32[6] &= 0x7ffffa; mix_32[7] &= 0x7ffffa;
-		*mix_32   = *(uint32_t*)&cache[*mix_32];
-		mix_32[1] = *(uint32_t*)&cache[mix_32[1]];
-		mix_32[2] = *(uint32_t*)&cache[mix_32[2]];
-		mix_32[3] = *(uint32_t*)&cache[mix_32[3]];
-		mix_32[4] = *(uint32_t*)&cache[mix_32[4]];
-		mix_32[5] = *(uint32_t*)&cache[mix_32[5]];
-		mix_32[6] = *(uint32_t*)&cache[mix_32[6]];
-		mix_32[7] = *(uint32_t*)&cache[mix_32[7]];
+		*mix_32 &= 0x1fffff; mix_32[1] &= 0x1fffff;
+		mix_32[2] &= 0x1fffff; mix_32[3] &= 0x1fffff;
+		mix_32[4] &= 0x1fffff; mix_32[5] &= 0x1fffff;
+		mix_32[6] &= 0x1fffff; mix_32[7] &= 0x1fffff;
+		*mix_32   = cache_32[*mix_32];
+		mix_32[1] = cache_32[mix_32[1]];
+		mix_32[2] = cache_32[mix_32[2]];
+		mix_32[3] = cache_32[mix_32[3]];
+		mix_32[4] = cache_32[mix_32[4]];
+		mix_32[5] = cache_32[mix_32[5]];
+		mix_32[6] = cache_32[mix_32[6]];
+		mix_32[7] = cache_32[mix_32[7]];
 		*mix_32   ^= x; mix_32[1] ^= x;
 		mix_32[2] ^= x; mix_32[3] ^= x;
 		mix_32[4] ^= x; mix_32[5] ^= x;
@@ -186,15 +180,13 @@ void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
 		crc32i(&mix_32_s[5]);
 		crc32i(&mix_32_s[6]);
 	}
-	//printf("%016jx.%016jx.%016jx.%016jx\n",*mix,mix[1],mix[2],mix[3]);
 	*out  =*mix;    out[1]=mix[1];
 	out[2]= mix[2]; out[3]=mix[3];
 }
 
 void calc_dataset(uint8_t* cache, uint64_t* out){
-	uint8_t* o8 = (uint8_t*)out;
-	for(uint64_t i=0;i<0x100000000;i+=32){
-		calc_dataset_item(cache, i, (uint64_t*)&o8[i]);
+	for(uint32_t i=0;i<536870912;i+=4){ // (1<<32)>>3
+		calcDatasetItem(cache, i, &out[i]);
 	}
 }
 
