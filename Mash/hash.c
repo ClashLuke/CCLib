@@ -37,6 +37,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[14] = *((uint64_t*)&dataset[hash_32[14]]);
 	hash_64[15] = *((uint64_t*)&dataset[hash_32[15]]);
 #if MEMORY_THREADS > 1
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[16] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[17] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -64,6 +65,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[31] = *((uint64_t*)&dataset[hash_32[47]]);
 #endif
 #if MEMORY_THREADS > 2
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[32] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[33] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -91,6 +93,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[47] = *((uint64_t*)&dataset[hash_32[79]]);
 #endif
 #if MEMORY_THREADS > 3
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[48] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[49] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -118,6 +121,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[63] = *((uint64_t*)&dataset[hash_32[111]]);
 #endif
 #if MEMORY_THREADS > 4
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[64] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[65] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -145,6 +149,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[79] = *((uint64_t*)&dataset[hash_32[143]]);
 #endif
 #if MEMORY_THREADS > 5
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[80] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[81] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -172,6 +177,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[95] = *((uint64_t*)&dataset[hash_32[175]]);
 #endif
 #if MEMORY_THREADS > 6
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[96] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[97] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -199,6 +205,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[111] = *((uint64_t*)&dataset[hash_32[207]]);
 #endif
 #if MEMORY_THREADS > 7
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[112] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[113] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -226,6 +233,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[127] = *((uint64_t*)&dataset[hash_32[239]]);
 #endif
 #if MEMORY_THREADS > 8
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[128] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[129] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -253,6 +261,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[143] = *((uint64_t*)&dataset[hash_32[271]]);
 #endif
 #if MEMORY_THREADS > 9
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[144] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[145] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -280,6 +289,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[159] = *((uint64_t*)&dataset[hash_32[303]]);
 #endif
 #if MEMORY_THREADS > 10
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[160] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[161] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -307,6 +317,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[175] = *((uint64_t*)&dataset[hash_32[335]]);
 #endif
 #if MEMORY_THREADS > 11
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[176] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[177] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -334,6 +345,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[191] = *((uint64_t*)&dataset[hash_32[367]]);
 #endif
 #if MEMORY_THREADS > 12
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[192] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[193] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -361,6 +373,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[207] = *((uint64_t*)&dataset[hash_32[399]]);
 #endif
 #if MEMORY_THREADS > 13
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[208] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[209] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -388,6 +401,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[223] = *((uint64_t*)&dataset[hash_32[431]]);
 #endif
 #if MEMORY_THREADS > 14
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[224] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[225] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -415,6 +429,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[239] = *((uint64_t*)&dataset[hash_32[463]]);
 #endif
 #if MEMORY_THREADS > 15
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[240] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[241] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -442,6 +457,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[255] = *((uint64_t*)&dataset[hash_32[495]]);
 #endif
 #if MEMORY_THREADS > 16
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[256] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[257] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -469,6 +485,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[271] = *((uint64_t*)&dataset[hash_32[527]]);
 #endif
 #if MEMORY_THREADS > 17
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[272] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[273] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -496,6 +513,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[287] = *((uint64_t*)&dataset[hash_32[559]]);
 #endif
 #if MEMORY_THREADS > 18
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[288] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[289] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -523,6 +541,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[303] = *((uint64_t*)&dataset[hash_32[591]]);
 #endif
 #if MEMORY_THREADS > 19
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[304] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[305] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -550,6 +569,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[319] = *((uint64_t*)&dataset[hash_32[623]]);
 #endif
 #if MEMORY_THREADS > 20
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[320] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[321] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -577,6 +597,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[335] = *((uint64_t*)&dataset[hash_32[655]]);
 #endif
 #if MEMORY_THREADS > 21
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[336] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[337] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -604,6 +625,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[351] = *((uint64_t*)&dataset[hash_32[687]]);
 #endif
 #if MEMORY_THREADS > 22
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[352] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[353] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -631,6 +653,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[367] = *((uint64_t*)&dataset[hash_32[719]]);
 #endif
 #if MEMORY_THREADS > 23
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[368] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[369] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -658,6 +681,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[383] = *((uint64_t*)&dataset[hash_32[751]]);
 #endif
 #if MEMORY_THREADS > 24
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[384] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[385] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -685,6 +709,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[399] = *((uint64_t*)&dataset[hash_32[783]]);
 #endif
 #if MEMORY_THREADS > 25
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[400] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[401] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -712,6 +737,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[415] = *((uint64_t*)&dataset[hash_32[815]]);
 #endif
 #if MEMORY_THREADS > 26
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[416] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[417] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -739,6 +765,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[431] = *((uint64_t*)&dataset[hash_32[847]]);
 #endif
 #if MEMORY_THREADS > 27
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[432] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[433] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -766,6 +793,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[447] = *((uint64_t*)&dataset[hash_32[879]]);
 #endif
 #if MEMORY_THREADS > 28
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[448] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[449] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -793,6 +821,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[463] = *((uint64_t*)&dataset[hash_32[911]]);
 #endif
 #if MEMORY_THREADS > 29
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[464] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[465] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -820,6 +849,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[479] = *((uint64_t*)&dataset[hash_32[943]]);
 #endif
 #if MEMORY_THREADS > 30
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[480] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[481] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -847,6 +877,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[495] = *((uint64_t*)&dataset[hash_32[975]]);
 #endif
 #if MEMORY_THREADS > 31
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[496] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[497] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -874,6 +905,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[511] = *((uint64_t*)&dataset[hash_32[1007]]);
 #endif
 #if MEMORY_THREADS > 32
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[512] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[513] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -901,6 +933,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[527] = *((uint64_t*)&dataset[hash_32[1039]]);
 #endif
 #if MEMORY_THREADS > 33
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[528] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[529] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -928,6 +961,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[543] = *((uint64_t*)&dataset[hash_32[1071]]);
 #endif
 #if MEMORY_THREADS > 34
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[544] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[545] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -955,6 +989,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[559] = *((uint64_t*)&dataset[hash_32[1103]]);
 #endif
 #if MEMORY_THREADS > 35
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[560] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[561] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -982,6 +1017,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[575] = *((uint64_t*)&dataset[hash_32[1135]]);
 #endif
 #if MEMORY_THREADS > 36
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[576] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[577] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1009,6 +1045,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[591] = *((uint64_t*)&dataset[hash_32[1167]]);
 #endif
 #if MEMORY_THREADS > 37
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[592] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[593] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1036,6 +1073,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[607] = *((uint64_t*)&dataset[hash_32[1199]]);
 #endif
 #if MEMORY_THREADS > 38
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[608] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[609] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1063,6 +1101,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[623] = *((uint64_t*)&dataset[hash_32[1231]]);
 #endif
 #if MEMORY_THREADS > 39
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[624] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[625] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1090,6 +1129,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[639] = *((uint64_t*)&dataset[hash_32[1263]]);
 #endif
 #if MEMORY_THREADS > 40
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[640] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[641] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1117,6 +1157,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[655] = *((uint64_t*)&dataset[hash_32[1295]]);
 #endif
 #if MEMORY_THREADS > 41
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[656] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[657] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1144,6 +1185,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[671] = *((uint64_t*)&dataset[hash_32[1327]]);
 #endif
 #if MEMORY_THREADS > 42
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[672] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[673] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1171,6 +1213,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[687] = *((uint64_t*)&dataset[hash_32[1359]]);
 #endif
 #if MEMORY_THREADS > 43
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[688] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[689] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1198,6 +1241,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[703] = *((uint64_t*)&dataset[hash_32[1391]]);
 #endif
 #if MEMORY_THREADS > 44
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[704] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[705] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1225,6 +1269,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[719] = *((uint64_t*)&dataset[hash_32[1423]]);
 #endif
 #if MEMORY_THREADS > 45
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[720] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[721] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1252,6 +1297,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[735] = *((uint64_t*)&dataset[hash_32[1455]]);
 #endif
 #if MEMORY_THREADS > 46
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[736] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[737] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1279,6 +1325,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[751] = *((uint64_t*)&dataset[hash_32[1487]]);
 #endif
 #if MEMORY_THREADS > 47
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[752] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[753] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1306,6 +1353,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[767] = *((uint64_t*)&dataset[hash_32[1519]]);
 #endif
 #if MEMORY_THREADS > 48
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[768] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[769] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1333,6 +1381,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[783] = *((uint64_t*)&dataset[hash_32[1551]]);
 #endif
 #if MEMORY_THREADS > 49
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[784] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[785] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1360,6 +1409,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[799] = *((uint64_t*)&dataset[hash_32[1583]]);
 #endif
 #if MEMORY_THREADS > 50
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[800] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[801] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1387,6 +1437,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[815] = *((uint64_t*)&dataset[hash_32[1615]]);
 #endif
 #if MEMORY_THREADS > 51
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[816] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[817] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1414,6 +1465,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[831] = *((uint64_t*)&dataset[hash_32[1647]]);
 #endif
 #if MEMORY_THREADS > 52
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[832] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[833] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1441,6 +1493,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[847] = *((uint64_t*)&dataset[hash_32[1679]]);
 #endif
 #if MEMORY_THREADS > 53
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[848] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[849] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1468,6 +1521,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[863] = *((uint64_t*)&dataset[hash_32[1711]]);
 #endif
 #if MEMORY_THREADS > 54
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[864] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[865] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1495,6 +1549,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[879] = *((uint64_t*)&dataset[hash_32[1743]]);
 #endif
 #if MEMORY_THREADS > 55
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[880] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[881] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1522,6 +1577,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[895] = *((uint64_t*)&dataset[hash_32[1775]]);
 #endif
 #if MEMORY_THREADS > 56
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[896] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[897] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1549,6 +1605,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[911] = *((uint64_t*)&dataset[hash_32[1807]]);
 #endif
 #if MEMORY_THREADS > 57
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[912] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[913] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1576,6 +1633,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[927] = *((uint64_t*)&dataset[hash_32[1839]]);
 #endif
 #if MEMORY_THREADS > 58
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[928] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[929] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1603,6 +1661,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[943] = *((uint64_t*)&dataset[hash_32[1871]]);
 #endif
 #if MEMORY_THREADS > 59
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[944] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[945] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1630,6 +1689,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[959] = *((uint64_t*)&dataset[hash_32[1903]]);
 #endif
 #if MEMORY_THREADS > 60
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[960] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[961] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1657,6 +1717,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[975] = *((uint64_t*)&dataset[hash_32[1935]]);
 #endif
 #if MEMORY_THREADS > 61
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[976] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[977] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1684,6 +1745,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[991] = *((uint64_t*)&dataset[hash_32[1967]]);
 #endif
 #if MEMORY_THREADS > 62
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[992] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[993] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1711,6 +1773,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1007] = *((uint64_t*)&dataset[hash_32[1999]]);
 #endif
 #if MEMORY_THREADS > 63
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1008] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1009] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1738,6 +1801,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1023] = *((uint64_t*)&dataset[hash_32[2031]]);
 #endif
 #if MEMORY_THREADS > 64
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1024] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1025] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1765,6 +1829,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1039] = *((uint64_t*)&dataset[hash_32[2063]]);
 #endif
 #if MEMORY_THREADS > 65
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1040] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1041] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1792,6 +1857,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1055] = *((uint64_t*)&dataset[hash_32[2095]]);
 #endif
 #if MEMORY_THREADS > 66
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1056] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1057] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1819,6 +1885,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1071] = *((uint64_t*)&dataset[hash_32[2127]]);
 #endif
 #if MEMORY_THREADS > 67
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1072] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1073] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1846,6 +1913,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1087] = *((uint64_t*)&dataset[hash_32[2159]]);
 #endif
 #if MEMORY_THREADS > 68
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1088] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1089] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1873,6 +1941,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1103] = *((uint64_t*)&dataset[hash_32[2191]]);
 #endif
 #if MEMORY_THREADS > 69
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1104] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1105] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1900,6 +1969,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1119] = *((uint64_t*)&dataset[hash_32[2223]]);
 #endif
 #if MEMORY_THREADS > 70
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1120] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1121] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1927,6 +1997,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1135] = *((uint64_t*)&dataset[hash_32[2255]]);
 #endif
 #if MEMORY_THREADS > 71
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1136] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1137] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1954,6 +2025,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1151] = *((uint64_t*)&dataset[hash_32[2287]]);
 #endif
 #if MEMORY_THREADS > 72
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1152] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1153] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -1981,6 +2053,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1167] = *((uint64_t*)&dataset[hash_32[2319]]);
 #endif
 #if MEMORY_THREADS > 73
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1168] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1169] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2008,6 +2081,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1183] = *((uint64_t*)&dataset[hash_32[2351]]);
 #endif
 #if MEMORY_THREADS > 74
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1184] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1185] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2035,6 +2109,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1199] = *((uint64_t*)&dataset[hash_32[2383]]);
 #endif
 #if MEMORY_THREADS > 75
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1200] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1201] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2062,6 +2137,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1215] = *((uint64_t*)&dataset[hash_32[2415]]);
 #endif
 #if MEMORY_THREADS > 76
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1216] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1217] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2089,6 +2165,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1231] = *((uint64_t*)&dataset[hash_32[2447]]);
 #endif
 #if MEMORY_THREADS > 77
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1232] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1233] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2116,6 +2193,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1247] = *((uint64_t*)&dataset[hash_32[2479]]);
 #endif
 #if MEMORY_THREADS > 78
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1248] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1249] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2143,6 +2221,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1263] = *((uint64_t*)&dataset[hash_32[2511]]);
 #endif
 #if MEMORY_THREADS > 79
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1264] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1265] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2170,6 +2249,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1279] = *((uint64_t*)&dataset[hash_32[2543]]);
 #endif
 #if MEMORY_THREADS > 80
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1280] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1281] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2197,6 +2277,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1295] = *((uint64_t*)&dataset[hash_32[2575]]);
 #endif
 #if MEMORY_THREADS > 81
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1296] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1297] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2224,6 +2305,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1311] = *((uint64_t*)&dataset[hash_32[2607]]);
 #endif
 #if MEMORY_THREADS > 82
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1312] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1313] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2251,6 +2333,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1327] = *((uint64_t*)&dataset[hash_32[2639]]);
 #endif
 #if MEMORY_THREADS > 83
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1328] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1329] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2278,6 +2361,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1343] = *((uint64_t*)&dataset[hash_32[2671]]);
 #endif
 #if MEMORY_THREADS > 84
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1344] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1345] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2305,6 +2389,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1359] = *((uint64_t*)&dataset[hash_32[2703]]);
 #endif
 #if MEMORY_THREADS > 85
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1360] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1361] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2332,6 +2417,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1375] = *((uint64_t*)&dataset[hash_32[2735]]);
 #endif
 #if MEMORY_THREADS > 86
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1376] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1377] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2359,6 +2445,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1391] = *((uint64_t*)&dataset[hash_32[2767]]);
 #endif
 #if MEMORY_THREADS > 87
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1392] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1393] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2386,6 +2473,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1407] = *((uint64_t*)&dataset[hash_32[2799]]);
 #endif
 #if MEMORY_THREADS > 88
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1408] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1409] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2413,6 +2501,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1423] = *((uint64_t*)&dataset[hash_32[2831]]);
 #endif
 #if MEMORY_THREADS > 89
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1424] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1425] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2440,6 +2529,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1439] = *((uint64_t*)&dataset[hash_32[2863]]);
 #endif
 #if MEMORY_THREADS > 90
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1440] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1441] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2467,6 +2557,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1455] = *((uint64_t*)&dataset[hash_32[2895]]);
 #endif
 #if MEMORY_THREADS > 91
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1456] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1457] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2494,6 +2585,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1471] = *((uint64_t*)&dataset[hash_32[2927]]);
 #endif
 #if MEMORY_THREADS > 92
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1472] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1473] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2521,6 +2613,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1487] = *((uint64_t*)&dataset[hash_32[2959]]);
 #endif
 #if MEMORY_THREADS > 93
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1488] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1489] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2548,6 +2641,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1503] = *((uint64_t*)&dataset[hash_32[2991]]);
 #endif
 #if MEMORY_THREADS > 94
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1504] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1505] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2575,6 +2669,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1519] = *((uint64_t*)&dataset[hash_32[3023]]);
 #endif
 #if MEMORY_THREADS > 95
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1520] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1521] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2602,6 +2697,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1535] = *((uint64_t*)&dataset[hash_32[3055]]);
 #endif
 #if MEMORY_THREADS > 96
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1536] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1537] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2629,6 +2725,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1551] = *((uint64_t*)&dataset[hash_32[3087]]);
 #endif
 #if MEMORY_THREADS > 97
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1552] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1553] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2656,6 +2753,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1567] = *((uint64_t*)&dataset[hash_32[3119]]);
 #endif
 #if MEMORY_THREADS > 98
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1568] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1569] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2683,6 +2781,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1583] = *((uint64_t*)&dataset[hash_32[3151]]);
 #endif
 #if MEMORY_THREADS > 99
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1584] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1585] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2710,6 +2809,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1599] = *((uint64_t*)&dataset[hash_32[3183]]);
 #endif
 #if MEMORY_THREADS > 100
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1600] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1601] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2737,6 +2837,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1615] = *((uint64_t*)&dataset[hash_32[3215]]);
 #endif
 #if MEMORY_THREADS > 101
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1616] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1617] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2764,6 +2865,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1631] = *((uint64_t*)&dataset[hash_32[3247]]);
 #endif
 #if MEMORY_THREADS > 102
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1632] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1633] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2791,6 +2893,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1647] = *((uint64_t*)&dataset[hash_32[3279]]);
 #endif
 #if MEMORY_THREADS > 103
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1648] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1649] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2818,6 +2921,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1663] = *((uint64_t*)&dataset[hash_32[3311]]);
 #endif
 #if MEMORY_THREADS > 104
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1664] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1665] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2845,6 +2949,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1679] = *((uint64_t*)&dataset[hash_32[3343]]);
 #endif
 #if MEMORY_THREADS > 105
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1680] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1681] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2872,6 +2977,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1695] = *((uint64_t*)&dataset[hash_32[3375]]);
 #endif
 #if MEMORY_THREADS > 106
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1696] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1697] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2899,6 +3005,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1711] = *((uint64_t*)&dataset[hash_32[3407]]);
 #endif
 #if MEMORY_THREADS > 107
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1712] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1713] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2926,6 +3033,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1727] = *((uint64_t*)&dataset[hash_32[3439]]);
 #endif
 #if MEMORY_THREADS > 108
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1728] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1729] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2953,6 +3061,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1743] = *((uint64_t*)&dataset[hash_32[3471]]);
 #endif
 #if MEMORY_THREADS > 109
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1744] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1745] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -2980,6 +3089,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1759] = *((uint64_t*)&dataset[hash_32[3503]]);
 #endif
 #if MEMORY_THREADS > 110
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1760] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1761] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3007,6 +3117,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1775] = *((uint64_t*)&dataset[hash_32[3535]]);
 #endif
 #if MEMORY_THREADS > 111
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1776] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1777] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3034,6 +3145,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1791] = *((uint64_t*)&dataset[hash_32[3567]]);
 #endif
 #if MEMORY_THREADS > 112
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1792] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1793] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3061,6 +3173,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1807] = *((uint64_t*)&dataset[hash_32[3599]]);
 #endif
 #if MEMORY_THREADS > 113
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1808] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1809] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3088,6 +3201,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1823] = *((uint64_t*)&dataset[hash_32[3631]]);
 #endif
 #if MEMORY_THREADS > 114
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1824] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1825] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3115,6 +3229,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1839] = *((uint64_t*)&dataset[hash_32[3663]]);
 #endif
 #if MEMORY_THREADS > 115
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1840] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1841] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3142,6 +3257,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1855] = *((uint64_t*)&dataset[hash_32[3695]]);
 #endif
 #if MEMORY_THREADS > 116
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1856] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1857] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3169,6 +3285,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1871] = *((uint64_t*)&dataset[hash_32[3727]]);
 #endif
 #if MEMORY_THREADS > 117
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1872] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1873] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3196,6 +3313,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1887] = *((uint64_t*)&dataset[hash_32[3759]]);
 #endif
 #if MEMORY_THREADS > 118
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1888] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1889] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3223,6 +3341,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1903] = *((uint64_t*)&dataset[hash_32[3791]]);
 #endif
 #if MEMORY_THREADS > 119
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1904] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1905] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3250,6 +3369,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1919] = *((uint64_t*)&dataset[hash_32[3823]]);
 #endif
 #if MEMORY_THREADS > 120
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1920] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1921] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3277,6 +3397,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1935] = *((uint64_t*)&dataset[hash_32[3855]]);
 #endif
 #if MEMORY_THREADS > 121
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1936] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1937] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3304,6 +3425,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1951] = *((uint64_t*)&dataset[hash_32[3887]]);
 #endif
 #if MEMORY_THREADS > 122
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1952] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1953] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3331,6 +3453,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1967] = *((uint64_t*)&dataset[hash_32[3919]]);
 #endif
 #if MEMORY_THREADS > 123
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1968] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1969] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3358,6 +3481,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1983] = *((uint64_t*)&dataset[hash_32[3951]]);
 #endif
 #if MEMORY_THREADS > 124
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[1984] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[1985] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3385,6 +3509,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[1999] = *((uint64_t*)&dataset[hash_32[3983]]);
 #endif
 #if MEMORY_THREADS > 125
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2000] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2001] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3412,6 +3537,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2015] = *((uint64_t*)&dataset[hash_32[4015]]);
 #endif
 #if MEMORY_THREADS > 126
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2016] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2017] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3439,6 +3565,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2031] = *((uint64_t*)&dataset[hash_32[4047]]);
 #endif
 #if MEMORY_THREADS > 127
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2032] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2033] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3466,6 +3593,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2047] = *((uint64_t*)&dataset[hash_32[4079]]);
 #endif
 #if MEMORY_THREADS > 128
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2048] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2049] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3493,6 +3621,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2063] = *((uint64_t*)&dataset[hash_32[4111]]);
 #endif
 #if MEMORY_THREADS > 129
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2064] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2065] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3520,6 +3649,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2079] = *((uint64_t*)&dataset[hash_32[4143]]);
 #endif
 #if MEMORY_THREADS > 130
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2080] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2081] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3547,6 +3677,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2095] = *((uint64_t*)&dataset[hash_32[4175]]);
 #endif
 #if MEMORY_THREADS > 131
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2096] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2097] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3574,6 +3705,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2111] = *((uint64_t*)&dataset[hash_32[4207]]);
 #endif
 #if MEMORY_THREADS > 132
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2112] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2113] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3601,6 +3733,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2127] = *((uint64_t*)&dataset[hash_32[4239]]);
 #endif
 #if MEMORY_THREADS > 133
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2128] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2129] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3628,6 +3761,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2143] = *((uint64_t*)&dataset[hash_32[4271]]);
 #endif
 #if MEMORY_THREADS > 134
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2144] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2145] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3655,6 +3789,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2159] = *((uint64_t*)&dataset[hash_32[4303]]);
 #endif
 #if MEMORY_THREADS > 135
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2160] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2161] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3682,6 +3817,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2175] = *((uint64_t*)&dataset[hash_32[4335]]);
 #endif
 #if MEMORY_THREADS > 136
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2176] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2177] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3709,6 +3845,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2191] = *((uint64_t*)&dataset[hash_32[4367]]);
 #endif
 #if MEMORY_THREADS > 137
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2192] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2193] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3736,6 +3873,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2207] = *((uint64_t*)&dataset[hash_32[4399]]);
 #endif
 #if MEMORY_THREADS > 138
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2208] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2209] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3763,6 +3901,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2223] = *((uint64_t*)&dataset[hash_32[4431]]);
 #endif
 #if MEMORY_THREADS > 139
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2224] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2225] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3790,6 +3929,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2239] = *((uint64_t*)&dataset[hash_32[4463]]);
 #endif
 #if MEMORY_THREADS > 140
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2240] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2241] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3817,6 +3957,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2255] = *((uint64_t*)&dataset[hash_32[4495]]);
 #endif
 #if MEMORY_THREADS > 141
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2256] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2257] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3844,6 +3985,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2271] = *((uint64_t*)&dataset[hash_32[4527]]);
 #endif
 #if MEMORY_THREADS > 142
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2272] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2273] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3871,6 +4013,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2287] = *((uint64_t*)&dataset[hash_32[4559]]);
 #endif
 #if MEMORY_THREADS > 143
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2288] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2289] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3898,6 +4041,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2303] = *((uint64_t*)&dataset[hash_32[4591]]);
 #endif
 #if MEMORY_THREADS > 144
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2304] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2305] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3925,6 +4069,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2319] = *((uint64_t*)&dataset[hash_32[4623]]);
 #endif
 #if MEMORY_THREADS > 145
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2320] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2321] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3952,6 +4097,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2335] = *((uint64_t*)&dataset[hash_32[4655]]);
 #endif
 #if MEMORY_THREADS > 146
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2336] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2337] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -3979,6 +4125,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2351] = *((uint64_t*)&dataset[hash_32[4687]]);
 #endif
 #if MEMORY_THREADS > 147
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2352] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2353] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4006,6 +4153,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2367] = *((uint64_t*)&dataset[hash_32[4719]]);
 #endif
 #if MEMORY_THREADS > 148
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2368] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2369] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4033,6 +4181,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2383] = *((uint64_t*)&dataset[hash_32[4751]]);
 #endif
 #if MEMORY_THREADS > 149
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2384] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2385] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4060,6 +4209,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2399] = *((uint64_t*)&dataset[hash_32[4783]]);
 #endif
 #if MEMORY_THREADS > 150
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2400] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2401] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4087,6 +4237,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2415] = *((uint64_t*)&dataset[hash_32[4815]]);
 #endif
 #if MEMORY_THREADS > 151
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2416] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2417] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4114,6 +4265,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2431] = *((uint64_t*)&dataset[hash_32[4847]]);
 #endif
 #if MEMORY_THREADS > 152
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2432] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2433] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4141,6 +4293,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2447] = *((uint64_t*)&dataset[hash_32[4879]]);
 #endif
 #if MEMORY_THREADS > 153
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2448] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2449] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4168,6 +4321,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2463] = *((uint64_t*)&dataset[hash_32[4911]]);
 #endif
 #if MEMORY_THREADS > 154
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2464] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2465] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4195,6 +4349,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2479] = *((uint64_t*)&dataset[hash_32[4943]]);
 #endif
 #if MEMORY_THREADS > 155
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2480] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2481] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4222,6 +4377,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2495] = *((uint64_t*)&dataset[hash_32[4975]]);
 #endif
 #if MEMORY_THREADS > 156
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2496] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2497] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4249,6 +4405,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2511] = *((uint64_t*)&dataset[hash_32[5007]]);
 #endif
 #if MEMORY_THREADS > 157
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2512] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2513] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4276,6 +4433,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2527] = *((uint64_t*)&dataset[hash_32[5039]]);
 #endif
 #if MEMORY_THREADS > 158
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2528] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2529] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4303,6 +4461,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2543] = *((uint64_t*)&dataset[hash_32[5071]]);
 #endif
 #if MEMORY_THREADS > 159
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2544] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2545] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4330,6 +4489,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2559] = *((uint64_t*)&dataset[hash_32[5103]]);
 #endif
 #if MEMORY_THREADS > 160
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2560] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2561] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4357,6 +4517,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2575] = *((uint64_t*)&dataset[hash_32[5135]]);
 #endif
 #if MEMORY_THREADS > 161
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2576] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2577] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4384,6 +4545,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2591] = *((uint64_t*)&dataset[hash_32[5167]]);
 #endif
 #if MEMORY_THREADS > 162
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2592] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2593] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4411,6 +4573,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2607] = *((uint64_t*)&dataset[hash_32[5199]]);
 #endif
 #if MEMORY_THREADS > 163
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2608] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2609] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4438,6 +4601,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2623] = *((uint64_t*)&dataset[hash_32[5231]]);
 #endif
 #if MEMORY_THREADS > 164
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2624] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2625] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4465,6 +4629,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2639] = *((uint64_t*)&dataset[hash_32[5263]]);
 #endif
 #if MEMORY_THREADS > 165
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2640] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2641] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4492,6 +4657,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2655] = *((uint64_t*)&dataset[hash_32[5295]]);
 #endif
 #if MEMORY_THREADS > 166
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2656] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2657] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4519,6 +4685,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2671] = *((uint64_t*)&dataset[hash_32[5327]]);
 #endif
 #if MEMORY_THREADS > 167
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2672] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2673] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4546,6 +4713,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2687] = *((uint64_t*)&dataset[hash_32[5359]]);
 #endif
 #if MEMORY_THREADS > 168
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2688] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2689] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4573,6 +4741,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2703] = *((uint64_t*)&dataset[hash_32[5391]]);
 #endif
 #if MEMORY_THREADS > 169
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2704] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2705] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4600,6 +4769,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2719] = *((uint64_t*)&dataset[hash_32[5423]]);
 #endif
 #if MEMORY_THREADS > 170
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2720] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2721] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4627,6 +4797,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2735] = *((uint64_t*)&dataset[hash_32[5455]]);
 #endif
 #if MEMORY_THREADS > 171
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2736] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2737] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4654,6 +4825,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2751] = *((uint64_t*)&dataset[hash_32[5487]]);
 #endif
 #if MEMORY_THREADS > 172
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2752] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2753] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4681,6 +4853,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2767] = *((uint64_t*)&dataset[hash_32[5519]]);
 #endif
 #if MEMORY_THREADS > 173
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2768] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2769] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4708,6 +4881,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2783] = *((uint64_t*)&dataset[hash_32[5551]]);
 #endif
 #if MEMORY_THREADS > 174
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2784] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2785] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4735,6 +4909,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2799] = *((uint64_t*)&dataset[hash_32[5583]]);
 #endif
 #if MEMORY_THREADS > 175
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2800] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2801] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4762,6 +4937,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2815] = *((uint64_t*)&dataset[hash_32[5615]]);
 #endif
 #if MEMORY_THREADS > 176
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2816] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2817] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4789,6 +4965,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2831] = *((uint64_t*)&dataset[hash_32[5647]]);
 #endif
 #if MEMORY_THREADS > 177
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2832] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2833] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4816,6 +4993,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2847] = *((uint64_t*)&dataset[hash_32[5679]]);
 #endif
 #if MEMORY_THREADS > 178
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2848] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2849] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4843,6 +5021,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2863] = *((uint64_t*)&dataset[hash_32[5711]]);
 #endif
 #if MEMORY_THREADS > 179
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2864] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2865] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4870,6 +5049,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2879] = *((uint64_t*)&dataset[hash_32[5743]]);
 #endif
 #if MEMORY_THREADS > 180
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2880] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2881] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4897,6 +5077,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2895] = *((uint64_t*)&dataset[hash_32[5775]]);
 #endif
 #if MEMORY_THREADS > 181
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2896] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2897] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4924,6 +5105,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2911] = *((uint64_t*)&dataset[hash_32[5807]]);
 #endif
 #if MEMORY_THREADS > 182
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2912] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2913] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4951,6 +5133,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2927] = *((uint64_t*)&dataset[hash_32[5839]]);
 #endif
 #if MEMORY_THREADS > 183
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2928] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2929] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -4978,6 +5161,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2943] = *((uint64_t*)&dataset[hash_32[5871]]);
 #endif
 #if MEMORY_THREADS > 184
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2944] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2945] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5005,6 +5189,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2959] = *((uint64_t*)&dataset[hash_32[5903]]);
 #endif
 #if MEMORY_THREADS > 185
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2960] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2961] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5032,6 +5217,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2975] = *((uint64_t*)&dataset[hash_32[5935]]);
 #endif
 #if MEMORY_THREADS > 186
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2976] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2977] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5059,6 +5245,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[2991] = *((uint64_t*)&dataset[hash_32[5967]]);
 #endif
 #if MEMORY_THREADS > 187
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[2992] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[2993] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5086,6 +5273,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3007] = *((uint64_t*)&dataset[hash_32[5999]]);
 #endif
 #if MEMORY_THREADS > 188
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3008] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3009] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5113,6 +5301,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3023] = *((uint64_t*)&dataset[hash_32[6031]]);
 #endif
 #if MEMORY_THREADS > 189
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3024] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3025] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5140,6 +5329,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3039] = *((uint64_t*)&dataset[hash_32[6063]]);
 #endif
 #if MEMORY_THREADS > 190
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3040] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3041] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5167,6 +5357,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3055] = *((uint64_t*)&dataset[hash_32[6095]]);
 #endif
 #if MEMORY_THREADS > 191
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3056] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3057] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5194,6 +5385,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3071] = *((uint64_t*)&dataset[hash_32[6127]]);
 #endif
 #if MEMORY_THREADS > 192
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3072] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3073] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5221,6 +5413,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3087] = *((uint64_t*)&dataset[hash_32[6159]]);
 #endif
 #if MEMORY_THREADS > 193
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3088] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3089] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5248,6 +5441,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3103] = *((uint64_t*)&dataset[hash_32[6191]]);
 #endif
 #if MEMORY_THREADS > 194
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3104] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3105] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5275,6 +5469,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3119] = *((uint64_t*)&dataset[hash_32[6223]]);
 #endif
 #if MEMORY_THREADS > 195
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3120] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3121] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5302,6 +5497,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3135] = *((uint64_t*)&dataset[hash_32[6255]]);
 #endif
 #if MEMORY_THREADS > 196
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3136] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3137] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5329,6 +5525,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3151] = *((uint64_t*)&dataset[hash_32[6287]]);
 #endif
 #if MEMORY_THREADS > 197
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3152] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3153] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5356,6 +5553,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3167] = *((uint64_t*)&dataset[hash_32[6319]]);
 #endif
 #if MEMORY_THREADS > 198
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3168] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3169] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5383,6 +5581,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3183] = *((uint64_t*)&dataset[hash_32[6351]]);
 #endif
 #if MEMORY_THREADS > 199
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3184] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3185] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5410,6 +5609,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3199] = *((uint64_t*)&dataset[hash_32[6383]]);
 #endif
 #if MEMORY_THREADS > 200
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3200] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3201] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5437,6 +5637,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3215] = *((uint64_t*)&dataset[hash_32[6415]]);
 #endif
 #if MEMORY_THREADS > 201
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3216] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3217] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5464,6 +5665,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3231] = *((uint64_t*)&dataset[hash_32[6447]]);
 #endif
 #if MEMORY_THREADS > 202
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3232] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3233] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5491,6 +5693,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3247] = *((uint64_t*)&dataset[hash_32[6479]]);
 #endif
 #if MEMORY_THREADS > 203
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3248] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3249] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5518,6 +5721,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3263] = *((uint64_t*)&dataset[hash_32[6511]]);
 #endif
 #if MEMORY_THREADS > 204
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3264] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3265] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5545,6 +5749,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3279] = *((uint64_t*)&dataset[hash_32[6543]]);
 #endif
 #if MEMORY_THREADS > 205
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3280] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3281] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5572,6 +5777,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3295] = *((uint64_t*)&dataset[hash_32[6575]]);
 #endif
 #if MEMORY_THREADS > 206
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3296] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3297] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5599,6 +5805,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3311] = *((uint64_t*)&dataset[hash_32[6607]]);
 #endif
 #if MEMORY_THREADS > 207
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3312] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3313] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5626,6 +5833,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3327] = *((uint64_t*)&dataset[hash_32[6639]]);
 #endif
 #if MEMORY_THREADS > 208
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3328] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3329] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5653,6 +5861,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3343] = *((uint64_t*)&dataset[hash_32[6671]]);
 #endif
 #if MEMORY_THREADS > 209
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3344] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3345] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5680,6 +5889,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3359] = *((uint64_t*)&dataset[hash_32[6703]]);
 #endif
 #if MEMORY_THREADS > 210
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3360] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3361] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5707,6 +5917,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3375] = *((uint64_t*)&dataset[hash_32[6735]]);
 #endif
 #if MEMORY_THREADS > 211
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3376] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3377] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5734,6 +5945,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3391] = *((uint64_t*)&dataset[hash_32[6767]]);
 #endif
 #if MEMORY_THREADS > 212
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3392] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3393] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5761,6 +5973,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3407] = *((uint64_t*)&dataset[hash_32[6799]]);
 #endif
 #if MEMORY_THREADS > 213
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3408] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3409] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5788,6 +6001,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3423] = *((uint64_t*)&dataset[hash_32[6831]]);
 #endif
 #if MEMORY_THREADS > 214
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3424] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3425] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5815,6 +6029,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3439] = *((uint64_t*)&dataset[hash_32[6863]]);
 #endif
 #if MEMORY_THREADS > 215
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3440] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3441] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5842,6 +6057,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3455] = *((uint64_t*)&dataset[hash_32[6895]]);
 #endif
 #if MEMORY_THREADS > 216
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3456] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3457] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5869,6 +6085,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3471] = *((uint64_t*)&dataset[hash_32[6927]]);
 #endif
 #if MEMORY_THREADS > 217
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3472] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3473] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5896,6 +6113,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3487] = *((uint64_t*)&dataset[hash_32[6959]]);
 #endif
 #if MEMORY_THREADS > 218
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3488] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3489] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5923,6 +6141,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3503] = *((uint64_t*)&dataset[hash_32[6991]]);
 #endif
 #if MEMORY_THREADS > 219
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3504] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3505] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5950,6 +6169,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3519] = *((uint64_t*)&dataset[hash_32[7023]]);
 #endif
 #if MEMORY_THREADS > 220
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3520] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3521] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -5977,6 +6197,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3535] = *((uint64_t*)&dataset[hash_32[7055]]);
 #endif
 #if MEMORY_THREADS > 221
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3536] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3537] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6004,6 +6225,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3551] = *((uint64_t*)&dataset[hash_32[7087]]);
 #endif
 #if MEMORY_THREADS > 222
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3552] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3553] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6031,6 +6253,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3567] = *((uint64_t*)&dataset[hash_32[7119]]);
 #endif
 #if MEMORY_THREADS > 223
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3568] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3569] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6058,6 +6281,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3583] = *((uint64_t*)&dataset[hash_32[7151]]);
 #endif
 #if MEMORY_THREADS > 224
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3584] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3585] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6085,6 +6309,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3599] = *((uint64_t*)&dataset[hash_32[7183]]);
 #endif
 #if MEMORY_THREADS > 225
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3600] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3601] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6112,6 +6337,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3615] = *((uint64_t*)&dataset[hash_32[7215]]);
 #endif
 #if MEMORY_THREADS > 226
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3616] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3617] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6139,6 +6365,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3631] = *((uint64_t*)&dataset[hash_32[7247]]);
 #endif
 #if MEMORY_THREADS > 227
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3632] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3633] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6166,6 +6393,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3647] = *((uint64_t*)&dataset[hash_32[7279]]);
 #endif
 #if MEMORY_THREADS > 228
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3648] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3649] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6193,6 +6421,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3663] = *((uint64_t*)&dataset[hash_32[7311]]);
 #endif
 #if MEMORY_THREADS > 229
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3664] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3665] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6220,6 +6449,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3679] = *((uint64_t*)&dataset[hash_32[7343]]);
 #endif
 #if MEMORY_THREADS > 230
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3680] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3681] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6247,6 +6477,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3695] = *((uint64_t*)&dataset[hash_32[7375]]);
 #endif
 #if MEMORY_THREADS > 231
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3696] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3697] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6274,6 +6505,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3711] = *((uint64_t*)&dataset[hash_32[7407]]);
 #endif
 #if MEMORY_THREADS > 232
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3712] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3713] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6301,6 +6533,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3727] = *((uint64_t*)&dataset[hash_32[7439]]);
 #endif
 #if MEMORY_THREADS > 233
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3728] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3729] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6328,6 +6561,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3743] = *((uint64_t*)&dataset[hash_32[7471]]);
 #endif
 #if MEMORY_THREADS > 234
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3744] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3745] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6355,6 +6589,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3759] = *((uint64_t*)&dataset[hash_32[7503]]);
 #endif
 #if MEMORY_THREADS > 235
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3760] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3761] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6382,6 +6617,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3775] = *((uint64_t*)&dataset[hash_32[7535]]);
 #endif
 #if MEMORY_THREADS > 236
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3776] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3777] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6409,6 +6645,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3791] = *((uint64_t*)&dataset[hash_32[7567]]);
 #endif
 #if MEMORY_THREADS > 237
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3792] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3793] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6436,6 +6673,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3807] = *((uint64_t*)&dataset[hash_32[7599]]);
 #endif
 #if MEMORY_THREADS > 238
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3808] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3809] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6463,6 +6701,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3823] = *((uint64_t*)&dataset[hash_32[7631]]);
 #endif
 #if MEMORY_THREADS > 239
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3824] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3825] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6490,6 +6729,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3839] = *((uint64_t*)&dataset[hash_32[7663]]);
 #endif
 #if MEMORY_THREADS > 240
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3840] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3841] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6517,6 +6757,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3855] = *((uint64_t*)&dataset[hash_32[7695]]);
 #endif
 #if MEMORY_THREADS > 241
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3856] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3857] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6544,6 +6785,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3871] = *((uint64_t*)&dataset[hash_32[7727]]);
 #endif
 #if MEMORY_THREADS > 242
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3872] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3873] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6571,6 +6813,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3887] = *((uint64_t*)&dataset[hash_32[7759]]);
 #endif
 #if MEMORY_THREADS > 243
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3888] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3889] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6598,6 +6841,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3903] = *((uint64_t*)&dataset[hash_32[7791]]);
 #endif
 #if MEMORY_THREADS > 244
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3904] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3905] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6625,6 +6869,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3919] = *((uint64_t*)&dataset[hash_32[7823]]);
 #endif
 #if MEMORY_THREADS > 245
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3920] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3921] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6652,6 +6897,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3935] = *((uint64_t*)&dataset[hash_32[7855]]);
 #endif
 #if MEMORY_THREADS > 246
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3936] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3937] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6679,6 +6925,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3951] = *((uint64_t*)&dataset[hash_32[7887]]);
 #endif
 #if MEMORY_THREADS > 247
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3952] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3953] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6706,6 +6953,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3967] = *((uint64_t*)&dataset[hash_32[7919]]);
 #endif
 #if MEMORY_THREADS > 248
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3968] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3969] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6733,6 +6981,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3983] = *((uint64_t*)&dataset[hash_32[7951]]);
 #endif
 #if MEMORY_THREADS > 249
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[3984] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[3985] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6760,6 +7009,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[3999] = *((uint64_t*)&dataset[hash_32[7983]]);
 #endif
 #if MEMORY_THREADS > 250
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[4000] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[4001] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6787,6 +7037,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[4015] = *((uint64_t*)&dataset[hash_32[8015]]);
 #endif
 #if MEMORY_THREADS > 251
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[4016] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[4017] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6814,6 +7065,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[4031] = *((uint64_t*)&dataset[hash_32[8047]]);
 #endif
 #if MEMORY_THREADS > 252
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[4032] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[4033] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6841,6 +7093,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[4047] = *((uint64_t*)&dataset[hash_32[8079]]);
 #endif
 #if MEMORY_THREADS > 253
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[4048] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[4049] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6868,6 +7121,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[4063] = *((uint64_t*)&dataset[hash_32[8111]]);
 #endif
 #if MEMORY_THREADS > 254
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[4064] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[4065] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -6895,6 +7149,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[4079] = *((uint64_t*)&dataset[hash_32[8143]]);
 #endif
 #if MEMORY_THREADS > 255
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
 	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
 	hash_64[4080] = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[4081] = *((uint64_t*)&dataset[data_32[ 1]]);
@@ -8972,6 +9227,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 #endif
 	*out_64   = hash_64[ 0]; out_64[1] = hash_64[ 4];
 	out_64[2] = hash_64[ 8]; out_64[3] = hash_64[12];
+#ifndef BENCHMARK
 #if MEMORY_THREADS > 1
 	if(((hash_64[16])<=(*out_64  ))
 	&& ((hash_64[20])<=(out_64[1]))
@@ -11266,6 +11522,1028 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 		*out_64   = hash_64[4080]; out_64[1] = hash_64[4084];
 		out_64[2] = hash_64[4088]; out_64[3] = hash_64[4092];
 	}
+#endif
+#else
+#if MEMORY_THREADS > 1
+		*out_64   ^= hash_64[16]; out_64[1] ^= hash_64[20];
+		out_64[2] ^= hash_64[24]; out_64[3] ^= hash_64[28];
+#endif
+#if MEMORY_THREADS > 2
+		*out_64   ^= hash_64[32]; out_64[1] ^= hash_64[36];
+		out_64[2] ^= hash_64[40]; out_64[3] ^= hash_64[44];
+#endif
+#if MEMORY_THREADS > 3
+		*out_64   ^= hash_64[48]; out_64[1] ^= hash_64[52];
+		out_64[2] ^= hash_64[56]; out_64[3] ^= hash_64[60];
+#endif
+#if MEMORY_THREADS > 4
+		*out_64   ^= hash_64[64]; out_64[1] ^= hash_64[68];
+		out_64[2] ^= hash_64[72]; out_64[3] ^= hash_64[76];
+#endif
+#if MEMORY_THREADS > 5
+		*out_64   ^= hash_64[80]; out_64[1] ^= hash_64[84];
+		out_64[2] ^= hash_64[88]; out_64[3] ^= hash_64[92];
+#endif
+#if MEMORY_THREADS > 6
+		*out_64   ^= hash_64[96]; out_64[1] ^= hash_64[100];
+		out_64[2] ^= hash_64[104]; out_64[3] ^= hash_64[108];
+#endif
+#if MEMORY_THREADS > 7
+		*out_64   ^= hash_64[112]; out_64[1] ^= hash_64[116];
+		out_64[2] ^= hash_64[120]; out_64[3] ^= hash_64[124];
+#endif
+#if MEMORY_THREADS > 8
+		*out_64   ^= hash_64[128]; out_64[1] ^= hash_64[132];
+		out_64[2] ^= hash_64[136]; out_64[3] ^= hash_64[140];
+#endif
+#if MEMORY_THREADS > 9
+		*out_64   ^= hash_64[144]; out_64[1] ^= hash_64[148];
+		out_64[2] ^= hash_64[152]; out_64[3] ^= hash_64[156];
+#endif
+#if MEMORY_THREADS > 10
+		*out_64   ^= hash_64[160]; out_64[1] ^= hash_64[164];
+		out_64[2] ^= hash_64[168]; out_64[3] ^= hash_64[172];
+#endif
+#if MEMORY_THREADS > 11
+		*out_64   ^= hash_64[176]; out_64[1] ^= hash_64[180];
+		out_64[2] ^= hash_64[184]; out_64[3] ^= hash_64[188];
+#endif
+#if MEMORY_THREADS > 12
+		*out_64   ^= hash_64[192]; out_64[1] ^= hash_64[196];
+		out_64[2] ^= hash_64[200]; out_64[3] ^= hash_64[204];
+#endif
+#if MEMORY_THREADS > 13
+		*out_64   ^= hash_64[208]; out_64[1] ^= hash_64[212];
+		out_64[2] ^= hash_64[216]; out_64[3] ^= hash_64[220];
+#endif
+#if MEMORY_THREADS > 14
+		*out_64   ^= hash_64[224]; out_64[1] ^= hash_64[228];
+		out_64[2] ^= hash_64[232]; out_64[3] ^= hash_64[236];
+#endif
+#if MEMORY_THREADS > 15
+		*out_64   ^= hash_64[240]; out_64[1] ^= hash_64[244];
+		out_64[2] ^= hash_64[248]; out_64[3] ^= hash_64[252];
+#endif
+#if MEMORY_THREADS > 16
+		*out_64   ^= hash_64[256]; out_64[1] ^= hash_64[260];
+		out_64[2] ^= hash_64[264]; out_64[3] ^= hash_64[268];
+#endif
+#if MEMORY_THREADS > 17
+		*out_64   ^= hash_64[272]; out_64[1] ^= hash_64[276];
+		out_64[2] ^= hash_64[280]; out_64[3] ^= hash_64[284];
+#endif
+#if MEMORY_THREADS > 18
+		*out_64   ^= hash_64[288]; out_64[1] ^= hash_64[292];
+		out_64[2] ^= hash_64[296]; out_64[3] ^= hash_64[300];
+#endif
+#if MEMORY_THREADS > 19
+		*out_64   ^= hash_64[304]; out_64[1] ^= hash_64[308];
+		out_64[2] ^= hash_64[312]; out_64[3] ^= hash_64[316];
+#endif
+#if MEMORY_THREADS > 20
+		*out_64   ^= hash_64[320]; out_64[1] ^= hash_64[324];
+		out_64[2] ^= hash_64[328]; out_64[3] ^= hash_64[332];
+#endif
+#if MEMORY_THREADS > 21
+		*out_64   ^= hash_64[336]; out_64[1] ^= hash_64[340];
+		out_64[2] ^= hash_64[344]; out_64[3] ^= hash_64[348];
+#endif
+#if MEMORY_THREADS > 22
+		*out_64   ^= hash_64[352]; out_64[1] ^= hash_64[356];
+		out_64[2] ^= hash_64[360]; out_64[3] ^= hash_64[364];
+#endif
+#if MEMORY_THREADS > 23
+		*out_64   ^= hash_64[368]; out_64[1] ^= hash_64[372];
+		out_64[2] ^= hash_64[376]; out_64[3] ^= hash_64[380];
+#endif
+#if MEMORY_THREADS > 24
+		*out_64   ^= hash_64[384]; out_64[1] ^= hash_64[388];
+		out_64[2] ^= hash_64[392]; out_64[3] ^= hash_64[396];
+#endif
+#if MEMORY_THREADS > 25
+		*out_64   ^= hash_64[400]; out_64[1] ^= hash_64[404];
+		out_64[2] ^= hash_64[408]; out_64[3] ^= hash_64[412];
+#endif
+#if MEMORY_THREADS > 26
+		*out_64   ^= hash_64[416]; out_64[1] ^= hash_64[420];
+		out_64[2] ^= hash_64[424]; out_64[3] ^= hash_64[428];
+#endif
+#if MEMORY_THREADS > 27
+		*out_64   ^= hash_64[432]; out_64[1] ^= hash_64[436];
+		out_64[2] ^= hash_64[440]; out_64[3] ^= hash_64[444];
+#endif
+#if MEMORY_THREADS > 28
+		*out_64   ^= hash_64[448]; out_64[1] ^= hash_64[452];
+		out_64[2] ^= hash_64[456]; out_64[3] ^= hash_64[460];
+#endif
+#if MEMORY_THREADS > 29
+		*out_64   ^= hash_64[464]; out_64[1] ^= hash_64[468];
+		out_64[2] ^= hash_64[472]; out_64[3] ^= hash_64[476];
+#endif
+#if MEMORY_THREADS > 30
+		*out_64   ^= hash_64[480]; out_64[1] ^= hash_64[484];
+		out_64[2] ^= hash_64[488]; out_64[3] ^= hash_64[492];
+#endif
+#if MEMORY_THREADS > 31
+		*out_64   ^= hash_64[496]; out_64[1] ^= hash_64[500];
+		out_64[2] ^= hash_64[504]; out_64[3] ^= hash_64[508];
+#endif
+#if MEMORY_THREADS > 32
+		*out_64   ^= hash_64[512]; out_64[1] ^= hash_64[516];
+		out_64[2] ^= hash_64[520]; out_64[3] ^= hash_64[524];
+#endif
+#if MEMORY_THREADS > 33
+		*out_64   ^= hash_64[528]; out_64[1] ^= hash_64[532];
+		out_64[2] ^= hash_64[536]; out_64[3] ^= hash_64[540];
+#endif
+#if MEMORY_THREADS > 34
+		*out_64   ^= hash_64[544]; out_64[1] ^= hash_64[548];
+		out_64[2] ^= hash_64[552]; out_64[3] ^= hash_64[556];
+#endif
+#if MEMORY_THREADS > 35
+		*out_64   ^= hash_64[560]; out_64[1] ^= hash_64[564];
+		out_64[2] ^= hash_64[568]; out_64[3] ^= hash_64[572];
+#endif
+#if MEMORY_THREADS > 36
+		*out_64   ^= hash_64[576]; out_64[1] ^= hash_64[580];
+		out_64[2] ^= hash_64[584]; out_64[3] ^= hash_64[588];
+#endif
+#if MEMORY_THREADS > 37
+		*out_64   ^= hash_64[592]; out_64[1] ^= hash_64[596];
+		out_64[2] ^= hash_64[600]; out_64[3] ^= hash_64[604];
+#endif
+#if MEMORY_THREADS > 38
+		*out_64   ^= hash_64[608]; out_64[1] ^= hash_64[612];
+		out_64[2] ^= hash_64[616]; out_64[3] ^= hash_64[620];
+#endif
+#if MEMORY_THREADS > 39
+		*out_64   ^= hash_64[624]; out_64[1] ^= hash_64[628];
+		out_64[2] ^= hash_64[632]; out_64[3] ^= hash_64[636];
+#endif
+#if MEMORY_THREADS > 40
+		*out_64   ^= hash_64[640]; out_64[1] ^= hash_64[644];
+		out_64[2] ^= hash_64[648]; out_64[3] ^= hash_64[652];
+#endif
+#if MEMORY_THREADS > 41
+		*out_64   ^= hash_64[656]; out_64[1] ^= hash_64[660];
+		out_64[2] ^= hash_64[664]; out_64[3] ^= hash_64[668];
+#endif
+#if MEMORY_THREADS > 42
+		*out_64   ^= hash_64[672]; out_64[1] ^= hash_64[676];
+		out_64[2] ^= hash_64[680]; out_64[3] ^= hash_64[684];
+#endif
+#if MEMORY_THREADS > 43
+		*out_64   ^= hash_64[688]; out_64[1] ^= hash_64[692];
+		out_64[2] ^= hash_64[696]; out_64[3] ^= hash_64[700];
+#endif
+#if MEMORY_THREADS > 44
+		*out_64   ^= hash_64[704]; out_64[1] ^= hash_64[708];
+		out_64[2] ^= hash_64[712]; out_64[3] ^= hash_64[716];
+#endif
+#if MEMORY_THREADS > 45
+		*out_64   ^= hash_64[720]; out_64[1] ^= hash_64[724];
+		out_64[2] ^= hash_64[728]; out_64[3] ^= hash_64[732];
+#endif
+#if MEMORY_THREADS > 46
+		*out_64   ^= hash_64[736]; out_64[1] ^= hash_64[740];
+		out_64[2] ^= hash_64[744]; out_64[3] ^= hash_64[748];
+#endif
+#if MEMORY_THREADS > 47
+		*out_64   ^= hash_64[752]; out_64[1] ^= hash_64[756];
+		out_64[2] ^= hash_64[760]; out_64[3] ^= hash_64[764];
+#endif
+#if MEMORY_THREADS > 48
+		*out_64   ^= hash_64[768]; out_64[1] ^= hash_64[772];
+		out_64[2] ^= hash_64[776]; out_64[3] ^= hash_64[780];
+#endif
+#if MEMORY_THREADS > 49
+		*out_64   ^= hash_64[784]; out_64[1] ^= hash_64[788];
+		out_64[2] ^= hash_64[792]; out_64[3] ^= hash_64[796];
+#endif
+#if MEMORY_THREADS > 50
+		*out_64   ^= hash_64[800]; out_64[1] ^= hash_64[804];
+		out_64[2] ^= hash_64[808]; out_64[3] ^= hash_64[812];
+#endif
+#if MEMORY_THREADS > 51
+		*out_64   ^= hash_64[816]; out_64[1] ^= hash_64[820];
+		out_64[2] ^= hash_64[824]; out_64[3] ^= hash_64[828];
+#endif
+#if MEMORY_THREADS > 52
+		*out_64   ^= hash_64[832]; out_64[1] ^= hash_64[836];
+		out_64[2] ^= hash_64[840]; out_64[3] ^= hash_64[844];
+#endif
+#if MEMORY_THREADS > 53
+		*out_64   ^= hash_64[848]; out_64[1] ^= hash_64[852];
+		out_64[2] ^= hash_64[856]; out_64[3] ^= hash_64[860];
+#endif
+#if MEMORY_THREADS > 54
+		*out_64   ^= hash_64[864]; out_64[1] ^= hash_64[868];
+		out_64[2] ^= hash_64[872]; out_64[3] ^= hash_64[876];
+#endif
+#if MEMORY_THREADS > 55
+		*out_64   ^= hash_64[880]; out_64[1] ^= hash_64[884];
+		out_64[2] ^= hash_64[888]; out_64[3] ^= hash_64[892];
+#endif
+#if MEMORY_THREADS > 56
+		*out_64   ^= hash_64[896]; out_64[1] ^= hash_64[900];
+		out_64[2] ^= hash_64[904]; out_64[3] ^= hash_64[908];
+#endif
+#if MEMORY_THREADS > 57
+		*out_64   ^= hash_64[912]; out_64[1] ^= hash_64[916];
+		out_64[2] ^= hash_64[920]; out_64[3] ^= hash_64[924];
+#endif
+#if MEMORY_THREADS > 58
+		*out_64   ^= hash_64[928]; out_64[1] ^= hash_64[932];
+		out_64[2] ^= hash_64[936]; out_64[3] ^= hash_64[940];
+#endif
+#if MEMORY_THREADS > 59
+		*out_64   ^= hash_64[944]; out_64[1] ^= hash_64[948];
+		out_64[2] ^= hash_64[952]; out_64[3] ^= hash_64[956];
+#endif
+#if MEMORY_THREADS > 60
+		*out_64   ^= hash_64[960]; out_64[1] ^= hash_64[964];
+		out_64[2] ^= hash_64[968]; out_64[3] ^= hash_64[972];
+#endif
+#if MEMORY_THREADS > 61
+		*out_64   ^= hash_64[976]; out_64[1] ^= hash_64[980];
+		out_64[2] ^= hash_64[984]; out_64[3] ^= hash_64[988];
+#endif
+#if MEMORY_THREADS > 62
+		*out_64   ^= hash_64[992]; out_64[1] ^= hash_64[996];
+		out_64[2] ^= hash_64[1000]; out_64[3] ^= hash_64[1004];
+#endif
+#if MEMORY_THREADS > 63
+		*out_64   ^= hash_64[1008]; out_64[1] ^= hash_64[1012];
+		out_64[2] ^= hash_64[1016]; out_64[3] ^= hash_64[1020];
+#endif
+#if MEMORY_THREADS > 64
+		*out_64   ^= hash_64[1024]; out_64[1] ^= hash_64[1028];
+		out_64[2] ^= hash_64[1032]; out_64[3] ^= hash_64[1036];
+#endif
+#if MEMORY_THREADS > 65
+		*out_64   ^= hash_64[1040]; out_64[1] ^= hash_64[1044];
+		out_64[2] ^= hash_64[1048]; out_64[3] ^= hash_64[1052];
+#endif
+#if MEMORY_THREADS > 66
+		*out_64   ^= hash_64[1056]; out_64[1] ^= hash_64[1060];
+		out_64[2] ^= hash_64[1064]; out_64[3] ^= hash_64[1068];
+#endif
+#if MEMORY_THREADS > 67
+		*out_64   ^= hash_64[1072]; out_64[1] ^= hash_64[1076];
+		out_64[2] ^= hash_64[1080]; out_64[3] ^= hash_64[1084];
+#endif
+#if MEMORY_THREADS > 68
+		*out_64   ^= hash_64[1088]; out_64[1] ^= hash_64[1092];
+		out_64[2] ^= hash_64[1096]; out_64[3] ^= hash_64[1100];
+#endif
+#if MEMORY_THREADS > 69
+		*out_64   ^= hash_64[1104]; out_64[1] ^= hash_64[1108];
+		out_64[2] ^= hash_64[1112]; out_64[3] ^= hash_64[1116];
+#endif
+#if MEMORY_THREADS > 70
+		*out_64   ^= hash_64[1120]; out_64[1] ^= hash_64[1124];
+		out_64[2] ^= hash_64[1128]; out_64[3] ^= hash_64[1132];
+#endif
+#if MEMORY_THREADS > 71
+		*out_64   ^= hash_64[1136]; out_64[1] ^= hash_64[1140];
+		out_64[2] ^= hash_64[1144]; out_64[3] ^= hash_64[1148];
+#endif
+#if MEMORY_THREADS > 72
+		*out_64   ^= hash_64[1152]; out_64[1] ^= hash_64[1156];
+		out_64[2] ^= hash_64[1160]; out_64[3] ^= hash_64[1164];
+#endif
+#if MEMORY_THREADS > 73
+		*out_64   ^= hash_64[1168]; out_64[1] ^= hash_64[1172];
+		out_64[2] ^= hash_64[1176]; out_64[3] ^= hash_64[1180];
+#endif
+#if MEMORY_THREADS > 74
+		*out_64   ^= hash_64[1184]; out_64[1] ^= hash_64[1188];
+		out_64[2] ^= hash_64[1192]; out_64[3] ^= hash_64[1196];
+#endif
+#if MEMORY_THREADS > 75
+		*out_64   ^= hash_64[1200]; out_64[1] ^= hash_64[1204];
+		out_64[2] ^= hash_64[1208]; out_64[3] ^= hash_64[1212];
+#endif
+#if MEMORY_THREADS > 76
+		*out_64   ^= hash_64[1216]; out_64[1] ^= hash_64[1220];
+		out_64[2] ^= hash_64[1224]; out_64[3] ^= hash_64[1228];
+#endif
+#if MEMORY_THREADS > 77
+		*out_64   ^= hash_64[1232]; out_64[1] ^= hash_64[1236];
+		out_64[2] ^= hash_64[1240]; out_64[3] ^= hash_64[1244];
+#endif
+#if MEMORY_THREADS > 78
+		*out_64   ^= hash_64[1248]; out_64[1] ^= hash_64[1252];
+		out_64[2] ^= hash_64[1256]; out_64[3] ^= hash_64[1260];
+#endif
+#if MEMORY_THREADS > 79
+		*out_64   ^= hash_64[1264]; out_64[1] ^= hash_64[1268];
+		out_64[2] ^= hash_64[1272]; out_64[3] ^= hash_64[1276];
+#endif
+#if MEMORY_THREADS > 80
+		*out_64   ^= hash_64[1280]; out_64[1] ^= hash_64[1284];
+		out_64[2] ^= hash_64[1288]; out_64[3] ^= hash_64[1292];
+#endif
+#if MEMORY_THREADS > 81
+		*out_64   ^= hash_64[1296]; out_64[1] ^= hash_64[1300];
+		out_64[2] ^= hash_64[1304]; out_64[3] ^= hash_64[1308];
+#endif
+#if MEMORY_THREADS > 82
+		*out_64   ^= hash_64[1312]; out_64[1] ^= hash_64[1316];
+		out_64[2] ^= hash_64[1320]; out_64[3] ^= hash_64[1324];
+#endif
+#if MEMORY_THREADS > 83
+		*out_64   ^= hash_64[1328]; out_64[1] ^= hash_64[1332];
+		out_64[2] ^= hash_64[1336]; out_64[3] ^= hash_64[1340];
+#endif
+#if MEMORY_THREADS > 84
+		*out_64   ^= hash_64[1344]; out_64[1] ^= hash_64[1348];
+		out_64[2] ^= hash_64[1352]; out_64[3] ^= hash_64[1356];
+#endif
+#if MEMORY_THREADS > 85
+		*out_64   ^= hash_64[1360]; out_64[1] ^= hash_64[1364];
+		out_64[2] ^= hash_64[1368]; out_64[3] ^= hash_64[1372];
+#endif
+#if MEMORY_THREADS > 86
+		*out_64   ^= hash_64[1376]; out_64[1] ^= hash_64[1380];
+		out_64[2] ^= hash_64[1384]; out_64[3] ^= hash_64[1388];
+#endif
+#if MEMORY_THREADS > 87
+		*out_64   ^= hash_64[1392]; out_64[1] ^= hash_64[1396];
+		out_64[2] ^= hash_64[1400]; out_64[3] ^= hash_64[1404];
+#endif
+#if MEMORY_THREADS > 88
+		*out_64   ^= hash_64[1408]; out_64[1] ^= hash_64[1412];
+		out_64[2] ^= hash_64[1416]; out_64[3] ^= hash_64[1420];
+#endif
+#if MEMORY_THREADS > 89
+		*out_64   ^= hash_64[1424]; out_64[1] ^= hash_64[1428];
+		out_64[2] ^= hash_64[1432]; out_64[3] ^= hash_64[1436];
+#endif
+#if MEMORY_THREADS > 90
+		*out_64   ^= hash_64[1440]; out_64[1] ^= hash_64[1444];
+		out_64[2] ^= hash_64[1448]; out_64[3] ^= hash_64[1452];
+#endif
+#if MEMORY_THREADS > 91
+		*out_64   ^= hash_64[1456]; out_64[1] ^= hash_64[1460];
+		out_64[2] ^= hash_64[1464]; out_64[3] ^= hash_64[1468];
+#endif
+#if MEMORY_THREADS > 92
+		*out_64   ^= hash_64[1472]; out_64[1] ^= hash_64[1476];
+		out_64[2] ^= hash_64[1480]; out_64[3] ^= hash_64[1484];
+#endif
+#if MEMORY_THREADS > 93
+		*out_64   ^= hash_64[1488]; out_64[1] ^= hash_64[1492];
+		out_64[2] ^= hash_64[1496]; out_64[3] ^= hash_64[1500];
+#endif
+#if MEMORY_THREADS > 94
+		*out_64   ^= hash_64[1504]; out_64[1] ^= hash_64[1508];
+		out_64[2] ^= hash_64[1512]; out_64[3] ^= hash_64[1516];
+#endif
+#if MEMORY_THREADS > 95
+		*out_64   ^= hash_64[1520]; out_64[1] ^= hash_64[1524];
+		out_64[2] ^= hash_64[1528]; out_64[3] ^= hash_64[1532];
+#endif
+#if MEMORY_THREADS > 96
+		*out_64   ^= hash_64[1536]; out_64[1] ^= hash_64[1540];
+		out_64[2] ^= hash_64[1544]; out_64[3] ^= hash_64[1548];
+#endif
+#if MEMORY_THREADS > 97
+		*out_64   ^= hash_64[1552]; out_64[1] ^= hash_64[1556];
+		out_64[2] ^= hash_64[1560]; out_64[3] ^= hash_64[1564];
+#endif
+#if MEMORY_THREADS > 98
+		*out_64   ^= hash_64[1568]; out_64[1] ^= hash_64[1572];
+		out_64[2] ^= hash_64[1576]; out_64[3] ^= hash_64[1580];
+#endif
+#if MEMORY_THREADS > 99
+		*out_64   ^= hash_64[1584]; out_64[1] ^= hash_64[1588];
+		out_64[2] ^= hash_64[1592]; out_64[3] ^= hash_64[1596];
+#endif
+#if MEMORY_THREADS > 100
+		*out_64   ^= hash_64[1600]; out_64[1] ^= hash_64[1604];
+		out_64[2] ^= hash_64[1608]; out_64[3] ^= hash_64[1612];
+#endif
+#if MEMORY_THREADS > 101
+		*out_64   ^= hash_64[1616]; out_64[1] ^= hash_64[1620];
+		out_64[2] ^= hash_64[1624]; out_64[3] ^= hash_64[1628];
+#endif
+#if MEMORY_THREADS > 102
+		*out_64   ^= hash_64[1632]; out_64[1] ^= hash_64[1636];
+		out_64[2] ^= hash_64[1640]; out_64[3] ^= hash_64[1644];
+#endif
+#if MEMORY_THREADS > 103
+		*out_64   ^= hash_64[1648]; out_64[1] ^= hash_64[1652];
+		out_64[2] ^= hash_64[1656]; out_64[3] ^= hash_64[1660];
+#endif
+#if MEMORY_THREADS > 104
+		*out_64   ^= hash_64[1664]; out_64[1] ^= hash_64[1668];
+		out_64[2] ^= hash_64[1672]; out_64[3] ^= hash_64[1676];
+#endif
+#if MEMORY_THREADS > 105
+		*out_64   ^= hash_64[1680]; out_64[1] ^= hash_64[1684];
+		out_64[2] ^= hash_64[1688]; out_64[3] ^= hash_64[1692];
+#endif
+#if MEMORY_THREADS > 106
+		*out_64   ^= hash_64[1696]; out_64[1] ^= hash_64[1700];
+		out_64[2] ^= hash_64[1704]; out_64[3] ^= hash_64[1708];
+#endif
+#if MEMORY_THREADS > 107
+		*out_64   ^= hash_64[1712]; out_64[1] ^= hash_64[1716];
+		out_64[2] ^= hash_64[1720]; out_64[3] ^= hash_64[1724];
+#endif
+#if MEMORY_THREADS > 108
+		*out_64   ^= hash_64[1728]; out_64[1] ^= hash_64[1732];
+		out_64[2] ^= hash_64[1736]; out_64[3] ^= hash_64[1740];
+#endif
+#if MEMORY_THREADS > 109
+		*out_64   ^= hash_64[1744]; out_64[1] ^= hash_64[1748];
+		out_64[2] ^= hash_64[1752]; out_64[3] ^= hash_64[1756];
+#endif
+#if MEMORY_THREADS > 110
+		*out_64   ^= hash_64[1760]; out_64[1] ^= hash_64[1764];
+		out_64[2] ^= hash_64[1768]; out_64[3] ^= hash_64[1772];
+#endif
+#if MEMORY_THREADS > 111
+		*out_64   ^= hash_64[1776]; out_64[1] ^= hash_64[1780];
+		out_64[2] ^= hash_64[1784]; out_64[3] ^= hash_64[1788];
+#endif
+#if MEMORY_THREADS > 112
+		*out_64   ^= hash_64[1792]; out_64[1] ^= hash_64[1796];
+		out_64[2] ^= hash_64[1800]; out_64[3] ^= hash_64[1804];
+#endif
+#if MEMORY_THREADS > 113
+		*out_64   ^= hash_64[1808]; out_64[1] ^= hash_64[1812];
+		out_64[2] ^= hash_64[1816]; out_64[3] ^= hash_64[1820];
+#endif
+#if MEMORY_THREADS > 114
+		*out_64   ^= hash_64[1824]; out_64[1] ^= hash_64[1828];
+		out_64[2] ^= hash_64[1832]; out_64[3] ^= hash_64[1836];
+#endif
+#if MEMORY_THREADS > 115
+		*out_64   ^= hash_64[1840]; out_64[1] ^= hash_64[1844];
+		out_64[2] ^= hash_64[1848]; out_64[3] ^= hash_64[1852];
+#endif
+#if MEMORY_THREADS > 116
+		*out_64   ^= hash_64[1856]; out_64[1] ^= hash_64[1860];
+		out_64[2] ^= hash_64[1864]; out_64[3] ^= hash_64[1868];
+#endif
+#if MEMORY_THREADS > 117
+		*out_64   ^= hash_64[1872]; out_64[1] ^= hash_64[1876];
+		out_64[2] ^= hash_64[1880]; out_64[3] ^= hash_64[1884];
+#endif
+#if MEMORY_THREADS > 118
+		*out_64   ^= hash_64[1888]; out_64[1] ^= hash_64[1892];
+		out_64[2] ^= hash_64[1896]; out_64[3] ^= hash_64[1900];
+#endif
+#if MEMORY_THREADS > 119
+		*out_64   ^= hash_64[1904]; out_64[1] ^= hash_64[1908];
+		out_64[2] ^= hash_64[1912]; out_64[3] ^= hash_64[1916];
+#endif
+#if MEMORY_THREADS > 120
+		*out_64   ^= hash_64[1920]; out_64[1] ^= hash_64[1924];
+		out_64[2] ^= hash_64[1928]; out_64[3] ^= hash_64[1932];
+#endif
+#if MEMORY_THREADS > 121
+		*out_64   ^= hash_64[1936]; out_64[1] ^= hash_64[1940];
+		out_64[2] ^= hash_64[1944]; out_64[3] ^= hash_64[1948];
+#endif
+#if MEMORY_THREADS > 122
+		*out_64   ^= hash_64[1952]; out_64[1] ^= hash_64[1956];
+		out_64[2] ^= hash_64[1960]; out_64[3] ^= hash_64[1964];
+#endif
+#if MEMORY_THREADS > 123
+		*out_64   ^= hash_64[1968]; out_64[1] ^= hash_64[1972];
+		out_64[2] ^= hash_64[1976]; out_64[3] ^= hash_64[1980];
+#endif
+#if MEMORY_THREADS > 124
+		*out_64   ^= hash_64[1984]; out_64[1] ^= hash_64[1988];
+		out_64[2] ^= hash_64[1992]; out_64[3] ^= hash_64[1996];
+#endif
+#if MEMORY_THREADS > 125
+		*out_64   ^= hash_64[2000]; out_64[1] ^= hash_64[2004];
+		out_64[2] ^= hash_64[2008]; out_64[3] ^= hash_64[2012];
+#endif
+#if MEMORY_THREADS > 126
+		*out_64   ^= hash_64[2016]; out_64[1] ^= hash_64[2020];
+		out_64[2] ^= hash_64[2024]; out_64[3] ^= hash_64[2028];
+#endif
+#if MEMORY_THREADS > 127
+		*out_64   ^= hash_64[2032]; out_64[1] ^= hash_64[2036];
+		out_64[2] ^= hash_64[2040]; out_64[3] ^= hash_64[2044];
+#endif
+#if MEMORY_THREADS > 128
+		*out_64   ^= hash_64[2048]; out_64[1] ^= hash_64[2052];
+		out_64[2] ^= hash_64[2056]; out_64[3] ^= hash_64[2060];
+#endif
+#if MEMORY_THREADS > 129
+		*out_64   ^= hash_64[2064]; out_64[1] ^= hash_64[2068];
+		out_64[2] ^= hash_64[2072]; out_64[3] ^= hash_64[2076];
+#endif
+#if MEMORY_THREADS > 130
+		*out_64   ^= hash_64[2080]; out_64[1] ^= hash_64[2084];
+		out_64[2] ^= hash_64[2088]; out_64[3] ^= hash_64[2092];
+#endif
+#if MEMORY_THREADS > 131
+		*out_64   ^= hash_64[2096]; out_64[1] ^= hash_64[2100];
+		out_64[2] ^= hash_64[2104]; out_64[3] ^= hash_64[2108];
+#endif
+#if MEMORY_THREADS > 132
+		*out_64   ^= hash_64[2112]; out_64[1] ^= hash_64[2116];
+		out_64[2] ^= hash_64[2120]; out_64[3] ^= hash_64[2124];
+#endif
+#if MEMORY_THREADS > 133
+		*out_64   ^= hash_64[2128]; out_64[1] ^= hash_64[2132];
+		out_64[2] ^= hash_64[2136]; out_64[3] ^= hash_64[2140];
+#endif
+#if MEMORY_THREADS > 134
+		*out_64   ^= hash_64[2144]; out_64[1] ^= hash_64[2148];
+		out_64[2] ^= hash_64[2152]; out_64[3] ^= hash_64[2156];
+#endif
+#if MEMORY_THREADS > 135
+		*out_64   ^= hash_64[2160]; out_64[1] ^= hash_64[2164];
+		out_64[2] ^= hash_64[2168]; out_64[3] ^= hash_64[2172];
+#endif
+#if MEMORY_THREADS > 136
+		*out_64   ^= hash_64[2176]; out_64[1] ^= hash_64[2180];
+		out_64[2] ^= hash_64[2184]; out_64[3] ^= hash_64[2188];
+#endif
+#if MEMORY_THREADS > 137
+		*out_64   ^= hash_64[2192]; out_64[1] ^= hash_64[2196];
+		out_64[2] ^= hash_64[2200]; out_64[3] ^= hash_64[2204];
+#endif
+#if MEMORY_THREADS > 138
+		*out_64   ^= hash_64[2208]; out_64[1] ^= hash_64[2212];
+		out_64[2] ^= hash_64[2216]; out_64[3] ^= hash_64[2220];
+#endif
+#if MEMORY_THREADS > 139
+		*out_64   ^= hash_64[2224]; out_64[1] ^= hash_64[2228];
+		out_64[2] ^= hash_64[2232]; out_64[3] ^= hash_64[2236];
+#endif
+#if MEMORY_THREADS > 140
+		*out_64   ^= hash_64[2240]; out_64[1] ^= hash_64[2244];
+		out_64[2] ^= hash_64[2248]; out_64[3] ^= hash_64[2252];
+#endif
+#if MEMORY_THREADS > 141
+		*out_64   ^= hash_64[2256]; out_64[1] ^= hash_64[2260];
+		out_64[2] ^= hash_64[2264]; out_64[3] ^= hash_64[2268];
+#endif
+#if MEMORY_THREADS > 142
+		*out_64   ^= hash_64[2272]; out_64[1] ^= hash_64[2276];
+		out_64[2] ^= hash_64[2280]; out_64[3] ^= hash_64[2284];
+#endif
+#if MEMORY_THREADS > 143
+		*out_64   ^= hash_64[2288]; out_64[1] ^= hash_64[2292];
+		out_64[2] ^= hash_64[2296]; out_64[3] ^= hash_64[2300];
+#endif
+#if MEMORY_THREADS > 144
+		*out_64   ^= hash_64[2304]; out_64[1] ^= hash_64[2308];
+		out_64[2] ^= hash_64[2312]; out_64[3] ^= hash_64[2316];
+#endif
+#if MEMORY_THREADS > 145
+		*out_64   ^= hash_64[2320]; out_64[1] ^= hash_64[2324];
+		out_64[2] ^= hash_64[2328]; out_64[3] ^= hash_64[2332];
+#endif
+#if MEMORY_THREADS > 146
+		*out_64   ^= hash_64[2336]; out_64[1] ^= hash_64[2340];
+		out_64[2] ^= hash_64[2344]; out_64[3] ^= hash_64[2348];
+#endif
+#if MEMORY_THREADS > 147
+		*out_64   ^= hash_64[2352]; out_64[1] ^= hash_64[2356];
+		out_64[2] ^= hash_64[2360]; out_64[3] ^= hash_64[2364];
+#endif
+#if MEMORY_THREADS > 148
+		*out_64   ^= hash_64[2368]; out_64[1] ^= hash_64[2372];
+		out_64[2] ^= hash_64[2376]; out_64[3] ^= hash_64[2380];
+#endif
+#if MEMORY_THREADS > 149
+		*out_64   ^= hash_64[2384]; out_64[1] ^= hash_64[2388];
+		out_64[2] ^= hash_64[2392]; out_64[3] ^= hash_64[2396];
+#endif
+#if MEMORY_THREADS > 150
+		*out_64   ^= hash_64[2400]; out_64[1] ^= hash_64[2404];
+		out_64[2] ^= hash_64[2408]; out_64[3] ^= hash_64[2412];
+#endif
+#if MEMORY_THREADS > 151
+		*out_64   ^= hash_64[2416]; out_64[1] ^= hash_64[2420];
+		out_64[2] ^= hash_64[2424]; out_64[3] ^= hash_64[2428];
+#endif
+#if MEMORY_THREADS > 152
+		*out_64   ^= hash_64[2432]; out_64[1] ^= hash_64[2436];
+		out_64[2] ^= hash_64[2440]; out_64[3] ^= hash_64[2444];
+#endif
+#if MEMORY_THREADS > 153
+		*out_64   ^= hash_64[2448]; out_64[1] ^= hash_64[2452];
+		out_64[2] ^= hash_64[2456]; out_64[3] ^= hash_64[2460];
+#endif
+#if MEMORY_THREADS > 154
+		*out_64   ^= hash_64[2464]; out_64[1] ^= hash_64[2468];
+		out_64[2] ^= hash_64[2472]; out_64[3] ^= hash_64[2476];
+#endif
+#if MEMORY_THREADS > 155
+		*out_64   ^= hash_64[2480]; out_64[1] ^= hash_64[2484];
+		out_64[2] ^= hash_64[2488]; out_64[3] ^= hash_64[2492];
+#endif
+#if MEMORY_THREADS > 156
+		*out_64   ^= hash_64[2496]; out_64[1] ^= hash_64[2500];
+		out_64[2] ^= hash_64[2504]; out_64[3] ^= hash_64[2508];
+#endif
+#if MEMORY_THREADS > 157
+		*out_64   ^= hash_64[2512]; out_64[1] ^= hash_64[2516];
+		out_64[2] ^= hash_64[2520]; out_64[3] ^= hash_64[2524];
+#endif
+#if MEMORY_THREADS > 158
+		*out_64   ^= hash_64[2528]; out_64[1] ^= hash_64[2532];
+		out_64[2] ^= hash_64[2536]; out_64[3] ^= hash_64[2540];
+#endif
+#if MEMORY_THREADS > 159
+		*out_64   ^= hash_64[2544]; out_64[1] ^= hash_64[2548];
+		out_64[2] ^= hash_64[2552]; out_64[3] ^= hash_64[2556];
+#endif
+#if MEMORY_THREADS > 160
+		*out_64   ^= hash_64[2560]; out_64[1] ^= hash_64[2564];
+		out_64[2] ^= hash_64[2568]; out_64[3] ^= hash_64[2572];
+#endif
+#if MEMORY_THREADS > 161
+		*out_64   ^= hash_64[2576]; out_64[1] ^= hash_64[2580];
+		out_64[2] ^= hash_64[2584]; out_64[3] ^= hash_64[2588];
+#endif
+#if MEMORY_THREADS > 162
+		*out_64   ^= hash_64[2592]; out_64[1] ^= hash_64[2596];
+		out_64[2] ^= hash_64[2600]; out_64[3] ^= hash_64[2604];
+#endif
+#if MEMORY_THREADS > 163
+		*out_64   ^= hash_64[2608]; out_64[1] ^= hash_64[2612];
+		out_64[2] ^= hash_64[2616]; out_64[3] ^= hash_64[2620];
+#endif
+#if MEMORY_THREADS > 164
+		*out_64   ^= hash_64[2624]; out_64[1] ^= hash_64[2628];
+		out_64[2] ^= hash_64[2632]; out_64[3] ^= hash_64[2636];
+#endif
+#if MEMORY_THREADS > 165
+		*out_64   ^= hash_64[2640]; out_64[1] ^= hash_64[2644];
+		out_64[2] ^= hash_64[2648]; out_64[3] ^= hash_64[2652];
+#endif
+#if MEMORY_THREADS > 166
+		*out_64   ^= hash_64[2656]; out_64[1] ^= hash_64[2660];
+		out_64[2] ^= hash_64[2664]; out_64[3] ^= hash_64[2668];
+#endif
+#if MEMORY_THREADS > 167
+		*out_64   ^= hash_64[2672]; out_64[1] ^= hash_64[2676];
+		out_64[2] ^= hash_64[2680]; out_64[3] ^= hash_64[2684];
+#endif
+#if MEMORY_THREADS > 168
+		*out_64   ^= hash_64[2688]; out_64[1] ^= hash_64[2692];
+		out_64[2] ^= hash_64[2696]; out_64[3] ^= hash_64[2700];
+#endif
+#if MEMORY_THREADS > 169
+		*out_64   ^= hash_64[2704]; out_64[1] ^= hash_64[2708];
+		out_64[2] ^= hash_64[2712]; out_64[3] ^= hash_64[2716];
+#endif
+#if MEMORY_THREADS > 170
+		*out_64   ^= hash_64[2720]; out_64[1] ^= hash_64[2724];
+		out_64[2] ^= hash_64[2728]; out_64[3] ^= hash_64[2732];
+#endif
+#if MEMORY_THREADS > 171
+		*out_64   ^= hash_64[2736]; out_64[1] ^= hash_64[2740];
+		out_64[2] ^= hash_64[2744]; out_64[3] ^= hash_64[2748];
+#endif
+#if MEMORY_THREADS > 172
+		*out_64   ^= hash_64[2752]; out_64[1] ^= hash_64[2756];
+		out_64[2] ^= hash_64[2760]; out_64[3] ^= hash_64[2764];
+#endif
+#if MEMORY_THREADS > 173
+		*out_64   ^= hash_64[2768]; out_64[1] ^= hash_64[2772];
+		out_64[2] ^= hash_64[2776]; out_64[3] ^= hash_64[2780];
+#endif
+#if MEMORY_THREADS > 174
+		*out_64   ^= hash_64[2784]; out_64[1] ^= hash_64[2788];
+		out_64[2] ^= hash_64[2792]; out_64[3] ^= hash_64[2796];
+#endif
+#if MEMORY_THREADS > 175
+		*out_64   ^= hash_64[2800]; out_64[1] ^= hash_64[2804];
+		out_64[2] ^= hash_64[2808]; out_64[3] ^= hash_64[2812];
+#endif
+#if MEMORY_THREADS > 176
+		*out_64   ^= hash_64[2816]; out_64[1] ^= hash_64[2820];
+		out_64[2] ^= hash_64[2824]; out_64[3] ^= hash_64[2828];
+#endif
+#if MEMORY_THREADS > 177
+		*out_64   ^= hash_64[2832]; out_64[1] ^= hash_64[2836];
+		out_64[2] ^= hash_64[2840]; out_64[3] ^= hash_64[2844];
+#endif
+#if MEMORY_THREADS > 178
+		*out_64   ^= hash_64[2848]; out_64[1] ^= hash_64[2852];
+		out_64[2] ^= hash_64[2856]; out_64[3] ^= hash_64[2860];
+#endif
+#if MEMORY_THREADS > 179
+		*out_64   ^= hash_64[2864]; out_64[1] ^= hash_64[2868];
+		out_64[2] ^= hash_64[2872]; out_64[3] ^= hash_64[2876];
+#endif
+#if MEMORY_THREADS > 180
+		*out_64   ^= hash_64[2880]; out_64[1] ^= hash_64[2884];
+		out_64[2] ^= hash_64[2888]; out_64[3] ^= hash_64[2892];
+#endif
+#if MEMORY_THREADS > 181
+		*out_64   ^= hash_64[2896]; out_64[1] ^= hash_64[2900];
+		out_64[2] ^= hash_64[2904]; out_64[3] ^= hash_64[2908];
+#endif
+#if MEMORY_THREADS > 182
+		*out_64   ^= hash_64[2912]; out_64[1] ^= hash_64[2916];
+		out_64[2] ^= hash_64[2920]; out_64[3] ^= hash_64[2924];
+#endif
+#if MEMORY_THREADS > 183
+		*out_64   ^= hash_64[2928]; out_64[1] ^= hash_64[2932];
+		out_64[2] ^= hash_64[2936]; out_64[3] ^= hash_64[2940];
+#endif
+#if MEMORY_THREADS > 184
+		*out_64   ^= hash_64[2944]; out_64[1] ^= hash_64[2948];
+		out_64[2] ^= hash_64[2952]; out_64[3] ^= hash_64[2956];
+#endif
+#if MEMORY_THREADS > 185
+		*out_64   ^= hash_64[2960]; out_64[1] ^= hash_64[2964];
+		out_64[2] ^= hash_64[2968]; out_64[3] ^= hash_64[2972];
+#endif
+#if MEMORY_THREADS > 186
+		*out_64   ^= hash_64[2976]; out_64[1] ^= hash_64[2980];
+		out_64[2] ^= hash_64[2984]; out_64[3] ^= hash_64[2988];
+#endif
+#if MEMORY_THREADS > 187
+		*out_64   ^= hash_64[2992]; out_64[1] ^= hash_64[2996];
+		out_64[2] ^= hash_64[3000]; out_64[3] ^= hash_64[3004];
+#endif
+#if MEMORY_THREADS > 188
+		*out_64   ^= hash_64[3008]; out_64[1] ^= hash_64[3012];
+		out_64[2] ^= hash_64[3016]; out_64[3] ^= hash_64[3020];
+#endif
+#if MEMORY_THREADS > 189
+		*out_64   ^= hash_64[3024]; out_64[1] ^= hash_64[3028];
+		out_64[2] ^= hash_64[3032]; out_64[3] ^= hash_64[3036];
+#endif
+#if MEMORY_THREADS > 190
+		*out_64   ^= hash_64[3040]; out_64[1] ^= hash_64[3044];
+		out_64[2] ^= hash_64[3048]; out_64[3] ^= hash_64[3052];
+#endif
+#if MEMORY_THREADS > 191
+		*out_64   ^= hash_64[3056]; out_64[1] ^= hash_64[3060];
+		out_64[2] ^= hash_64[3064]; out_64[3] ^= hash_64[3068];
+#endif
+#if MEMORY_THREADS > 192
+		*out_64   ^= hash_64[3072]; out_64[1] ^= hash_64[3076];
+		out_64[2] ^= hash_64[3080]; out_64[3] ^= hash_64[3084];
+#endif
+#if MEMORY_THREADS > 193
+		*out_64   ^= hash_64[3088]; out_64[1] ^= hash_64[3092];
+		out_64[2] ^= hash_64[3096]; out_64[3] ^= hash_64[3100];
+#endif
+#if MEMORY_THREADS > 194
+		*out_64   ^= hash_64[3104]; out_64[1] ^= hash_64[3108];
+		out_64[2] ^= hash_64[3112]; out_64[3] ^= hash_64[3116];
+#endif
+#if MEMORY_THREADS > 195
+		*out_64   ^= hash_64[3120]; out_64[1] ^= hash_64[3124];
+		out_64[2] ^= hash_64[3128]; out_64[3] ^= hash_64[3132];
+#endif
+#if MEMORY_THREADS > 196
+		*out_64   ^= hash_64[3136]; out_64[1] ^= hash_64[3140];
+		out_64[2] ^= hash_64[3144]; out_64[3] ^= hash_64[3148];
+#endif
+#if MEMORY_THREADS > 197
+		*out_64   ^= hash_64[3152]; out_64[1] ^= hash_64[3156];
+		out_64[2] ^= hash_64[3160]; out_64[3] ^= hash_64[3164];
+#endif
+#if MEMORY_THREADS > 198
+		*out_64   ^= hash_64[3168]; out_64[1] ^= hash_64[3172];
+		out_64[2] ^= hash_64[3176]; out_64[3] ^= hash_64[3180];
+#endif
+#if MEMORY_THREADS > 199
+		*out_64   ^= hash_64[3184]; out_64[1] ^= hash_64[3188];
+		out_64[2] ^= hash_64[3192]; out_64[3] ^= hash_64[3196];
+#endif
+#if MEMORY_THREADS > 200
+		*out_64   ^= hash_64[3200]; out_64[1] ^= hash_64[3204];
+		out_64[2] ^= hash_64[3208]; out_64[3] ^= hash_64[3212];
+#endif
+#if MEMORY_THREADS > 201
+		*out_64   ^= hash_64[3216]; out_64[1] ^= hash_64[3220];
+		out_64[2] ^= hash_64[3224]; out_64[3] ^= hash_64[3228];
+#endif
+#if MEMORY_THREADS > 202
+		*out_64   ^= hash_64[3232]; out_64[1] ^= hash_64[3236];
+		out_64[2] ^= hash_64[3240]; out_64[3] ^= hash_64[3244];
+#endif
+#if MEMORY_THREADS > 203
+		*out_64   ^= hash_64[3248]; out_64[1] ^= hash_64[3252];
+		out_64[2] ^= hash_64[3256]; out_64[3] ^= hash_64[3260];
+#endif
+#if MEMORY_THREADS > 204
+		*out_64   ^= hash_64[3264]; out_64[1] ^= hash_64[3268];
+		out_64[2] ^= hash_64[3272]; out_64[3] ^= hash_64[3276];
+#endif
+#if MEMORY_THREADS > 205
+		*out_64   ^= hash_64[3280]; out_64[1] ^= hash_64[3284];
+		out_64[2] ^= hash_64[3288]; out_64[3] ^= hash_64[3292];
+#endif
+#if MEMORY_THREADS > 206
+		*out_64   ^= hash_64[3296]; out_64[1] ^= hash_64[3300];
+		out_64[2] ^= hash_64[3304]; out_64[3] ^= hash_64[3308];
+#endif
+#if MEMORY_THREADS > 207
+		*out_64   ^= hash_64[3312]; out_64[1] ^= hash_64[3316];
+		out_64[2] ^= hash_64[3320]; out_64[3] ^= hash_64[3324];
+#endif
+#if MEMORY_THREADS > 208
+		*out_64   ^= hash_64[3328]; out_64[1] ^= hash_64[3332];
+		out_64[2] ^= hash_64[3336]; out_64[3] ^= hash_64[3340];
+#endif
+#if MEMORY_THREADS > 209
+		*out_64   ^= hash_64[3344]; out_64[1] ^= hash_64[3348];
+		out_64[2] ^= hash_64[3352]; out_64[3] ^= hash_64[3356];
+#endif
+#if MEMORY_THREADS > 210
+		*out_64   ^= hash_64[3360]; out_64[1] ^= hash_64[3364];
+		out_64[2] ^= hash_64[3368]; out_64[3] ^= hash_64[3372];
+#endif
+#if MEMORY_THREADS > 211
+		*out_64   ^= hash_64[3376]; out_64[1] ^= hash_64[3380];
+		out_64[2] ^= hash_64[3384]; out_64[3] ^= hash_64[3388];
+#endif
+#if MEMORY_THREADS > 212
+		*out_64   ^= hash_64[3392]; out_64[1] ^= hash_64[3396];
+		out_64[2] ^= hash_64[3400]; out_64[3] ^= hash_64[3404];
+#endif
+#if MEMORY_THREADS > 213
+		*out_64   ^= hash_64[3408]; out_64[1] ^= hash_64[3412];
+		out_64[2] ^= hash_64[3416]; out_64[3] ^= hash_64[3420];
+#endif
+#if MEMORY_THREADS > 214
+		*out_64   ^= hash_64[3424]; out_64[1] ^= hash_64[3428];
+		out_64[2] ^= hash_64[3432]; out_64[3] ^= hash_64[3436];
+#endif
+#if MEMORY_THREADS > 215
+		*out_64   ^= hash_64[3440]; out_64[1] ^= hash_64[3444];
+		out_64[2] ^= hash_64[3448]; out_64[3] ^= hash_64[3452];
+#endif
+#if MEMORY_THREADS > 216
+		*out_64   ^= hash_64[3456]; out_64[1] ^= hash_64[3460];
+		out_64[2] ^= hash_64[3464]; out_64[3] ^= hash_64[3468];
+#endif
+#if MEMORY_THREADS > 217
+		*out_64   ^= hash_64[3472]; out_64[1] ^= hash_64[3476];
+		out_64[2] ^= hash_64[3480]; out_64[3] ^= hash_64[3484];
+#endif
+#if MEMORY_THREADS > 218
+		*out_64   ^= hash_64[3488]; out_64[1] ^= hash_64[3492];
+		out_64[2] ^= hash_64[3496]; out_64[3] ^= hash_64[3500];
+#endif
+#if MEMORY_THREADS > 219
+		*out_64   ^= hash_64[3504]; out_64[1] ^= hash_64[3508];
+		out_64[2] ^= hash_64[3512]; out_64[3] ^= hash_64[3516];
+#endif
+#if MEMORY_THREADS > 220
+		*out_64   ^= hash_64[3520]; out_64[1] ^= hash_64[3524];
+		out_64[2] ^= hash_64[3528]; out_64[3] ^= hash_64[3532];
+#endif
+#if MEMORY_THREADS > 221
+		*out_64   ^= hash_64[3536]; out_64[1] ^= hash_64[3540];
+		out_64[2] ^= hash_64[3544]; out_64[3] ^= hash_64[3548];
+#endif
+#if MEMORY_THREADS > 222
+		*out_64   ^= hash_64[3552]; out_64[1] ^= hash_64[3556];
+		out_64[2] ^= hash_64[3560]; out_64[3] ^= hash_64[3564];
+#endif
+#if MEMORY_THREADS > 223
+		*out_64   ^= hash_64[3568]; out_64[1] ^= hash_64[3572];
+		out_64[2] ^= hash_64[3576]; out_64[3] ^= hash_64[3580];
+#endif
+#if MEMORY_THREADS > 224
+		*out_64   ^= hash_64[3584]; out_64[1] ^= hash_64[3588];
+		out_64[2] ^= hash_64[3592]; out_64[3] ^= hash_64[3596];
+#endif
+#if MEMORY_THREADS > 225
+		*out_64   ^= hash_64[3600]; out_64[1] ^= hash_64[3604];
+		out_64[2] ^= hash_64[3608]; out_64[3] ^= hash_64[3612];
+#endif
+#if MEMORY_THREADS > 226
+		*out_64   ^= hash_64[3616]; out_64[1] ^= hash_64[3620];
+		out_64[2] ^= hash_64[3624]; out_64[3] ^= hash_64[3628];
+#endif
+#if MEMORY_THREADS > 227
+		*out_64   ^= hash_64[3632]; out_64[1] ^= hash_64[3636];
+		out_64[2] ^= hash_64[3640]; out_64[3] ^= hash_64[3644];
+#endif
+#if MEMORY_THREADS > 228
+		*out_64   ^= hash_64[3648]; out_64[1] ^= hash_64[3652];
+		out_64[2] ^= hash_64[3656]; out_64[3] ^= hash_64[3660];
+#endif
+#if MEMORY_THREADS > 229
+		*out_64   ^= hash_64[3664]; out_64[1] ^= hash_64[3668];
+		out_64[2] ^= hash_64[3672]; out_64[3] ^= hash_64[3676];
+#endif
+#if MEMORY_THREADS > 230
+		*out_64   ^= hash_64[3680]; out_64[1] ^= hash_64[3684];
+		out_64[2] ^= hash_64[3688]; out_64[3] ^= hash_64[3692];
+#endif
+#if MEMORY_THREADS > 231
+		*out_64   ^= hash_64[3696]; out_64[1] ^= hash_64[3700];
+		out_64[2] ^= hash_64[3704]; out_64[3] ^= hash_64[3708];
+#endif
+#if MEMORY_THREADS > 232
+		*out_64   ^= hash_64[3712]; out_64[1] ^= hash_64[3716];
+		out_64[2] ^= hash_64[3720]; out_64[3] ^= hash_64[3724];
+#endif
+#if MEMORY_THREADS > 233
+		*out_64   ^= hash_64[3728]; out_64[1] ^= hash_64[3732];
+		out_64[2] ^= hash_64[3736]; out_64[3] ^= hash_64[3740];
+#endif
+#if MEMORY_THREADS > 234
+		*out_64   ^= hash_64[3744]; out_64[1] ^= hash_64[3748];
+		out_64[2] ^= hash_64[3752]; out_64[3] ^= hash_64[3756];
+#endif
+#if MEMORY_THREADS > 235
+		*out_64   ^= hash_64[3760]; out_64[1] ^= hash_64[3764];
+		out_64[2] ^= hash_64[3768]; out_64[3] ^= hash_64[3772];
+#endif
+#if MEMORY_THREADS > 236
+		*out_64   ^= hash_64[3776]; out_64[1] ^= hash_64[3780];
+		out_64[2] ^= hash_64[3784]; out_64[3] ^= hash_64[3788];
+#endif
+#if MEMORY_THREADS > 237
+		*out_64   ^= hash_64[3792]; out_64[1] ^= hash_64[3796];
+		out_64[2] ^= hash_64[3800]; out_64[3] ^= hash_64[3804];
+#endif
+#if MEMORY_THREADS > 238
+		*out_64   ^= hash_64[3808]; out_64[1] ^= hash_64[3812];
+		out_64[2] ^= hash_64[3816]; out_64[3] ^= hash_64[3820];
+#endif
+#if MEMORY_THREADS > 239
+		*out_64   ^= hash_64[3824]; out_64[1] ^= hash_64[3828];
+		out_64[2] ^= hash_64[3832]; out_64[3] ^= hash_64[3836];
+#endif
+#if MEMORY_THREADS > 240
+		*out_64   ^= hash_64[3840]; out_64[1] ^= hash_64[3844];
+		out_64[2] ^= hash_64[3848]; out_64[3] ^= hash_64[3852];
+#endif
+#if MEMORY_THREADS > 241
+		*out_64   ^= hash_64[3856]; out_64[1] ^= hash_64[3860];
+		out_64[2] ^= hash_64[3864]; out_64[3] ^= hash_64[3868];
+#endif
+#if MEMORY_THREADS > 242
+		*out_64   ^= hash_64[3872]; out_64[1] ^= hash_64[3876];
+		out_64[2] ^= hash_64[3880]; out_64[3] ^= hash_64[3884];
+#endif
+#if MEMORY_THREADS > 243
+		*out_64   ^= hash_64[3888]; out_64[1] ^= hash_64[3892];
+		out_64[2] ^= hash_64[3896]; out_64[3] ^= hash_64[3900];
+#endif
+#if MEMORY_THREADS > 244
+		*out_64   ^= hash_64[3904]; out_64[1] ^= hash_64[3908];
+		out_64[2] ^= hash_64[3912]; out_64[3] ^= hash_64[3916];
+#endif
+#if MEMORY_THREADS > 245
+		*out_64   ^= hash_64[3920]; out_64[1] ^= hash_64[3924];
+		out_64[2] ^= hash_64[3928]; out_64[3] ^= hash_64[3932];
+#endif
+#if MEMORY_THREADS > 246
+		*out_64   ^= hash_64[3936]; out_64[1] ^= hash_64[3940];
+		out_64[2] ^= hash_64[3944]; out_64[3] ^= hash_64[3948];
+#endif
+#if MEMORY_THREADS > 247
+		*out_64   ^= hash_64[3952]; out_64[1] ^= hash_64[3956];
+		out_64[2] ^= hash_64[3960]; out_64[3] ^= hash_64[3964];
+#endif
+#if MEMORY_THREADS > 248
+		*out_64   ^= hash_64[3968]; out_64[1] ^= hash_64[3972];
+		out_64[2] ^= hash_64[3976]; out_64[3] ^= hash_64[3980];
+#endif
+#if MEMORY_THREADS > 249
+		*out_64   ^= hash_64[3984]; out_64[1] ^= hash_64[3988];
+		out_64[2] ^= hash_64[3992]; out_64[3] ^= hash_64[3996];
+#endif
+#if MEMORY_THREADS > 250
+		*out_64   ^= hash_64[4000]; out_64[1] ^= hash_64[4004];
+		out_64[2] ^= hash_64[4008]; out_64[3] ^= hash_64[4012];
+#endif
+#if MEMORY_THREADS > 251
+		*out_64   ^= hash_64[4016]; out_64[1] ^= hash_64[4020];
+		out_64[2] ^= hash_64[4024]; out_64[3] ^= hash_64[4028];
+#endif
+#if MEMORY_THREADS > 252
+		*out_64   ^= hash_64[4032]; out_64[1] ^= hash_64[4036];
+		out_64[2] ^= hash_64[4040]; out_64[3] ^= hash_64[4044];
+#endif
+#if MEMORY_THREADS > 253
+		*out_64   ^= hash_64[4048]; out_64[1] ^= hash_64[4052];
+		out_64[2] ^= hash_64[4056]; out_64[3] ^= hash_64[4060];
+#endif
+#if MEMORY_THREADS > 254
+		*out_64   ^= hash_64[4064]; out_64[1] ^= hash_64[4068];
+		out_64[2] ^= hash_64[4072]; out_64[3] ^= hash_64[4076];
+#endif
+#if MEMORY_THREADS > 255
+		*out_64   ^= hash_64[4080]; out_64[1] ^= hash_64[4084];
+		out_64[2] ^= hash_64[4088]; out_64[3] ^= hash_64[4092];
+#endif
 #endif
 }
 

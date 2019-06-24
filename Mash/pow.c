@@ -6,13 +6,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include "config.h"
 #include "error.h"
-
-
-#define HASH_BYTES      32                // hash length in bytes
-#define EPOCH_LENGTH    1                 // blocks per epoch
-#define DATASET_PARENTS 1                 // number of hashes before calculating dataset entry
-// Assuming 4 blocks per second, an epoch estimates 15 minutes
 
 uint32_t crc32c_table[256] = {
 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
