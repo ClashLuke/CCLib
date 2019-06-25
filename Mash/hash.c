@@ -12552,24 +12552,27 @@ uint64_t calcItem(uint32_t itemNumber, uint8_t* cache){
 	uint64_t* item_64  = (uint64_t*)item;
 	uint64_t  out0     = 0; 
 	uint64_t  out1     = 0; 
-	uint8_t   innerPos = itemNumber&0xff;
-	calcDatasetItem(cache, itemNumber>>8, item_64);
-	if(innerPos>0xbf){
-		out0   = item_64[3]>>(32-(innerPos&0x20));
-		out0 >>= 32-(innerPos&0x1f);
-		calcDatasetItem(cache, 1+(itemNumber>>8), item_64);
-		out1   = item_64[0]<<(innerPos&0x20);
-		out1 <<= innerPos&0x1f;
-		out0  |= out1; 
+	uint8_t   innerPos = itemNumber&0x1f;
+	uint8_t   pos      = itemNumber&0x7;
+	itemNumber>>=3;
+	if(innerPos>0x18){
+		calcDatasetItem(cache, itemNumber, item_64);
+		out0   = item_64[3];
+		calcDatasetItem(cache, 1+itemNumber, item_64);
+		out1   = item_64[0];
+		for(uint8_t i=0; i<  pos; i++) out0>>=8;
+		for(uint8_t i=0; i<8-pos; i++) out1<<=8;
+		out0  |= out1;
 	}else{
-		uint8_t pos = innerPos&0x3f;
 		if(!pos){
-			out0 = item_64[innerPos/64];
+			calcDatasetItem(cache, itemNumber, item_64);
+			out0 = item_64[innerPos/8];
 		} else {
-			out0   = item_64[innerPos/64]>>(32-(pos&0x20));
-			out0 >>= 32-(pos&0x1f);
-			out1   = item_64[1+(innerPos/64)]<<(pos&0x20);
-			out1 <<= pos&0x1f;
+			calcDatasetItem(cache, itemNumber, item_64);
+			out0   = item_64[innerPos/8];
+			out1   = item_64[1+(innerPos/8)];
+			for(uint8_t i=0; i<  pos; i++) out0>>=8;
+			for(uint8_t i=0; i<8-pos; i++) out1<<=8;
 			out0  |= out1;
 		}
 	}
