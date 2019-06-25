@@ -150,9 +150,9 @@ int main(int argc, char *argv[]){
 	printf("\tSeed: %08x\n", seed);
 	printf("\tMemory-Threads: %u\n", MEMORY_THREADS);
 	printf("Mining\n");
-	benchmark_mine(seed_64, printing, iterations);
+	benchmark_mine(seed64_0, printing, iterations);
 	printf("Validation\n");
-	benchmark_validation(seed_64, printing, iterations);
+	benchmark_validation(seed64_1, printing, iterations);
 	printf("\e[?25h");
 	return 1;
 }
