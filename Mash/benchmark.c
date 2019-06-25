@@ -135,8 +135,10 @@ int main(int argc, char *argv[]){
 	uint8_t   printing   = argc>1?atoi(argv[1]):0;
 	uint8_t   iterShifts = argc>2?atoi(argv[2]):20;
 	uint32_t  seed       = argc>3?atoi(argv[3]):0x89ABCDEF;
-	uint32_t  seed_32[8] = {0};
-	uint64_t* seed_64    = (uint64_t*)seed_32;
+	uint32_t  seed32_0[8] = {0};
+	uint64_t* seed64_0    = (uint64_t*)seed32_0;
+	uint32_t  seed32_1[8] = {0};
+	uint64_t* seed64_1    = (uint64_t*)seed32_1;
 	uint64_t  iterations = 1;
 	srand(seed);
 	for(uint8_t i=0; i<iterShifts; i++) iterations<<=1;
