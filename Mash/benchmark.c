@@ -142,12 +142,13 @@ int main(int argc, char *argv[]){
 	uint64_t  iterations = 1;
 	srand(seed);
 	for(uint8_t i=0; i<iterShifts; i++) iterations<<=1;
-	for(uint8_t i=0;i<8;i++) seed_32[i] = rand();
+	for(uint8_t i=0;i<8;i++) seed32_0[i] = seed32_1[i] = rand();
 	printf("\e[?25l"); // Hide cursor
 	printf("Parameters\n");
 	printf("\tProgressbar: %s\n", printing?"yes":"no");
-	printf("\tMemory-Threads: %u\n", MEMORY_THREADS);
+	printf("\tIterations\n\t\tFull:  %lu\n\t\tLight: %lu\n", iterations<<6, iterations);
 	printf("\tSeed: %08x\n", seed);
+	printf("\tMemory-Threads: %u\n", MEMORY_THREADS);
 	printf("Mining\n");
 	benchmark_mine(seed_64, printing, iterations);
 	printf("Validation\n");
