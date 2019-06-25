@@ -136,7 +136,7 @@ void calcDatasetItem(uint8_t* cache, uint32_t item_number, uint64_t* out){
 	uint32_t* mix_32   = (uint32_t*)mix;
 	uint32_t* mix_32_s = (uint32_t*)&(((uint16_t*)mix)[1]);
 	uint32_t  x        = 0;
-	item_number = item_number >> 2;
+	item_number>>=2;
 	*mix_32    = cache_32[(item_number  )&0x1fffff];
 	mix_32[1]  = cache_32[(item_number+1)&0x1fffff];
 	mix_32[2]  = cache_32[(item_number+2)&0x1fffff];
@@ -180,8 +180,20 @@ void calcDatasetItem(uint8_t* cache, uint32_t item_number, uint64_t* out){
 }
 
 void calc_dataset(uint8_t* cache, uint64_t* out){
-	for(uint32_t i=0;i<536870912;i+=4){ // (1<<32)>>3
-		calcDatasetItem(cache, i, &out[i]);
+	uint32_t pos0 = 0x0;
+	uint32_t pos1 = 0x1;
+	uint32_t pos2 = 0x2;
+	uint32_t pos3 = 0x3;
+	uint32_t i1 = 0x1;
+	uint32_t i2 = 0x2;
+	uint32_t i3 = 0x3;
+	for(uint32_t i=0;i<536870912;i+=0x10){ // (1<<32)>>3
+		pos0 += 0x10; pos1 += 0x10; pos2 += 0x10; pos3 += 0x10;
+		i1 += 0x10; i2 += 0x10; i3 += 0x10;
+		calcDatasetItem(cache, i , &out[pos0]);
+		calcDatasetItem(cache, i1, &out[pos1]);
+		calcDatasetItem(cache, i2, &out[pos2]);
+		calcDatasetItem(cache, i3, &out[pos3]);
 	}
 }
 
