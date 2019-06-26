@@ -148,7 +148,15 @@ int main(int argc, char *argv[]){
 	printf("\tProgressbar: %s\n", printing?"yes":"no");
 	printf("\tIterations\n\t\tFull:  %lu\n\t\tLight: %lu\n", iterations<<6, iterations);
 	printf("\tSeed: %08x\n", seed);
+	printf("Config\n");
 	printf("\tMemory-Threads: %u\n", MEMORY_THREADS);
+	printf("\tAccess Rounds: %u\n", ACCESS_ROUNDS);
+	printf("\tDataset Parents: %u\n", DATASET_PARENTS);
+#ifdef BENCHMARK
+	printf("\tBenchmark: yes\n");
+#else
+	printf("\tBenchmark: no\n");
+#endif
 	printf("Mining\n");
 	benchmark_mine(seed64_0, printing, iterations);
 	printf("Validation\n");
