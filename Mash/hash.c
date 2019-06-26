@@ -9,9 +9,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	uint32_t* hash_32         = (uint32_t*)hash_64;
 	uint32_t* data_32         = (uint32_t*)data;
 	uint64_t* out_64          = (uint64_t*)out;
-#ifdef ACCESS_ROUNDS
-	for(uint32_t i=0; i<ACCESS_ROUNDS; i++){
-#endif
+
 	*hash_64    = *((uint64_t*)&dataset[*data_32   ]);
 	hash_64[ 1] = *((uint64_t*)&dataset[data_32[ 1]]);
 	hash_64[ 2] = *((uint64_t*)&dataset[data_32[ 2]]);
@@ -7177,6 +7175,21 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	hash_64[4095] = *((uint64_t*)&dataset[hash_32[8175]]);
 #endif
 #ifdef ACCESS_ROUNDS
+	for(uint32_t i=0; i<ACCESS_ROUNDS; i++){
+	#if MEMORY_THREADS > 1
+		for(uint32_t j=0; j<MEMORY_THREADS; j++)
+			for(uint8_t k=0; k<32; k++) hash_32[k+(j<<5)] = *((uint32_t*)&dataset[hash_32[k+(j<<5)]]);
+	#else
+		for(uint8_t k=0; k<32; k++) hash_32[k] = *((uint32_t*)&dataset[hash_32[k]]);
+	#endif
+		for(uint8_t j=0; j<16; j+=2) hash_64[j]   += hash_64[j+1];
+	#if MEMORY_THREADS > 1
+		for(uint32_t j=0; j<MEMORY_THREADS; j++)
+			for(uint8_t k=0; k<32; k++) hash_32[k+(j<<5)] = *((uint32_t*)&dataset[hash_32[k+(j<<5)]]);
+	#else
+		for(uint8_t k=0; k<32; k++) hash_32[k] = *((uint32_t*)&dataset[hash_32[k]]);
+	#endif
+		for(uint8_t j=0; j<16; j+=2) hash_64[j+1] += hash_64[j];
 	}
 #endif
 	hash_64[ 0] += hash_64[ 1]; hash_64[ 2] += hash_64[ 3];
@@ -12547,7 +12560,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 #endif
 }
 
-uint64_t calcItem(uint32_t itemNumber, uint8_t* cache){
+uint64_t calcItem64(uint32_t itemNumber, uint8_t* cache){
 	uint8_t   item[32] = {0};
 	uint64_t* item_64  = (uint64_t*)item;
 	uint64_t  out0     = 0; 
@@ -12579,39 +12592,75 @@ uint64_t calcItem(uint32_t itemNumber, uint8_t* cache){
 	return(out0);
 }
 
+void calcItem32(uint32_t* itemNumber, uint8_t* cache){
+	uint8_t   item[32] = {0};
+	uint32_t* item_32  = (uint32_t*)item;
+	uint64_t* item_64  = (uint64_t*)item;
+	uint64_t  out0     = 0; 
+	uint64_t  out1     = 0; 
+	uint8_t   innerPos = (*itemNumber)&0x1f;
+	uint8_t   pos      = (*itemNumber)&0x3;
+	(*itemNumber)>>=3;
+	if(innerPos>0x1C){
+		calcDatasetItem(cache, *itemNumber, item_64);
+		out0   = item_32[7];
+		calcDatasetItem(cache, 1+(*itemNumber), item_64);
+		out1   = item_32[0];
+		for(uint8_t i=0; i<  pos; i++) out0>>=8;
+		for(uint8_t i=0; i<4-pos; i++) out1<<=8;
+		out0  |= out1;
+	}else{
+		if(!pos){
+			calcDatasetItem(cache, *itemNumber, item_64);
+			out0 = item_32[innerPos/4];
+		} else {
+			calcDatasetItem(cache, *itemNumber, item_64);
+			out0   = item_32[innerPos/4];
+			out1   = item_32[1+(innerPos/4)];
+			for(uint8_t i=0; i<  pos; i++) out0>>=8;
+			for(uint8_t i=0; i<4-pos; i++) out1<<=8;
+			out0  |= out1;
+		}
+	}
+	*itemNumber = out0;
+}
+
 void mash_light(uint8_t* data, uint8_t* cache, uint8_t* out){
 	uint64_t  hash_64[16]     = {0};
 	uint32_t* hash_32         = (uint32_t*)hash_64;
 	uint32_t* data_32         = (uint32_t*)data;
 	uint64_t* out_64          = (uint64_t*)out;
+
+	*hash_64    = calcItem64(*data_32,    cache);
+	hash_64[ 1] = calcItem64(data_32[ 1], cache);
+	hash_64[ 2] = calcItem64(data_32[ 2], cache);
+	hash_64[ 3] = calcItem64(data_32[ 3], cache);
+	hash_64[ 4] = calcItem64(data_32[ 4], cache);
+	hash_64[ 5] = calcItem64(data_32[ 5], cache);
+	hash_64[ 6] = calcItem64(data_32[ 6], cache);
+	hash_64[ 7] = calcItem64(data_32[ 7], cache);
+	*hash_64    = calcItem64(*hash_32,    cache);
+	hash_64[ 1] = calcItem64(hash_32[ 1], cache);
+	hash_64[ 2] = calcItem64(hash_32[ 2], cache);
+	hash_64[ 3] = calcItem64(hash_32[ 3], cache);
+	hash_64[ 4] = calcItem64(hash_32[ 4], cache);
+	hash_64[ 5] = calcItem64(hash_32[ 5], cache);
+	hash_64[ 6] = calcItem64(hash_32[ 6], cache);
+	hash_64[ 7] = calcItem64(hash_32[ 7], cache);
+	hash_64[ 8] = calcItem64(hash_32[ 8], cache);
+	hash_64[ 9] = calcItem64(hash_32[ 9], cache);
+	hash_64[10] = calcItem64(hash_32[10], cache);
+	hash_64[11] = calcItem64(hash_32[11], cache);
+	hash_64[12] = calcItem64(hash_32[12], cache);
+	hash_64[13] = calcItem64(hash_32[13], cache);
+	hash_64[14] = calcItem64(hash_32[14], cache);
+	hash_64[15] = calcItem64(hash_32[15], cache);
 #ifdef ACCESS_ROUNDS
 	for(uint32_t i=0; i<ACCESS_ROUNDS; i++){
-#endif
-	*hash_64    = calcItem(*data_32,    cache);
-	hash_64[ 1] = calcItem(data_32[ 1], cache);
-	hash_64[ 2] = calcItem(data_32[ 2], cache);
-	hash_64[ 3] = calcItem(data_32[ 3], cache);
-	hash_64[ 4] = calcItem(data_32[ 4], cache);
-	hash_64[ 5] = calcItem(data_32[ 5], cache);
-	hash_64[ 6] = calcItem(data_32[ 6], cache);
-	hash_64[ 7] = calcItem(data_32[ 7], cache);
-	*hash_64    = calcItem(*hash_32,    cache);
-	hash_64[ 1] = calcItem(hash_32[ 1], cache);
-	hash_64[ 2] = calcItem(hash_32[ 2], cache);
-	hash_64[ 3] = calcItem(hash_32[ 3], cache);
-	hash_64[ 4] = calcItem(hash_32[ 4], cache);
-	hash_64[ 5] = calcItem(hash_32[ 5], cache);
-	hash_64[ 6] = calcItem(hash_32[ 6], cache);
-	hash_64[ 7] = calcItem(hash_32[ 7], cache);
-	hash_64[ 8] = calcItem(hash_32[ 8], cache);
-	hash_64[ 9] = calcItem(hash_32[ 9], cache);
-	hash_64[10] = calcItem(hash_32[10], cache);
-	hash_64[11] = calcItem(hash_32[11], cache);
-	hash_64[12] = calcItem(hash_32[12], cache);
-	hash_64[13] = calcItem(hash_32[13], cache);
-	hash_64[14] = calcItem(hash_32[14], cache);
-	hash_64[15] = calcItem(hash_32[15], cache);
-#ifdef ACCESS_ROUNDS
+		for(uint8_t j=0; j<32; j++) calcItem32(&hash_32[j], cache);
+		for(uint8_t j=0; j<16; j+=2) hash_64[j]   += hash_64[j+1];
+		for(uint8_t j=0; j<32; j++) calcItem32(&hash_32[j], cache);
+		for(uint8_t j=0; j<16; j+=2) hash_64[j+1] += hash_64[j];
 	}
 #endif
 	*hash_64    += hash_64[ 1]; hash_64[ 2] += hash_64[ 3];
