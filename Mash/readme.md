@@ -1,4 +1,4 @@
-A quick-to-verify hash entirely dependent on the memory.
+A quick-to-verify hash entirely dependent on the memory bandwidth.
 
 Recommended way of compiling: `gcc -Ofast -msse2 -msse4.2 -march=native -flto -fwhole-program -Wall *.c -funroll-loops`
 SSE2 and SSE4.2 are not used in the code, but allow the compiler to use these extensions. It may increase the performance.
