@@ -9,22 +9,27 @@ Memory threads are only recommended if you validate hashes and check whether or 
 Calculating everything in batches of 256 nonces and finding a nonce that solves the block in the first try but continueing to calculate all other nonces instead of pushing the nonce out right after it was found is no issue. It will have a maximum slowdown of 0.02% (compared to checking and broadcasting it instantly) but adds a 5% speedup on top of that.
 
 Those are the benchmarking results, when using the code as-is on a Xeon E3-1225v2.
-```Parameters
+```
+Parameters
 	Progressbar: yes
 	Iterations
-		Full:  1073741824
-		Light: 16777216
+		Full:  67108864
+		Light: 1048576
 	Seed: 89abcdef
+Config
 	Memory-Threads: 1
+	Access Rounds: 128
+	Dataset Parents: 1
+	Benchmark: no
 Mining
-        Dataset generation took: 250s                                           
-        Calculation of 1073741824 hashes took: 699s                             
-	Hashrate is approximately: 1536111H/s
-	Result: bc7048295c38a7b1,4fe4a2cac88d7cf5,4e3961f1de653702,cf457a9297902126
+        Dataset generation took: 13s                                            
+        Calculation of 67108864 hashes took: 99s                                
+	Hashrate is approximately: 677867H/s
+	Result: 08478f1a3a6ebde6,b06ea9923f42490f,8f711f81e9350220,79936f3969b8f716
 Validation
 	Cache generation took: 0s
-Benchmarking: [##                                                              ]        Calculation of 16777216 hashes took: 804s                               
-	Hashrate is approximately: 20867H/s
-	Result: d1b5b09b7e14377f,142432f68f2b1d2c,708f4aa171a5485b,71820a8c4785bca5
+        Calculation of 1048576 hashes took: 1577s                               
+	Hashrate is approximately: 664H/s
+	Result: 031a9f57fc194560,da16e57a8a19faea,2b023914b752f4b6,dbe87d9d0ac012c5
 
 ```
