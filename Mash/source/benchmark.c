@@ -89,6 +89,7 @@ uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t ITER
 	uint64_t* cache_64     = (uint64_t*)calloc(8388608,8);
 	if (!cache_64) error_exit(1);
 	uint8_t*  seed         = (uint8_t*)seed_64;
+	uint32_t* seed_32      = (uint32_t*)seed_64;
 	uint8_t*  cache        = (uint8_t*)cache_64;
 	uint32_t  current_time = (uint32_t)time(NULL);
 	uint64_t  iterations   = ITERATIONS>>6;
