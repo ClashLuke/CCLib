@@ -4,11 +4,7 @@
 
 
 #include <stdint.h>
-#define SIZE 1048576 // Bytes, stored in cache
-#define ITER 1048576 // Iterations to move over the cache
-#define MT   16      // Memory-Threads, number of item accesses in parallel
-		     // Please note that it changes the output 
-
+#include "config.h"
 
 uint32_t crc32c_table[256] = {
 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
@@ -284,7 +280,6 @@ void balloon(uint8_t* data, uint8_t* out){
 	uint8_t   cache[SIZE]  = {0};
 	uint64_t* out_64       = (uint64_t*)out;
 	uint32_t* data_32      = (uint32_t*)data;
-	uint64_t* data_64      = (uint64_t*)data;
 	uint32_t* cache_32     = (uint32_t*)cache;
 	uint64_t* cache_64     = (uint64_t*)cache;
 	uint32_t  mask         = SIZE-1;
