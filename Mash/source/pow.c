@@ -181,9 +181,9 @@ void calcDatasetItem(uint8_t* cache, uint32_t item_number, uint64_t* out){
 
 void calc_dataset(uint8_t* cache, uint64_t* out){
 	uint32_t pos0 = 0x0;
-	uint32_t pos1 = 0x1;
-	uint32_t pos2 = 0x2;
-	uint32_t pos3 = 0x3;
+	uint32_t pos1 = 0x4;
+	uint32_t pos2 = 0x8;
+	uint32_t pos3 = 0xC;
 	uint32_t i1 = 0x1;
 	uint32_t i2 = 0x2;
 	uint32_t i3 = 0x3;
