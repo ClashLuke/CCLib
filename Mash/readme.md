@@ -5,24 +5,24 @@ Those are the benchmarking results, when using the code as-is on a Xeon E3-1225v
 Parameters
 	Progressbar: yes
 	Iterations
-		Full:  67108864
-		Light: 1048576
+		Full:  1048576
+		Light: 16384
 	Seed: 89abcdef
 Config
-	Memory-Threads: 1
-	Access Rounds: 128
-	Dataset Parents: 1
+	Access Rounds: 64
+	Dataset Parents: 4
 	Benchmark: no
 Mining
-        Dataset generation took: 13s                                            
-        Calculation of 67108864 hashes took: 99s                                
-	Hashrate is approximately: 677867H/s
-	Result: 08478f1a3a6ebde6,b06ea9923f42490f,8f711f81e9350220,79936f3969b8f716
+        Dataset generation took: 61s                                            
+        Calculation of 1048576 hashes took: 167s                                
+	Hashrate is approximately: 6278H/s
+	Result: 375a81e77f7f2794,c51dfdea938b5a48,484a4722e8abe589,42fbcab1dec6a4b6
 Validation
 	Cache generation took: 0s
-        Calculation of 1048576 hashes took: 1577s                               
-	Hashrate is approximately: 664H/s
-	Result: 031a9f57fc194560,da16e57a8a19faea,2b023914b752f4b6,dbe87d9d0ac012c5
+        Calculation of 16384 hashes took: 39s                                   
+	Hashrate is approximately: 420H/s
+	Result: b7f279906ee37bf1,6006b426afd688d0,82e9b4a163024a51,2e92d6521302bb5a
+
 
 ```
 
