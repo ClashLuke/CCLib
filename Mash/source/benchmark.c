@@ -62,7 +62,6 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t ITERATIONS
 				mash_full(seed, dataset, result);
 				temp[0] ^= result_64[0]; temp[1] ^= result_64[1];
 				temp[2] ^= result_64[2]; temp[3] ^= result_64[3];
-				(*seed_64)++; seed_64[1]++; seed_64[2]++; seed_64[3]++;
 			}
 			buffer[j] = '#';
 			printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
@@ -73,7 +72,6 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t ITERATIONS
 			mash_full(seed, dataset, result);
 			temp[0] ^= result_64[0]; temp[1] ^= result_64[1];
 			temp[2] ^= result_64[2]; temp[3] ^= result_64[3];
-			(*seed_64)++; seed_64[1]++; seed_64[2]++; seed_64[3]++;
 		}
 	}
 	free(dataset);
@@ -107,7 +105,7 @@ uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t ITER
 				mash_light(seed, cache, result);
 				temp[0] ^= result_64[0]; temp[1] ^= result_64[1];
 				temp[2] ^= result_64[2]; temp[3] ^= result_64[3];
-				(*seed_64)++; seed_64[1]++; seed_64[2]++; seed_64[3]++;
+				for(uint8_t i=0; i< 8; i++) seed_32[i]++;
 			}
 			buffer[j] = '#';
 			printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
