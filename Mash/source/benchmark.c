@@ -58,7 +58,7 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t ITERATIONS
 	if(printing){
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 		for(uint8_t j=0;j<64;j++){
-			for(uint64_t i=0;i<ITERATIONS;i+=MEMORY_THREADS){
+			for(uint64_t i=0;i<ITERATIONS;i++){
 				mash_full(seed, dataset, result);
 				temp[0] ^= result_64[0]; temp[1] ^= result_64[1];
 				temp[2] ^= result_64[2]; temp[3] ^= result_64[3];
@@ -68,7 +68,7 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t ITERATIONS
 		}
 		printf("\r%*s\r",80,"");
 	} else {
-		for(uint64_t i=0;i<iterations;i+=MEMORY_THREADS){
+		for(uint64_t i=0;i<iterations;i++){
 			mash_full(seed, dataset, result);
 			temp[0] ^= result_64[0]; temp[1] ^= result_64[1];
 			temp[2] ^= result_64[2]; temp[3] ^= result_64[3];
