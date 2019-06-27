@@ -2,6 +2,7 @@
 //
 // Please see the included LICENSE file for more information.
 
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -14,11 +15,11 @@
 #include "blake2/sse/blake2.h"
 #endif
 
-
 #define HASH_BYTES      32                // hash length in bytes
 #define EPOCH_LENGTH    1                 // blocks per epoch
 #define DATASET_PARENTS 16                // number of hashes before calculating dataset entry
 // Assuming 4 blocks per second, an epoch estimates 15 minutes
+
 
 void make_cache(uint8_t* seed, uint8_t* cache){
 	/* 64MiB cache is allocated before executing

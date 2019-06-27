@@ -2,7 +2,9 @@
 //
 // Please see the included LICENSE file for more information.
 
+
 #include <stdint.h>
+
 
 void squash_pow_full(uint8_t* data, uint32_t lenght, uint64_t* dataset, uint8_t* result);
 void squash_pow_light(uint8_t* data, uint32_t lenght, uint8_t* cache, uint8_t* result);

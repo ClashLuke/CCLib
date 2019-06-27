@@ -2,6 +2,7 @@
 //
 // Please see the included LICENSE file for more information.
 
+
 #include <stdint.h>
 // Comment these to improve performance but remove the feature associated with it
 //#define MIXING     // Mix CRC32s, when enabled, every bit of the output is dependent on every bit of the input

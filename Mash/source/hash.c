@@ -1,8 +1,14 @@
+// Copyright (c) 2019, The CCLib Developers
+//
+// Please see the included LICENSE file for more information.
+
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "pow.h"
 #include "config.h"
+
 
 void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	uint64_t  hash_64[16]     = {0};

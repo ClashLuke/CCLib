@@ -2,12 +2,14 @@
 //
 // Please see the included LICENSE file for more information.
 
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include "aes.h"
 
 #define ACCESSES 256
+
 
 uint32_t crc32c_table[256] = {
 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,

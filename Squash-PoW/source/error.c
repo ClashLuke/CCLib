@@ -2,9 +2,11 @@
 //
 // Please see the included LICENSE file for more information.
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+
 
 void error_exit(uint8_t code){
 	printf("Error, exiting program. Code: %u\n", code);

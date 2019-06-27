@@ -2,21 +2,10 @@
 //
 // Please see the included LICENSE file for more information.
 
+
 #include <stdint.h>
 
-// Two round implementation optimized for x86_64+AES-NI and ARMv8+crypto
-// extensions. Test pattern :
-//
-// Plaintext:
-// 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-//
-// Ciphertext (encryption result):
-// 0x16, 0xcd, 0xb8, 0x7a, 0xc6, 0xae, 0xdb, 0x19, 0xe9, 0x32, 0x47, 0x85, 0x39, 0x51, 0x24, 0xe6
-//
-// Plaintext (decryption result):
-// 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
-/* Rijndael's substitution box for sub_bytes step */
 static uint8_t SBOX[256] = {
 	 0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
 	 0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
@@ -36,12 +25,10 @@ static uint8_t SBOX[256] = {
 	 0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
 };
 
-/*--- The parts below are not used when crypto extensions are available ---*/
-/* Use -march=armv8-a+crypto on ARMv8 to use crypto extensions */
-/* Use -maes on x86_64 to use AES-NI */
+
 #if (!defined(__aarch64__) || !defined(__ARM_FEATURE_CRYPTO)) && (!defined(__x86_64__) || !defined(__AES__))
 
-/* shifts to do for shift_rows step */
+
 static uint8_t shifts[16] = {
 	 0,  5, 10, 15,
 	 4,  9, 14,  3,
@@ -49,22 +36,21 @@ static uint8_t shifts[16] = {
 	12,  1,  6, 11
 };
 
-/* add the round key to the state with simple XOR operation */
+
 static void add_round_key(uint8_t * state, uint8_t * rkey) {
 	uint8_t i;
 	for (i = 0; i < 16; i++)
 		state[i] ^= rkey[i];
 }
 
-/* substitute all bytes using Rijndael's substitution box */
+
 static void sub_bytes(uint8_t * state) {
 	uint8_t i;
 	for (i = 0; i < 16; i++)
 		state[i] = SBOX[state[i]];
 }
 
-/* imagine the state not as 1-dimensional, but a 4x4 grid;
- * this step shifts the rows of this grid around */
+
 static void shift_rows(uint8_t * state) {
 	uint8_t temp[16];
 	uint8_t i;
@@ -78,7 +64,7 @@ static void shift_rows(uint8_t * state) {
 	}
 }
 
-/* mix columns */
+
 static void mix_columns(uint8_t * state) {
 	uint8_t a[4];
 	uint8_t b[4];
@@ -101,12 +87,8 @@ static void mix_columns(uint8_t * state) {
 		state[3 + 4 * k] = b[3] ^ a[2] ^ a[1] ^ b[0] ^ a[0];
 	}
 }
-#endif // (!defined(__aarch64__) || !defined(__ARM_FEATURE_CRYPTO)) && (!defined(__x86_64__) || !defined(__AES__))
+#endif 
 
-
-/* key schedule stuff */
-
-/* simple function to rotate 4 byte array */
 static inline uint32_t rotate32(uint32_t in) {
 #if defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	in = (in >> 8) | (in << 24);
@@ -119,7 +101,6 @@ static inline uint32_t rotate32(uint32_t in) {
 	return in;
 }
 
-/* key schedule core operation */
 static inline uint32_t sbox(uint32_t in, uint8_t n) {
 	in = (SBOX[in & 255]) | (SBOX[(in >> 8) & 255] << 8) | (SBOX[(in >> 16) & 255] << 16) | (SBOX[(in >> 24) & 255] << 24);
 #if defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -132,13 +113,10 @@ static inline uint32_t sbox(uint32_t in, uint8_t n) {
 	return in;
 }
 
-// this version is optimized for exactly two rounds.
-// _state_ must be 16-byte aligned.
 void aes(uint8_t * state, uint8_t * key) {
 	uint32_t key_schedule[12] __attribute__((aligned(16)));
 	uint32_t t;
 
-	/* initialize key schedule; its first 16 bytes are the key */
 	key_schedule[0] = ((uint32_t *)key)[0];
 	key_schedule[1] = ((uint32_t *)key)[1];
 	key_schedule[2] = ((uint32_t *)key)[2];
@@ -159,17 +137,16 @@ void aes(uint8_t * state, uint8_t * key) {
 	t = key_schedule[10] = key_schedule[6] ^ t;
 	t = key_schedule[11] = key_schedule[7] ^ t;
 
-// Use -march=armv8-a+crypto+crc to get this one
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRYPTO)
 	__asm__ volatile(
 	"ld1   {v0.16b},[%0]		\n"
 	"ld1   {v1.16b,v2.16b,v3.16b},[%1]  \n"
-	"aese  v0.16b,v1.16b		\n" // round1: add_round_key,sub_bytes,shift_rows
-	"aesmc v0.16b,v0.16b		\n" // round1: mix_columns
-	"aese  v0.16b,v2.16b		\n" // round2: add_round_key,sub_bytes,shift_rows
-	"eor   v0.16b,v0.16b,v3.16b \n" // finish: add_round_key
+	"aese  v0.16b,v1.16b		\n"
+	"aesmc v0.16b,v0.16b		\n"
+	"aese  v0.16b,v2.16b		\n"
+	"eor   v0.16b,v0.16b,v3.16b \n" 
 	"st1   {v0.16b},[%0]		\n"
-	: /* only output is in *state */
+	:
 	: "r"(state), "r"(key_schedule)
 	: "v0", "v1", "v2", "v3", "cc", "memory");
 
@@ -178,25 +155,23 @@ void aes(uint8_t * state, uint8_t * key) {
 	__asm__ volatile(
 	"movups (%0),  %%xmm0	 \n"
 	"movups (%1),  %%xmm1	 \n"
-	"pxor   %%xmm1,%%xmm0	 \n" // add_round_key(state, key_schedule)
+	"pxor   %%xmm1,%%xmm0	 \n" 
 	"movups 16(%1),%%xmm2	 \n"
 	"movups 32(%1),%%xmm1	 \n"
-	"aesenc %%xmm2,%%xmm0	 \n" // first round
-	"aesenclast %%xmm1,%%xmm0 \n" // final round
+	"aesenc %%xmm2,%%xmm0	 \n" 
+	"aesenclast %%xmm1,%%xmm0 \n" 
 	"movups %%xmm0, (%0)  \n"
-	: /* only output is in *state */
+	: 
 	: "r"(state), "r" (key_schedule)
 	: "xmm0", "xmm1", "xmm2", "cc", "memory");
 
 #else
-	/* first round of the algorithm */
 	add_round_key(state, (uint8_t*)&key_schedule[0]);
 	sub_bytes(state);
 	shift_rows(state);
 	mix_columns(state);
 	add_round_key(state, (uint8_t*)&key_schedule[4]);
 
-	/* final round of the algorithm */
 	sub_bytes(state);
 	shift_rows(state);
 	add_round_key(state, (uint8_t*)&key_schedule[8]);

@@ -2,12 +2,12 @@
 //
 // Please see the included LICENSE file for more information.
 
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include "blake2/blake2.h"
-
 
 #define CACHE_ROUNDS    4                  // number of rounds in cache production
 #define DATASET_PARENTS 16                 // number of hashes before calculating dataset entry

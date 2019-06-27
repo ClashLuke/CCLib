@@ -2,6 +2,7 @@
 //
 // Please see the included LICENSE file for more information.
 
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -11,6 +12,7 @@
 #include "error.h"
 
 #define ITERATIONS 65536 // iterations are multiplied with 64
+
 
 void benchmark_dataset_generation(uint8_t* seed, uint64_t* dataset){
 	char      buffer[65] = {0};

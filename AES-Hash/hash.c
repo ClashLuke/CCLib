@@ -2,9 +2,11 @@
 //
 // Please see the included LICENSE file for more information.
 
+
 #include <stdint.h>
 #include <stdio.h>
 #include "aes.h"
+
 
 // lenght is dividable by 256bit (rest will be ignored)
 // seed has to be 256 bit (can be 000..00)

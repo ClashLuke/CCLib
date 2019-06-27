@@ -2,9 +2,11 @@
 //
 // Please see the included LICENSE file for more information.
 
+
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+
 
 void get_current_header(uint8_t* header_out){
 	/* Currently a dummy function

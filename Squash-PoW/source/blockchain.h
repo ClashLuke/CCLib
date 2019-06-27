@@ -2,6 +2,7 @@
 //
 // Please see the included LICENSE file for more information.
 
+
 void get_current_header(uint8_t* header_out);
 void getheader(uint64_t block_height, uint8_t* header_out);
 void gethash(uint64_t block_height, uint8_t* hash_out);

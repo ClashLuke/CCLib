@@ -2,6 +2,7 @@
 //
 // Please see the included LICENSE file for more information.
 
+
 #include <stdint.h>
 
 
@@ -65,11 +66,11 @@ static void mix_columns(uint8_t * state) {
 	for (k = 0; k < 4; k++) {
 		for (i = 0; i < 4; i++) {
 			a[i] = state[i + 4 * k];
-			h = state[i + 4 * k] & 0x80; /* hi bit */
+			h = state[i + 4 * k] & 0x80;
 			b[i] = state[i + 4 * k] << 1;
 
 			if (h == 0x80) {
-				b[i] ^= 0x1b; /* Rijndael's Galois field */
+				b[i] ^= 0x1b;
 			}
 		}
 
@@ -79,17 +80,17 @@ static void mix_columns(uint8_t * state) {
 		state[3 + 4 * k] = b[3] ^ a[2] ^ a[1] ^ b[0] ^ a[0];
 	}
 }
-#endif // (!defined(__aarch64__) || !defined(__ARM_FEATURE_CRYPTO)) && (!defined(__x86_64__) || !defined(__AES__))
+#endif
 
 void aesSingleRound(uint8_t* state, uint8_t* key) {
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRYPTO)
 	__asm__ volatile(
 	"ld1   {v0.16b,v1.16b},[%0]     \n"
 	"ld1   {v2.16b,v3.16b},[%1]     \n"
-	"aese  v0.16b,v2.16b		\n" // round1: add_round_key,sub_bytes,shift_rows
-	"aesmc v0.16b,v0.16b		\n" // round1: mix_columns
-	"aese  v1.16b,v3.16b		\n" // round1: add_round_key,sub_bytes,shift_rows
-	"aesmc v1.16b,v1.16b		\n" // round1: mix_columns
+	"aese  v0.16b,v2.16b		\n"
+	"aesmc v0.16b,v0.16b		\n"
+	"aese  v1.16b,v3.16b		\n" 
+	"aesmc v1.16b,v1.16b		\n" 
 	"st1   {v0.16b},[%0]		\n"
 	:
 	: "r"(state), "r"(key)
@@ -101,10 +102,10 @@ void aesSingleRound(uint8_t* state, uint8_t* key) {
 	"movups (%1),  %%xmm1	 \n"
 	"movups 16(%0),%%xmm2	 \n"
 	"movups 16(%1),%%xmm3	 \n"
-	"pxor   %%xmm1,%%xmm0	 \n" // add_round_key(state, key)
-	"pxor   %%xmm2,%%xmm3	 \n" // add_round_key(state, key)
-	"aesenc %%xmm1,%%xmm0	 \n" // first round
-	"aesenc %%xmm3,%%xmm2	 \n" // first round
+	"pxor   %%xmm1,%%xmm0	 \n" 
+	"pxor   %%xmm2,%%xmm3	 \n" 
+	"aesenc %%xmm1,%%xmm0	 \n" 
+	"aesenc %%xmm3,%%xmm2	 \n" 
 	"movups %%xmm0, (%0)     \n"
 	:
 	: "r"(state), "r" (key)

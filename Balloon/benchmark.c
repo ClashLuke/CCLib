@@ -2,6 +2,7 @@
 //
 // Please see the included LICENSE file for more information.
 
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -9,6 +10,7 @@
 #include <time.h>
 #include "hash.h"
 #include "config.h"
+
 
 uint64_t benchmark(uint64_t* seed_64, uint8_t printing, uint64_t ITERATIONS){
 	uint64_t  result_64[4] = {0};
