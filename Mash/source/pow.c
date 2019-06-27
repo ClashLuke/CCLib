@@ -180,20 +180,8 @@ void calcDatasetItem(uint8_t* cache, uint32_t item_number, uint64_t* out){
 }
 
 void calc_dataset(uint8_t* cache, uint64_t* out){
-	uint32_t pos0 = 0x0;
-	uint32_t pos1 = 0x4;
-	uint32_t pos2 = 0x8;
-	uint32_t pos3 = 0xC;
-	uint32_t i1 = 0x1;
-	uint32_t i2 = 0x2;
-	uint32_t i3 = 0x3;
-	for(uint32_t i=0;i<536870912;i+=0x10){ // (1<<32)>>3
-		pos0 += 0x10; pos1 += 0x10; pos2 += 0x10; pos3 += 0x10;
-		i1 += 0x10; i2 += 0x10; i3 += 0x10;
-		calcDatasetItem(cache, i , &out[pos0]);
-		calcDatasetItem(cache, i1, &out[pos1]);
-		calcDatasetItem(cache, i2, &out[pos2]);
-		calcDatasetItem(cache, i3, &out[pos3]);
+	for(uint32_t i=0;i<536870912;i+=4){ // (1<<32)>>3
+		calcDatasetItem(cache, i , &out[i]);
 	}
 }
 
