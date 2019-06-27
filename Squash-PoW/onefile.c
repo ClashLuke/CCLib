@@ -9,11 +9,9 @@
 #include "blake2/blake2.h"
 
 
-#define HASH_BYTES      32                 // hash length in bytes
 #define CACHE_ROUNDS    4                  // number of rounds in cache production
-#define EPOCH_LENGTH    60                 // blocks per epoch
 #define DATASET_PARENTS 16                 // number of hashes before calculating dataset entry
-#define ACCESSES        256
+#define ACCESS_ROUNDS 10                   // Each access round is equal to 192 memory accessses.
 // Assuming 4 blocks per second, an epoch estimates 15 minutes
 
 
@@ -265,7 +263,7 @@ void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
 	uint32_t* mix_32   = (uint32_t*)mix;
 	uint32_t* mix_32_s = (uint32_t*)&(((uint16_t*)mix)[1]);
 	uint32_t  x        = 0;
-	item_number = item_number >> 2;
+	item_number>>=2;
 	*mix_32    = cache_32[(item_number  )&0x1fffff];
 	mix_32[1]  = cache_32[(item_number+1)&0x1fffff];
 	mix_32[2]  = cache_32[(item_number+2)&0x1fffff];
@@ -686,23 +684,35 @@ void make_scratchpad(uint8_t* seed, uint8_t* scratchpad){
 	for(uint32_t i=32; i<65536;i+=32) squash_0(&scratchpad[i-32], &scratchpad[i]);
 }
 
-void make_cache(uint8_t* scratchpad, uint8_t* cache){
+void make_cache(uint8_t* seed, uint8_t* cache){
 	/* 64MiB cache is allocated before executing
 	   this function */
-	uint32_t  mask          = 67108864/HASH_BYTES-1;
+	uint32_t* se32          = (uint32_t*)seed;
+	uint32_t* cache_32      = (uint32_t*)cache; 
 	uint64_t* cache_64      = (uint64_t*)cache; 
-	uint64_t  temp_cache[4] = {0};
-	uint64_t  index_0       = 0;
-	uint64_t  index_1       = 0;
-	for(uint32_t i=0;i<mask;i++) squash_2(&cache[i*32], scratchpad, &cache[(i+1)*32]);
-	for(uint8_t j=0;j<CACHE_ROUNDS;j++){
-		for(uint32_t i=0;i<mask;i++){
-			index_0   = cache_64[i*4]&mask;
-			index_1 = (i-1+mask)&mask; 
-			for(uint8_t k=0;k<4;k++)
-				temp_cache[k] = *((uint64_t*)&cache[index_0+k])^*((uint64_t*)&cache[index_1+k]);
-			squash_2((uint8_t*)temp_cache, scratchpad, &cache[i*32]);
-		}
+	uint32_t  i64           = 0;
+	crc32p(se32,       cache_32);
+	crc32p(&se32[1],  &cache_32[1]);
+	crc32p(&se32[2],  &cache_32[2]);
+	crc32p(&se32[3],  &cache_32[3]);
+	crc32p(&se32[4],  &cache_32[4]);
+	crc32p(&se32[5],  &cache_32[5]);
+	crc32p(&se32[6],  &cache_32[6]);
+	crc32p(&se32[7],  &cache_32[7]);
+	for(uint32_t i=0;i<0xfffff7;i+=8){
+		i64 >>= 1;
+		crc32p(&cache_32[i  ],  &cache_32[i+ 8]);
+		crc32p(&cache_32[i+1],  &cache_32[i+ 9]);
+		crc32p(&cache_32[i+2],  &cache_32[i+10]);
+		crc32p(&cache_32[i+3],  &cache_32[i+11]);
+		crc32p(&cache_32[i+4],  &cache_32[i+12]);
+		crc32p(&cache_32[i+5],  &cache_32[i+13]);
+		crc32p(&cache_32[i+6],  &cache_32[i+14]);
+		crc32p(&cache_32[i+7],  &cache_32[i+15]);
+		cache_64[i64  ] += cache_64[i64+1];
+		cache_64[i64+2] += cache_64[i64+3];
+		cache_64[i64+1] += cache_64[i64+2];
+		cache_64[i64+3] += cache_64[i64  ];
 	}
 }
 
@@ -711,6 +721,8 @@ void calc_dataset(uint8_t* cache, uint64_t* out){
 		calc_dataset_item(cache, i, &out[i]);
 	}
 }
+
+//      ]===[ API Functions ]====[
 
 void squash_pow_full(uint8_t* data, uint32_t lenght, uint64_t* dataset, uint8_t* result){
 	uint64_t  seed_64[4] = {0}; 
@@ -726,27 +738,14 @@ void squash_pow_light(uint8_t* data, uint32_t lenght, uint8_t* cache, uint8_t* r
 	squash_3_light(seed, cache, result);
 }
 
-void get_seedhash(uint32_t block_number, uint8_t* seed){ /* IN: block number | OUT: seed */
-	for(uint32_t i=0;i<block_number/EPOCH_LENGTH;i++) squash_0(seed, seed);
+void cache_from_seed(uint8_t* seed, uint8_t* cache){
+	make_cache(seed, cache);
 }
-
-void cache_from_height(uint32_t height, uint8_t* cache){
-	uint64_t  seedhash_64[4]      = {0};
-	uint8_t*  seedhash            = (uint8_t*)seedhash_64;
-	uint64_t  scratchpad_64[8193] = {0};
-	uint8_t*  scratchpad          = (uint8_t*)scratchpad_64;
-	get_seedhash(height, seedhash);
-	make_scratchpad(seedhash, scratchpad);
-	make_cache(scratchpad, cache);
-}
-
-//      ]===[ API Functions ]====[
-
-void dataset_from_height(uint32_t height, uint64_t* dataset){
-	uint64_t* cache_64    = (uint64_t*)calloc(8388608,8);
-	uint8_t*  cache       = (uint8_t*)cache_64;
+void dataset_from_seed(uint8_t* seed, uint64_t* dataset){
+	uint64_t* cache_64 = (uint64_t*)calloc(8388608,8);
 	if(!cache_64) error_exit(1);
-	cache_from_height(height, cache);
+	uint8_t*  cache    = (uint8_t*)cache_64;
+	cache_from_seed(seed, cache);
 	calc_dataset(cache, dataset);
 	free(cache);
 }

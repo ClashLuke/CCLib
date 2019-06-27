@@ -123,10 +123,6 @@ void squash_pow_light(uint8_t* header, uint64_t nonce, uint8_t* cache, uint8_t* 
 	squash_3_light(seed, cache, result);
 }
 
-void get_seedhash(uint64_t block_number, uint8_t* seed){ /* IN: block number | OUT: seed */
-	for(uint64_t i=0;i<(block_number+EPOCH_LENGTH-1)/EPOCH_LENGTH;i++) squash_0(seed, seed);
-}
-
 void cache_from_seed(uint8_t* seed, uint8_t* cache){
 	make_cache(seed, cache);
 }
