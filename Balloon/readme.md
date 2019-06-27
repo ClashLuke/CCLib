@@ -1,3 +1,5 @@
+A CPU-only interpretation of the popular [balloon hashing algorithm](https://crypto.stanford.edu/balloon/).
+
 Benchmarking results using one thread on a Xeon E3-1225v2 are the following
 ```
 Parameters

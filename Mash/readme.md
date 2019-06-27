@@ -1,4 +1,4 @@
-A quick-to-verify hash entirely dependent on the memory bandwidth
+A quick-to-verify hash solely dependent RAM speed.
 
 Those are the benchmarking results, when using the code as-is on a Xeon E3-1225v2.
 ```
