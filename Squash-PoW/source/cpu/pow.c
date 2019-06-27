@@ -58,7 +58,7 @@ void calc_dataset_item(uint8_t* cache, uint32_t item_number, uint64_t* out){
 	uint32_t* mix_32   = (uint32_t*)mix;
 	uint32_t* mix_32_s = (uint32_t*)&(((uint16_t*)mix)[1]);
 	uint32_t  x        = 0;
-	item_number = item_number >> 2;
+	item_number>>=2;
 	*mix_32    = cache_32[(item_number  )&0x1fffff];
 	mix_32[1]  = cache_32[(item_number+1)&0x1fffff];
 	mix_32[2]  = cache_32[(item_number+2)&0x1fffff];
