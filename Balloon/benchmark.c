@@ -68,8 +68,7 @@ int main(int argc, char *argv[]){
 	printf("\tSeed: %08x\n", seed);
 	printf("Config\n");
 	printf("\tCache Size: %uKiB\n", SIZE/1024);
-	printf("\tMixing Iterations: %u\n", 1048576);
-	printf("\tMemory Threads: %u\n", 16);
+	printf("\tMixing Iterations: %u\n", ITER);
 	printf("Mining\n");
 	benchmark(seed64, printing, iterations);
 	printf("\e[?25h");
