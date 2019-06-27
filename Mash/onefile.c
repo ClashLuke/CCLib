@@ -7,10 +7,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define ACCESS_ROUNDS 128   // Access rounds make hashing slower for everyone by a defined factor, comment it to have the greatest speed. 
-#define MEMORY_THREADS 1    // 256 is the absolute maximum
-			    // with 256 memory threads, 32kb of L1 cache are used for storage
-#define DATASET_PARENTS 1   // Determines dataset creation time and validation speed. The higher the slower.
+#define ACCESS_ROUNDS 64   // Access rounds make hashing slower for everyone by a defined factor, comment it to have the greatest speed. 
+#define DATASET_PARENTS 4   // Determines dataset creation time and validation speed. The higher the slower.
 
 
 void error_exit(uint8_t code){
@@ -190,23 +188,10 @@ void calcDatasetItem(uint8_t* cache, uint32_t item_number, uint64_t* out){
 }
 
 void calc_dataset(uint8_t* cache, uint64_t* out){
-	uint32_t pos0 = 0x0;
-	uint32_t pos1 = 0x1;
-	uint32_t pos2 = 0x2;
-	uint32_t pos3 = 0x3;
-	uint32_t i1 = 0x1;
-	uint32_t i2 = 0x2;
-	uint32_t i3 = 0x3;
-	for(uint32_t i=0;i<536870912;i+=0x10){ // (1<<32)>>3
-		pos0 += 0x10; pos1 += 0x10; pos2 += 0x10; pos3 += 0x10;
-		i1 += 0x10; i2 += 0x10; i3 += 0x10;
-		calcDatasetItem(cache, i , &out[pos0]);
-		calcDatasetItem(cache, i1, &out[pos1]);
-		calcDatasetItem(cache, i2, &out[pos2]);
-		calcDatasetItem(cache, i3, &out[pos3]);
+	for(uint32_t i=0;i<536870912;i+=4){ // (1<<32)>>3
+		calcDatasetItem(cache, i , &out[i]);
 	}
 }
-
 void cache_from_seed(uint8_t* seed, uint8_t* cache){
 	make_cache(seed, cache);
 }
@@ -222,43 +207,119 @@ void dataset_from_seed(uint8_t* seed, uint64_t* dataset){
 
 
 void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
-	uint64_t  hash_64[MEMORY_THREADS*16]     = {0};
+	uint64_t  hash_64[16]     = {0};
 	uint32_t* hash_32         = (uint32_t*)hash_64;
 	uint32_t* data_32         = (uint32_t*)data;
 	uint64_t* out_64          = (uint64_t*)out;
-	for(uint32_t j=0; j<MEMORY_THREADS; j++){
-		for(uint8_t i=0; i< 8; i++) hash_64[i] = *((uint64_t*)&dataset[data_32[i]]);
-		for(uint8_t i=0; i<16; i++) hash_64[i] = *((uint64_t*)&dataset[hash_32[i]]);
-	}
-	for(uint32_t i=0; i<ACCESS_ROUNDS; i++){
-		for(uint32_t j=0; j<MEMORY_THREADS*16; j+=16){
-			for(uint8_t k=0; k<32; k++ ) hash_32[k+j*2] = *((uint32_t*)&dataset[hash_32[k+j*2]]);
-			for(uint8_t k=0; k<16; k+=2) hash_64[k+j]   += hash_64[k+j+1];
-			for(uint8_t k=0; k<32; k++ ) hash_32[k+j*2] = *((uint32_t*)&dataset[hash_32[k+j*2]]);
-			for(uint8_t k=0; k<16; k+=2) hash_64[k+j+1] += hash_64[k+j];
-		}
-	}
-	for(uint32_t j=0; j<MEMORY_THREADS*16; j+=16){
-		hash_64[j+ 0] += hash_64[j+ 1]; hash_64[j+ 2] += hash_64[j+ 3];
-		hash_64[j+ 4] += hash_64[j+ 5]; hash_64[j+ 6] += hash_64[j+ 7];
-		hash_64[j+ 8] += hash_64[j+ 9]; hash_64[j+10] += hash_64[j+11];
-		hash_64[j+12] += hash_64[j+13]; hash_64[j+14] += hash_64[j+15];
-		hash_64[j+ 0] += hash_64[j+ 2]; hash_64[j+ 4] += hash_64[j+ 6];
-		hash_64[j+ 8] += hash_64[j+10]; hash_64[j+12] += hash_64[j+14];
-	}
 
+	*hash_64    = *((uint64_t*)&dataset[*data_32   ]);
+	hash_64[ 1] = *((uint64_t*)&dataset[data_32[ 1]]);
+	hash_64[ 2] = *((uint64_t*)&dataset[data_32[ 2]]);
+	hash_64[ 3] = *((uint64_t*)&dataset[data_32[ 3]]);
+	hash_64[ 4] = *((uint64_t*)&dataset[data_32[ 4]]);
+	hash_64[ 5] = *((uint64_t*)&dataset[data_32[ 5]]);
+	hash_64[ 6] = *((uint64_t*)&dataset[data_32[ 6]]);
+	hash_64[ 7] = *((uint64_t*)&dataset[data_32[ 7]]);
+	*hash_64    = *((uint64_t*)&dataset[*hash_32   ]);
+	hash_64[ 1] = *((uint64_t*)&dataset[hash_32[ 1]]);
+	hash_64[ 2] = *((uint64_t*)&dataset[hash_32[ 2]]);
+	hash_64[ 3] = *((uint64_t*)&dataset[hash_32[ 3]]);
+	hash_64[ 4] = *((uint64_t*)&dataset[hash_32[ 4]]);
+	hash_64[ 5] = *((uint64_t*)&dataset[hash_32[ 5]]);
+	hash_64[ 6] = *((uint64_t*)&dataset[hash_32[ 6]]);
+	hash_64[ 7] = *((uint64_t*)&dataset[hash_32[ 7]]);
+	hash_64[ 8] = *((uint64_t*)&dataset[hash_32[ 8]]);
+	hash_64[ 9] = *((uint64_t*)&dataset[hash_32[ 9]]);
+	hash_64[10] = *((uint64_t*)&dataset[hash_32[10]]);
+	hash_64[11] = *((uint64_t*)&dataset[hash_32[11]]);
+	hash_64[12] = *((uint64_t*)&dataset[hash_32[12]]);
+	hash_64[13] = *((uint64_t*)&dataset[hash_32[13]]);
+	hash_64[14] = *((uint64_t*)&dataset[hash_32[14]]);
+	hash_64[15] = *((uint64_t*)&dataset[hash_32[15]]);
+	data_32[ 0]++; data_32[ 2]++; data_32[ 4]++; data_32[ 6]++;
+	data_32[ 1]++; data_32[ 3]++; data_32[ 5]++; data_32[ 7]++;
+	for(uint32_t i=0; i<ACCESS_ROUNDS; i++){
+		hash_32[0]  = *((uint32_t*)&dataset[hash_32[0]]);
+		hash_32[1]  = *((uint32_t*)&dataset[hash_32[1]]);
+		hash_32[2]  = *((uint32_t*)&dataset[hash_32[2]]);
+		hash_32[3]  = *((uint32_t*)&dataset[hash_32[3]]);
+		hash_32[4]  = *((uint32_t*)&dataset[hash_32[4]]);
+		hash_32[5]  = *((uint32_t*)&dataset[hash_32[5]]);
+		hash_32[6]  = *((uint32_t*)&dataset[hash_32[6]]);
+		hash_32[7]  = *((uint32_t*)&dataset[hash_32[7]]);
+		hash_32[8]  = *((uint32_t*)&dataset[hash_32[8]]);
+		hash_32[9]  = *((uint32_t*)&dataset[hash_32[9]]);
+		hash_32[10]  = *((uint32_t*)&dataset[hash_32[10]]);
+		hash_32[11]  = *((uint32_t*)&dataset[hash_32[11]]);
+		hash_32[12]  = *((uint32_t*)&dataset[hash_32[12]]);
+		hash_32[13]  = *((uint32_t*)&dataset[hash_32[13]]);
+		hash_32[14]  = *((uint32_t*)&dataset[hash_32[14]]);
+		hash_32[15]  = *((uint32_t*)&dataset[hash_32[15]]);
+		hash_32[16]  = *((uint32_t*)&dataset[hash_32[16]]);
+		hash_32[17]  = *((uint32_t*)&dataset[hash_32[17]]);
+		hash_32[18]  = *((uint32_t*)&dataset[hash_32[18]]);
+		hash_32[19]  = *((uint32_t*)&dataset[hash_32[19]]);
+		hash_32[20]  = *((uint32_t*)&dataset[hash_32[20]]);
+		hash_32[21]  = *((uint32_t*)&dataset[hash_32[21]]);
+		hash_32[22]  = *((uint32_t*)&dataset[hash_32[22]]);
+		hash_32[23]  = *((uint32_t*)&dataset[hash_32[23]]);
+		hash_32[24]  = *((uint32_t*)&dataset[hash_32[24]]);
+		hash_32[25]  = *((uint32_t*)&dataset[hash_32[25]]);
+		hash_32[26]  = *((uint32_t*)&dataset[hash_32[26]]);
+		hash_32[27]  = *((uint32_t*)&dataset[hash_32[27]]);
+		hash_32[28]  = *((uint32_t*)&dataset[hash_32[28]]);
+		hash_32[29]  = *((uint32_t*)&dataset[hash_32[29]]);
+		hash_32[30]  = *((uint32_t*)&dataset[hash_32[30]]);
+		hash_32[31]  = *((uint32_t*)&dataset[hash_32[31]]);
+		hash_64[0] += hash_64[1]; hash_64[2] += hash_64[3];
+		hash_64[4] += hash_64[5]; hash_64[6] += hash_64[7];
+		hash_64[8] += hash_64[9]; hash_64[10] += hash_64[11];
+		hash_64[12] += hash_64[13]; hash_64[14] += hash_64[15];
+		hash_32[0]  = *((uint32_t*)&dataset[hash_32[0]]);
+		hash_32[1]  = *((uint32_t*)&dataset[hash_32[1]]);
+		hash_32[2]  = *((uint32_t*)&dataset[hash_32[2]]);
+		hash_32[3]  = *((uint32_t*)&dataset[hash_32[3]]);
+		hash_32[4]  = *((uint32_t*)&dataset[hash_32[4]]);
+		hash_32[5]  = *((uint32_t*)&dataset[hash_32[5]]);
+		hash_32[6]  = *((uint32_t*)&dataset[hash_32[6]]);
+		hash_32[7]  = *((uint32_t*)&dataset[hash_32[7]]);
+		hash_32[8]  = *((uint32_t*)&dataset[hash_32[8]]);
+		hash_32[9]  = *((uint32_t*)&dataset[hash_32[9]]);
+		hash_32[10]  = *((uint32_t*)&dataset[hash_32[10]]);
+		hash_32[11]  = *((uint32_t*)&dataset[hash_32[11]]);
+		hash_32[12]  = *((uint32_t*)&dataset[hash_32[12]]);
+		hash_32[13]  = *((uint32_t*)&dataset[hash_32[13]]);
+		hash_32[14]  = *((uint32_t*)&dataset[hash_32[14]]);
+		hash_32[15]  = *((uint32_t*)&dataset[hash_32[15]]);
+		hash_32[16]  = *((uint32_t*)&dataset[hash_32[16]]);
+		hash_32[17]  = *((uint32_t*)&dataset[hash_32[17]]);
+		hash_32[18]  = *((uint32_t*)&dataset[hash_32[18]]);
+		hash_32[19]  = *((uint32_t*)&dataset[hash_32[19]]);
+		hash_32[20]  = *((uint32_t*)&dataset[hash_32[20]]);
+		hash_32[21]  = *((uint32_t*)&dataset[hash_32[21]]);
+		hash_32[22]  = *((uint32_t*)&dataset[hash_32[22]]);
+		hash_32[23]  = *((uint32_t*)&dataset[hash_32[23]]);
+		hash_32[24]  = *((uint32_t*)&dataset[hash_32[24]]);
+		hash_32[25]  = *((uint32_t*)&dataset[hash_32[25]]);
+		hash_32[26]  = *((uint32_t*)&dataset[hash_32[26]]);
+		hash_32[27]  = *((uint32_t*)&dataset[hash_32[27]]);
+		hash_32[28]  = *((uint32_t*)&dataset[hash_32[28]]);
+		hash_32[29]  = *((uint32_t*)&dataset[hash_32[29]]);
+		hash_32[30]  = *((uint32_t*)&dataset[hash_32[30]]);
+		hash_32[31]  = *((uint32_t*)&dataset[hash_32[31]]);
+		hash_64[1] += hash_64[0]; hash_64[3] += hash_64[2];
+		hash_64[5] += hash_64[4]; hash_64[7] += hash_64[6];
+		hash_64[9] += hash_64[8]; hash_64[11] += hash_64[10];
+		hash_64[13] += hash_64[12]; hash_64[15] += hash_64[14];
+	}
+	hash_64[ 0] += hash_64[ 1]; hash_64[ 2] += hash_64[ 3];
+	hash_64[ 4] += hash_64[ 5]; hash_64[ 6] += hash_64[ 7];
+	hash_64[ 8] += hash_64[ 9]; hash_64[10] += hash_64[11];
+	hash_64[12] += hash_64[13]; hash_64[14] += hash_64[15];
+	hash_64[ 0] += hash_64[ 2]; hash_64[ 4] += hash_64[ 6];
+	hash_64[ 8] += hash_64[10]; hash_64[12] += hash_64[14];
 	*out_64   = hash_64[ 0]; out_64[1] = hash_64[ 4];
 	out_64[2] = hash_64[ 8]; out_64[3] = hash_64[12];
-
-	for(uint32_t j=0; j<MEMORY_THREADS*16; j+=16){
-		if(((hash_64[j   ])<=(*out_64  ))
-		&& ((hash_64[j+ 4])<=(out_64[1]))
-		&& ((hash_64[j+ 8])<=(out_64[2]))
-		&& ((hash_64[j+12])<=(out_64[3]))){
-			*out_64   = hash_64[j  ]; out_64[1] = hash_64[j+ 4];
-			out_64[2] = hash_64[j+8]; out_64[3] = hash_64[j+12];
-		}
-	}
 }
 
 uint64_t calcItem64(uint32_t itemNumber, uint8_t* cache){
@@ -331,6 +392,7 @@ void mash_light(uint8_t* data, uint8_t* cache, uint8_t* out){
 	uint32_t* hash_32         = (uint32_t*)hash_64;
 	uint32_t* data_32         = (uint32_t*)data;
 	uint64_t* out_64          = (uint64_t*)out;
+
 	*hash_64    = calcItem64(*data_32,    cache);
 	hash_64[ 1] = calcItem64(data_32[ 1], cache);
 	hash_64[ 2] = calcItem64(data_32[ 2], cache);
@@ -355,12 +417,14 @@ void mash_light(uint8_t* data, uint8_t* cache, uint8_t* out){
 	hash_64[13] = calcItem64(hash_32[13], cache);
 	hash_64[14] = calcItem64(hash_32[14], cache);
 	hash_64[15] = calcItem64(hash_32[15], cache);
+#ifdef ACCESS_ROUNDS
 	for(uint32_t i=0; i<ACCESS_ROUNDS; i++){
 		for(uint8_t j=0; j<32; j++) calcItem32(&hash_32[j], cache);
 		for(uint8_t j=0; j<16; j+=2) hash_64[j]   += hash_64[j+1];
 		for(uint8_t j=0; j<32; j++) calcItem32(&hash_32[j], cache);
 		for(uint8_t j=0; j<16; j+=2) hash_64[j+1] += hash_64[j];
 	}
+#endif
 	*hash_64    += hash_64[ 1]; hash_64[ 2] += hash_64[ 3];
 	hash_64[ 4] += hash_64[ 5]; hash_64[ 6] += hash_64[ 7];
 	hash_64[ 8] += hash_64[ 9]; hash_64[10] += hash_64[11];
@@ -370,5 +434,4 @@ void mash_light(uint8_t* data, uint8_t* cache, uint8_t* out){
 	*out_64      = *hash_64;    out_64[  1]  = hash_64[ 4];
 	out_64[  2]  = hash_64[ 8]; out_64[  3]  = hash_64[12];
 }
-
 
