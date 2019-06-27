@@ -331,7 +331,8 @@ void balloon(uint8_t* data, uint8_t* out){
 #endif
 #endif
 #endif
-	for(uint32_t j=0; j<SIZE/4; j+=64){
+	aes(&cache[128], cache);
+	for(uint32_t j=1; j<SIZE/4; j+=64){
 		j_2 = j>>1;
 		crc32p(&cache_32[j   ], &cache_32[j+16]); crc32p(&cache_32[j+ 1], &cache_32[j+17]);
 		crc32p(&cache_32[j+ 2], &cache_32[j+18]); crc32p(&cache_32[j+ 3], &cache_32[j+19]);
