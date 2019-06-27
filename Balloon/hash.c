@@ -277,22 +277,60 @@ void aes(uint8_t* state, uint8_t* key) {
 
 // Input will always be 64 byte, output will be 32 byte
 void balloon(uint8_t* data, uint8_t* out){
-	uint8_t   cache[SIZE]  = {0};
+	uint64_t  cache_64[SIZE/8] = {0};
 	uint64_t* out_64       = (uint64_t*)out;
 	uint32_t* data_32      = (uint32_t*)data;
-	uint32_t* cache_32     = (uint32_t*)cache;
-	uint64_t* cache_64     = (uint64_t*)cache;
+	uint8_t*  cache        = (uint8_t*)cache_64;
+	uint32_t* cache_32     = (uint32_t*)cache_64;
 	uint32_t  mask         = (SIZE/4)-1;
 	uint32_t  prevItem[16] = {0};
 	uint32_t  j_2          = 0;
 	crc32p(data_32,       cache_32    ); crc32p(&data_32[ 1], &cache_32[ 1]);
+#if INPUT_SIZE > 1
 	crc32p(&data_32[ 2], &cache_32[ 2]); crc32p(&data_32[ 3], &cache_32[ 3]);
+#if INPUT_SIZE > 2
 	crc32p(&data_32[ 4], &cache_32[ 4]); crc32p(&data_32[ 5], &cache_32[ 5]);
+#if INPUT_SIZE > 3
 	crc32p(&data_32[ 6], &cache_32[ 6]); crc32p(&data_32[ 7], &cache_32[ 7]);
+#if INPUT_SIZE > 4
 	crc32p(&data_32[ 8], &cache_32[ 8]); crc32p(&data_32[ 9], &cache_32[ 9]);
+#if INPUT_SIZE > 5
 	crc32p(&data_32[10], &cache_32[10]); crc32p(&data_32[11], &cache_32[11]);
+#if INPUT_SIZE > 6
 	crc32p(&data_32[12], &cache_32[12]); crc32p(&data_32[13], &cache_32[13]);
+#if INPUT_SIZE > 7
 	crc32p(&data_32[14], &cache_32[14]); crc32p(&data_32[15], &cache_32[15]);
+#if INPUT_SIZE > 8
+	crc32p(&data_32[16], &cache_32[16]); crc32p(&data_32[17], &cache_32[17]);
+#if INPUT_SIZE > 9
+	crc32p(&data_32[18], &cache_32[18]); crc32p(&data_32[19], &cache_32[19]);
+#if INPUT_SIZE > 10
+	crc32p(&data_32[20], &cache_32[20]); crc32p(&data_32[21], &cache_32[21]);
+#if INPUT_SIZE > 11
+	crc32p(&data_32[22], &cache_32[22]); crc32p(&data_32[23], &cache_32[23]);
+#if INPUT_SIZE > 12
+	crc32p(&data_32[24], &cache_32[24]); crc32p(&data_32[25], &cache_32[25]);
+#if INPUT_SIZE > 13
+	crc32p(&data_32[26], &cache_32[26]); crc32p(&data_32[27], &cache_32[27]);
+#if INPUT_SIZE > 14
+	crc32p(&data_32[28], &cache_32[28]); crc32p(&data_32[29], &cache_32[29]);
+#if INPUT_SIZE > 15
+	crc32p(&data_32[30], &cache_32[30]); crc32p(&data_32[31], &cache_32[31]);
+#endif
+#endif
+#endif
+#endif
+#endif
+#endif
+#endif
+#endif
+#endif
+#endif
+#endif
+#endif
+#endif
+#endif
+#endif
 	for(uint32_t j=0; j<SIZE/4; j+=64){
 		j_2 = j>>1;
 		crc32p(&cache_32[j   ], &cache_32[j+16]); crc32p(&cache_32[j+ 1], &cache_32[j+17]);
@@ -351,9 +389,17 @@ void balloon(uint8_t* data, uint8_t* out){
 		crc32i(&cache_32[prevItem[12]]); crc32i(&cache_32[prevItem[13]]);
 		crc32i(&cache_32[prevItem[14]]); crc32i(&cache_32[prevItem[15]]);
 	}
-	for(uint32_t j=0; j<SIZE/8; j+=4){
+	for(uint32_t j=0; j<SIZE/8; j+=OUTPUT_SIZE*2){
 		 *out_64   += cache_64[j  ]; out_64[1] += cache_64[j+1];
+#if OUTPUT_SIZE > 1
 		 out_64[2] += cache_64[j+2]; out_64[3] += cache_64[j+3];
+#if OUTPUT_SIZE > 2
+		 out_64[4] += cache_64[j+4]; out_64[5] += cache_64[j+5];
+#if OUTPUT_SIZE > 3
+		 out_64[6] += cache_64[j+6]; out_64[7] += cache_64[j+7];
+#endif
+#endif
+#endif
 	}
 }
 
