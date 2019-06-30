@@ -11,7 +11,7 @@
 #define MAX32   0xffffffff
 #define MAX32R   0x1fffffff
 //#define REDUCED
-#define ROUNDS 4
+#define ROUNDS 6
 
 void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	uint32_t* out32 = (uint32_t*)out;
@@ -70,15 +70,21 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 			return;
 			#if ROUNDS > 2
 			}
+			}
 			#if ROUNDS > 3
+			}
 			}
 			#if ROUNDS > 4
 			}
+			}
 			#if ROUNDS > 5
+			}
 			}
 			#if ROUNDS > 6
 			}
+			}
 			#if ROUNDS > 7
+			}
 			}
 			#endif
 			#endif
@@ -86,8 +92,10 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 			#endif
 			#endif
 			#endif
+			}
 		}
 	}
+	printf("Found nothing, next nonce\n");
 #else
 	uint32_t* dataset32 = (uint32_t*)dataset;
 	for(uint32_t i=0; i<MAX32R; i++){
