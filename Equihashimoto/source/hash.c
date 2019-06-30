@@ -8,13 +8,16 @@
 #include <stdio.h>
 #include "pow.h"
 
-#define MAX32   0x1fffffff
+#define MAX32   0xffffffff
+#define MAX32R   0x1fffffff
+//#define REDUCED
 
 void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	uint32_t* out32 = (uint32_t*)out;
 	uint64_t* dataset64 = (uint64_t*)dataset;
 	uint32_t  item = 0;
 	calcDataset(data, dataset64);
+#ifndef REDUCED
 	for(uint32_t i=0; i<MAX32; i++){
 		for(uint32_t j=1+i; j<MAX32; j++){
 			item = *(uint32_t*)&dataset[i];
@@ -30,6 +33,24 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 			}
 		}
 	}
+#else
+	uint32_t* dataset32 = (uint32_t*)dataset;
+	for(uint32_t i=0; i<MAX32R; i++){
+		for(uint32_t j=1+i; j<MAX32R; j++){
+			item = dataset32[i];
+			if(item==dataset32[j]){
+				printf("%u: %u,%u\n",item, i,j);
+				for(uint32_t k=1+j; k<MAX32R; k++){
+					if(item==dataset32[k]){
+						printf("%u\n",k);
+						*out32 = i; out32[1] = j; out32[2] = k;
+						return;
+					}
+				}
+			}
+		}
+	}
+#endif
 }
 
 uint32_t calcItem32(uint8_t* data, uint32_t itemNumber){
