@@ -1,38 +1,8 @@
-A quick-to-verify hash solely dependent RAM speed.
-
-Those are the benchmarking results, when using the code as-is on a Xeon E3-1225v2.
-```
-Parameters
-	Progressbar: yes
-	Iterations
-		Full:  1048576
-		Light: 16384
-	Seed: 89abcdef
-Config
-	Access Rounds: 64
-	Dataset Parents: 4
-	Benchmark: no
-Mining
-        Dataset generation took: 61s                                            
-        Calculation of 1048576 hashes took: 167s                                
-	Hashrate is approximately: 6278H/s
-	Result: 375a81e77f7f2794,c51dfdea938b5a48,484a4722e8abe589,42fbcab1dec6a4b6
-Validation
-	Cache generation took: 0s
-        Calculation of 16384 hashes took: 39s                                   
-	Hashrate is approximately: 420H/s
-	Result: b7f279906ee37bf1,6006b426afd688d0,82e9b4a163024a51,2e92d6521302bb5a
-
-
-```
-
-An easy-to-plug-in single-file solution can be found in `onefile.c`, all functions required to call use selfexplanatory names and can be seen in `onefile.h`. To test this algorithm and achieve benchmarking results like above, it is recommended to compile the files in the `source/` folder.
-
-Recommended way of compiling: `gcc -Ofast -msse2 -msse4.2 -march=native -flto -fwhole-program -Wall *.c -funroll-loops`
-SSE2 and SSE4.2 are not used in the code, but allow the compiler to use these extensions. It may increase the performance.
-`-Ofast` and `-march=native` are standard optimisations, `-flto`, `-fwhole-program` and `-funroll-loops` are optimisations which can create minor improvements in this particular case.
-`-Wall` is used to ensure there are no major issues, a compiler can detect.
-
-In case the configuration is supposed to be tweaked, please read through the following section:
-Memory threads are only recommended if you validate hashes and check whether or not they are "better" than another hash, instead of benchmarking the hash. An improvement of 5% can be achieved by using 256 memory-threads in favour of using one thread.
-Calculating everything in batches of 256 nonces and finding a nonce that solves the block in the first try but continueing to calculate all other nonces instead of pushing the nonce out right after it was found is no issue. It will have a maximum slowdown of 0.02% (compared to checking and broadcasting it instantly) but adds a 5% speedup on top of that.
+The dataset is tied to 4GB (or (2^32)-31 elements of 32bit size) and generated once for every "seed hash". The seed hash is the hash of the block header including the transactions and the nonce and therefore can be changed quickly. A dataset of 4GB for mining is not enforced, but recommended to achieve the optimal performance. The upper limit is 4GiB.
+Dataset generation: 4.5s/4GiB
+Recommended Rounds: 5 or 6.
+The number of rounds determines how many items have to be equal to eachother. Research of the birthday paradox indicates that with n days in a year and a group of n/2 people, you already have a probability of 50% of finding one one possible solution if the number of rounds is equal to four, which could lead to memory optimisations. When the number of rounds is five, you need n people to achieve a 75% probability of finding a fitting solution with your current dataset. The next best optimisation in the case of five rounds would be a probability of 50% of finding a possible solution to the birthday paradox when using a 3.4GiB dataset. Further increasing the number of rounds to 6 would allow a 12.5% chance for every miner (per thread) to find one nonce on a 4GiB dataset. When using a smaller dataset such as 2GiB, the probability is in the low 0%-area.
+Please note that increasing the rounds heavily increases the time needed for the successful finding of the required amount of sub-nonces to the previous nonce and with that also increases the minimum required block time.
+With four rounds, the minimum required block time would be 45s. (39s is the average time required for finding a nonce, 4.5s is the average dataset generation time).
+After sub-nonces to the major nonce are found, they are attached to the block and hashed with any fast hash such as blake2s or AES-hash, if the result meets the difficulty requirements, it can be submitted.
+Using this design, equihashimoto is botnet resistant, has heavy ASIC resistance and low dataset generation times while being extremely fast verifyable (>4M Validations/s). Additionally it's provably assymetric and provably secure.
