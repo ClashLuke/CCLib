@@ -11,6 +11,7 @@
 #define MAX32   0xffffffff
 #define MAX32R   0x1fffffff
 //#define REDUCED
+#define ROUNDS 4
 
 void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	uint32_t* out32 = (uint32_t*)out;
@@ -21,13 +22,21 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	for(uint32_t i=0; i<MAX32; i++){
 		for(uint32_t j=1+i; j<MAX32; j++){
 			item = *(uint32_t*)&dataset[i];
+			#if ROUNDS > 1
 			if(item==*(uint32_t*)&dataset[j]){
-				printf("%u: %u,%u\n",item, i,j);
+				#if ROUNDS > 2
 				for(uint32_t k=1+j; k<MAX32; k++){
 					if(item==*(uint32_t*)&dataset[k]){
-						printf("%u\n",k);
-						*out32 = i; out32[1] = j; out32[2] = k;
-						return;
+						#if ROUNDS > 3
+						for(uint32_t l=1+k; k<MAX32; l++){
+							if(item==*(uint32_t*)&dataset[l]){
+						#endif
+				#endif
+			#endif
+								*out32 = i; out32[1] = j; out32[2] = k; out32[3] = l;
+								return;
+							}
+						}
 					}
 				}
 			}
@@ -42,9 +51,12 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 				printf("%u: %u,%u\n",item, i,j);
 				for(uint32_t k=1+j; k<MAX32R; k++){
 					if(item==dataset32[k]){
-						printf("%u\n",k);
-						*out32 = i; out32[1] = j; out32[2] = k;
-						return;
+						for(uint32_t l=1+k; k<MAX32R; l++){
+							if(item==dataset32[l]){
+								*out32 = i; out32[1] = j; out32[2] = k; out32[3] = l;
+								return;
+							}
+						}
 					}
 				}
 			}
