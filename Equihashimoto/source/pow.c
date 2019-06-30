@@ -107,16 +107,25 @@ void crc32i(uint32_t* in) { // CRC32-Inplace
 #endif
 }
 
-void calcDatasetItem(uint8_t* seed, uint32_t* itemNumber, uint64_t* out){
-	blake2b(out, 64, seed, 32, itemNumber, 4);
+void calcDatasetItem(uint8_t* seed, uint32_t itemNumber, uint64_t* out){
+	uint64_t mix64[16] = {0};
+	uint8_t* mix       = (uint8_t*)mix64;
+	*mix    = itemNumber; mix[ 1] = itemNumber; mix[ 2] = itemNumber; mix[ 3] = itemNumber;
+	mix[4]  = itemNumber; mix[ 5] = itemNumber; mix[ 6] = itemNumber; mix[ 7] = itemNumber;
+	mix[8]  = itemNumber; mix[ 9] = itemNumber; mix[10] = itemNumber; mix[11] = itemNumber;
+	mix[12] = itemNumber; mix[13] = itemNumber; mix[14] = itemNumber; mix[15] = itemNumber;
+	aes(mix, seed         ); aes(&mix[ 16], &seed[16]);
+	aes(&mix[32], mix     ); aes(&mix[ 48], &mix[16]);
+	aes(&mix[64], &mix[32]); aes(&mix[ 80], &mix[48]);
+	aes(&mix[96], &mix[64]); aes(&mix[112], &mix[80]);
+	memcpy(out, mix, 128);
 }
 
 void calcDataset(uint8_t* seed, uint64_t* out){
 	uint32_t* seed32 = (uint32_t*)seed;
-	uint32_t  i      = 0;
-	uint32_t* ip     = &i;
-	for(;i<536870912;i+=8){ // (1<<32)>>3
-		blake2b(&out[i], 64, seed, 32, ip, 4);
-		(*seed32)++;
+	for(uint32_t i=0;i<536870912;i+=16){ // (1<<32)>>3
+		calcDatasetItem(seed, i, &out[i]);
+		(*seed32)++; seed32[1]++; seed32[2]++; seed32[3]++;
+		seed32[4]++; seed32[5]++; seed32[6]++; seed32[7]++;
 	}
 }
