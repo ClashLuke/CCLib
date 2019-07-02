@@ -132,12 +132,12 @@ uint8_t mash_light(uint8_t* data){
 	if(i==o) 
 	#if ROUNDS > 7
 	if(i==p) 
+	#endif
+	#endif
+	#endif
+	#endif
+	#endif
+	#endif
 	return 1;
-	#endif
-	#endif
-	#endif
-	#endif
-	#endif
-	#endif
 	return 0;
 }
