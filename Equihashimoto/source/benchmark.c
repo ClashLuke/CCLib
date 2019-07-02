@@ -54,7 +54,8 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t ITERATIONS
 				#endif
 				#endif
 				#endif
-				for(uint8_t i=0; i< 8; i++) seed_32[i]++;
+				(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+				seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 			}
 			buffer[j] = '#';
 			printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
@@ -82,7 +83,8 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t ITERATIONS
 			#endif
 			#endif
 			#endif
-			for(uint8_t i=0; i< 8; i++) seed_32[i]++;
+			(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+			seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 		}
 	}
 	free(dataset);
