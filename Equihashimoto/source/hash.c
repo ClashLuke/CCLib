@@ -95,44 +95,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	printf("Found nothing, next nonce\n");
 }
 
-uint32_t calcItem32(uint8_t* data, uint32_t itemNumber){
-	uint8_t   item[128] = {0};
-	uint32_t* item_32  = (uint32_t*)item;
-	uint64_t* item_64  = (uint64_t*)item;
-	uint32_t* data_32  = (uint32_t*)data;
-	uint32_t  out0     = 0; 
-	uint32_t  out1     = 0; 
-	uint8_t   innerPos = itemNumber&0x7f;
-	uint8_t   pos      = itemNumber&0x3;
-	itemNumber>>=7;
-	(*data_32) += itemNumber; data_32[1] += itemNumber;
-	data_32[2] += itemNumber; data_32[3] += itemNumber;
-	data_32[4] += itemNumber; data_32[5] += itemNumber;
-	data_32[6] += itemNumber; data_32[7] += itemNumber;
-	itemNumber<<=4;
-	if(innerPos>0x7c){
-		calcDatasetItem(data, itemNumber, item_64);
-		out0   = item_32[31];
-		calcDatasetItem(data, 16+itemNumber, item_64);
-		out1   = item_32[ 0];
-		for(uint8_t i=0; i<  pos; i++) out0>>=8;
-		for(uint8_t i=0; i<4-pos; i++) out1<<=8;
-		out0  |= out1;
-	}else{
-		if(!pos){
-			calcDatasetItem(data, itemNumber, item_64);
-			out0 = item_32[innerPos/4];
-		} else {
-			calcDatasetItem(data, itemNumber, item_64);
-			out0   = item_32[innerPos/4];
-			out1   = item_32[1+(innerPos/4)];
-			for(uint8_t i=0; i<  pos; i++) out0>>=8;
-			for(uint8_t i=0; i<4-pos; i++) out1<<=8;
-			out0  |= out1;
-		}
-	}
-	return out0;
-}
+
 
 uint8_t mash_light(uint8_t* data){
 	uint32_t* data32 = (uint32_t*)&data[32];

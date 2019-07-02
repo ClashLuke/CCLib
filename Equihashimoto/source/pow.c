@@ -108,16 +108,12 @@ void crc32i(uint32_t* in) { // CRC32-Inplace
 }
 
 void calcDatasetItem(uint8_t* seed, uint32_t itemNumber, uint64_t* out){
-	uint64_t mix64[16] = {0};
-	uint8_t* mix       = (uint8_t*)mix64;
-	*mix    = itemNumber; mix[ 1] = itemNumber; mix[ 2] = itemNumber; mix[ 3] = itemNumber;
-	mix[4]  = itemNumber; mix[ 5] = itemNumber; mix[ 6] = itemNumber; mix[ 7] = itemNumber;
-	mix[8]  = itemNumber; mix[ 9] = itemNumber; mix[10] = itemNumber; mix[11] = itemNumber;
-	mix[12] = itemNumber; mix[13] = itemNumber; mix[14] = itemNumber; mix[15] = itemNumber;
-	aes(mix, seed         ); aes(&mix[ 16], &seed[16]);
-	aes(&mix[32], mix     ); aes(&mix[ 48], &mix[16]);
-	aes(&mix[64], &mix[32]); aes(&mix[ 80], &mix[48]);
-	aes(&mix[96], &mix[64]); aes(&mix[112], &mix[80]);
+	uint64_t mix[16] = {0};
+	uint8_t* mix8       = (uint8_t*)mix;
+	*mix    = itemNumber; mix[ 2] = itemNumber; mix[ 4] = itemNumber; mix[ 6] = itemNumber;
+	mix[8]  = itemNumber; mix[10] = itemNumber; mix[12] = itemNumber; mix[14] = itemNumber;
+	aes(mix8, seed         ); aes(&mix8[ 16], &seed[16]); //Optimise to only calculate whats necessary by moving the entire calc32 function in here
+	aes(&mix8[32], mix8     ); aes(&mix8[ 48], &mix8[16]);
 	memcpy(out, mix, 128);
 }
 
@@ -127,5 +123,35 @@ void calcDataset(uint8_t* seed, uint64_t* out){
 		calcDatasetItem(seed, i, &out[i]);
 		(*seed32)++; seed32[1]++; seed32[2]++; seed32[3]++;
 		seed32[4]++; seed32[5]++; seed32[6]++; seed32[7]++;
+uint32_t calcItem32(uint8_t* data, uint32_t itemNumber){
+	uint8_t   item[128] = {0};
+	uint32_t* item_32  = (uint32_t*)item;
+	uint64_t* item_64  = (uint64_t*)item;
+	uint32_t* data_32  = (uint32_t*)data;
+	uint32_t  out0     = 0; 
+	uint32_t  out1     = 0; 
+	uint8_t   innerPos = itemNumber&0x7f;
+	uint8_t   pos      = itemNumber&0x3;
+	itemNumber&=0xfffffff0;
+	if(innerPos>0x7c){
+		calcDatasetItem(data, itemNumber, item_64);
+		out0   = item_32[31];
+		calcDatasetItem(data, 16+itemNumber, item_64);
+		out1   = item_32[ 0];
+		for(uint8_t i=0; i<  pos; i++) out0>>=8;
+		for(uint8_t i=0; i<4-pos; i++) out1<<=8;
+		out0  |= out1;
+	}else{
+		if(!pos){
+			calcDatasetItem(data, itemNumber, item_64);
+			out0 = item_32[innerPos/4];
+		} else {
+			calcDatasetItem(data, itemNumber, item_64);
+			out0   = item_32[innerPos/4];
+			out1   = item_32[1+(innerPos/4)];
+			for(uint8_t i=0; i<  pos; i++) out0>>=8;
+			for(uint8_t i=0; i<4-pos; i++) out1<<=8;
+			out0  |= out1;
+		}
 	}
 }
