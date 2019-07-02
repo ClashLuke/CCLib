@@ -14,12 +14,11 @@
 #include "config.h"
 
 uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t ITERATIONS){
-	uint64_t  result_64[4] = {0};
-	uint8_t*  result       = (uint8_t*)result_64;
 	uint64_t* dataset_64   = (uint64_t*)calloc(536870912,8);
 	if (!dataset_64) error_exit(1);
 	uint8_t*  seed         = (uint8_t*)seed_64;
 	uint32_t* seed_32      = (uint32_t*)seed_64;
+	uint8_t*  result       = &seed[32];
 	uint8_t*  dataset      = (uint8_t*)dataset_64;
 	uint32_t  current_time = (uint32_t)time(NULL);
 	char      buffer[65]   = {0};
@@ -140,9 +139,9 @@ int main(int argc, char *argv[]){
 	uint8_t   printing   = argc>1?atoi(argv[1]):0;
 	uint8_t   iterShifts = argc>2?atoi(argv[2]):20;
 	uint32_t  seed       = argc>3?atoi(argv[3]):0x89ABCDEF;
-	uint32_t  seed32_0[11] = {0};
+	uint32_t  seed32_0[16] = {0};
 	uint64_t* seed64_0    = (uint64_t*)seed32_0;
-	uint32_t  seed32_1[11] = {0};
+	uint32_t  seed32_1[16] = {0};
 	uint64_t* seed64_1    = (uint64_t*)seed32_1;
 	uint64_t  iterations = 1;
 	srand(seed);
