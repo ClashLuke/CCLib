@@ -107,15 +107,6 @@ void crc32i(uint32_t* in) { // CRC32-Inplace
 #endif
 }
 
-void calcDatasetItem(uint8_t* seed, uint32_t itemNumber, uint64_t* out){
-	uint64_t mix[16] = {0};
-	uint8_t* mix8       = (uint8_t*)mix;
-	*mix    = itemNumber; mix[ 2] = itemNumber; mix[ 4] = itemNumber; mix[ 6] = itemNumber;
-	mix[8]  = itemNumber; mix[10] = itemNumber; mix[12] = itemNumber; mix[14] = itemNumber;
-	aes(mix8, seed         ); aes(&mix8[ 16], &seed[16]); //Optimise to only calculate whats necessary by moving the entire calc32 function in here
-	aes(&mix8[32], mix8     ); aes(&mix8[ 48], &mix8[16]);
-	memcpy(out, mix, 128);
-}
 
 uint32_t calcItem32(uint8_t* data, uint32_t itemNumber){
 	uint8_t   item[128] = {0};
