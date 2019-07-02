@@ -16,7 +16,6 @@
 uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t ITERATIONS){
 	uint64_t  result_64[4] = {0};
 	uint8_t*  result       = (uint8_t*)result_64;
-	uint32_t  temp[3]      = {0};
 	uint64_t* dataset_64   = (uint64_t*)calloc(536870912,8);
 	if (!dataset_64) error_exit(1);
 	uint8_t*  seed         = (uint8_t*)seed_64;
@@ -25,17 +24,36 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t ITERATIONS
 	uint32_t  current_time = (uint32_t)time(NULL);
 	char      buffer[65]   = {0};
 	uint64_t  iterations   = ITERATIONS>>6;
+	uint32_t  temp[ROUNDS];
+	for(uint8_t i=0;i<ROUNDS;i++)temp[i]=0;
 	for(uint16_t i=0;i<64;i++) buffer[i]=' ';
 	current_time = (uint32_t)time(NULL);
 	calcDataset(seed, dataset_64);
-	printf("Dataset generation Time: %us\n",(uint32_t)time(NULL)-current_time);
+	uint8_t datasetGenerationTime = (uint32_t)time(NULL)-current_time;
 	if(printing){
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 		for(uint8_t j=0;j<64;j++){
 			for(uint64_t i=0;i<iterations;i++){
 				mash_full(seed, dataset, result);
 				temp[0] ^= seed_32[8]; temp[1] ^= seed_32[9];
+				#if ROUNDS > 2
 				temp[2] ^= seed_32[10];
+				#if ROUNDS > 3
+				temp[3] ^= seed_32[11];
+				#if ROUNDS > 4
+				temp[4] ^= seed_32[12];
+				#if ROUNDS > 5
+				temp[5] ^= seed_32[13];
+				#if ROUNDS > 6
+				temp[6] ^= seed_32[14];
+				#if ROUNDS > 7
+				temp[7] ^= seed_32[15];
+				#endif
+				#endif
+				#endif
+				#endif
+				#endif
+				#endif
 				for(uint8_t i=0; i< 8; i++) seed_32[i]++;
 			}
 			buffer[j] = '#';
@@ -45,16 +63,36 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t ITERATIONS
 	} else {
 		for(uint64_t i=0;i<ITERATIONS;i++){
 			mash_full(seed, dataset, result);
-			temp[0] ^= result_64[0]; temp[1] ^= result_64[1];
-			temp[2] ^= result_64[2]; temp[3] ^= result_64[3];
+			temp[0] ^= seed_32[8]; temp[1] ^= seed_32[9];
+			#if ROUNDS > 2
+			temp[2] ^= seed_32[10];
+			#if ROUNDS > 3
+			temp[3] ^= seed_32[11];
+			#if ROUNDS > 4
+			temp[4] ^= seed_32[12];
+			#if ROUNDS > 5
+			temp[5] ^= seed_32[13];
+			#if ROUNDS > 6
+			temp[6] ^= seed_32[14];
+			#if ROUNDS > 7
+			temp[7] ^= seed_32[15];
+			#endif
+			#endif
+			#endif
+			#endif
+			#endif
+			#endif
 			for(uint8_t i=0; i< 8; i++) seed_32[i]++;
 		}
 	}
 	free(dataset);
 	uint32_t end_time = (uint32_t)time(NULL);
 	printf("\tCalculation of %lu hashes took: %us\n",ITERATIONS, end_time-current_time);
-	printf("\tHashrate is approximately: %luH/s\n", ITERATIONS/(end_time-current_time));
-	printf("\tResult: %08x,%08x,%08x\n",temp[0],temp[1],temp[2]);
+	printf("\tDataset generation Time: %us\n",datasetGenerationTime);
+	printf("\tHashrate is approximately: %lu sol/s\n", ITERATIONS/(end_time-current_time-ITERATIONS*datasetGenerationTime));
+	printf("\tResult: %08x",temp[0]);
+	for(uint8_t i=1;i<ROUNDS;i++)printf(".%08x",temp[i]);
+	printf("\n");
 	return 0;
 }
 
@@ -90,7 +128,7 @@ uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t ITER
 	}
 	uint32_t end_time = (uint32_t)time(NULL);
 	printf("\tCalculation of %lu hashes took: %us\n",iterations, end_time-current_time);
-	printf("\tHashrate is approximately: %luH/s\n", iterations/(end_time-current_time));
+	printf("\tHashrate is approximately: %lu H/s\n", iterations/(end_time-current_time));
 	printf("\tResult: %016jx\n",temp);
 	return 0;
 }
