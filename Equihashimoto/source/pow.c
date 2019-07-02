@@ -110,33 +110,90 @@ void crc32i(uint32_t* in) { // CRC32-Inplace
 uint32_t calcItem32(uint8_t* seed, uint32_t itemNumber){
 	uint64_t  mix[16] = {0};
 	uint8_t*  mix8    = (uint8_t*)mix;
+	uint32_t* mix32   = (uint32_t*)mix;
 	uint32_t  out0    = 0; 
+	uint32_t  out1    = 0; 
+	uint8_t   pos     = itemNumber&0x3;
 	uint8_t   pos64   = itemNumber&0x3f;
 	itemNumber&=0xffffffc0;
 	itemNumber>>=2;
 	*mix   = itemNumber; mix[1] = itemNumber;
 	mix[2] = itemNumber; mix[3] = itemNumber;
-	if(!(itemNumber&0x3)){
+	if(!pos){
+		// Heavy TODO, Testing needed
 		aes(mix8, &seed[pos64&0x10]);
+		uint8_t pos64_4 = pos64>>2;
+		if(pos64>31) aes(&mix8[16], mix8);
+		out0 = mix32[pos64_4];
 	}else{
-		//Process inside of each block, same goes for the if above
 		if(pos64<29){
-			aes(mix8, seed); aes(&mix8[16], &seed[16]); 
+			if(pos64<13){
+				uint8_t pos64_4 = pos64>>2;
+				aes(mix8, seed);
+				out0 = mix32[pos64_4  ];
+				out1 = mix32[pos64_4+1];
+				for(uint8_t i=0; i<  pos; i++) out0>>=8;
+				for(uint8_t i=0; i<4-pos; i++) out1<<=8;
+			}else if(pos64>15){	
+				uint8_t pos64_4 = pos64>>2;	
+				aes(&mix8[16], &seed[16]); 
+				out0 = mix32[pos64_4  ];
+				out1 = mix32[pos64_4+1];
+				for(uint8_t i=0; i<  pos; i++) out0>>=8;
+				for(uint8_t i=0; i<4-pos; i++) out1<<=8;
+			}else{
+				aes(mix8, seed); aes(&mix8[16], &seed[16]); 
+				out0 = mix32[3];
+				out1 = mix32[4];
+				for(uint8_t i=0; i<  pos; i++) out0>>=8;
+				for(uint8_t i=0; i<4-pos; i++) out1<<=8;
+
+			}
 		}else if(pos64<45){
 			mix[4] = itemNumber; mix[5] = itemNumber;
-			aes(mix8, seed); aes(&mix8[16], &seed[16]); 
+			aes(mix8, seed);
 			aes(&mix8[32], mix8);
+			if(pos64<32){
+				aes(&mix8[16], &seed[16]); 
+				out0 = mix32[7];
+				out1 = mix32[8];
+				for(uint8_t i=0; i<  pos; i++) out0>>=8;
+				for(uint8_t i=0; i<4-pos; i++) out1<<=8;
+			}else{
+				uint8_t pos64_4 = pos64>>2;
+				out0 = mix32[pos64_4  ];
+				out1 = mix32[pos64_4+1];
+				for(uint8_t i=0; i<  pos; i++) out0>>=8;
+				for(uint8_t i=0; i<4-pos; i++) out1<<=8;
+			}
 		}else if(pos64<61){
 			mix[4] = itemNumber; mix[5] = itemNumber;
 			mix[6] = itemNumber; mix[7] = itemNumber;
-			aes(mix8, seed); aes(&mix8[16], &seed[16]); 
-			aes(&mix8[32], mix8); aes(&mix8[48], &mix8[16]);
+			aes(&mix8[16], &seed[16]); aes(&mix8[48], &mix8[16]);
+			if(pos64<48){
+				aes(mix8, seed); aes(&mix8[32], mix8); 
+				out0 = mix32[11];
+				out1 = mix32[12];
+				for(uint8_t i=0; i<  pos; i++) out0>>=8;
+				for(uint8_t i=0; i<4-pos; i++) out1<<=8;
+			}else{
+				uint8_t pos64_4 = pos64>>2;
+				out0 = mix32[pos64_4  ];
+				out1 = mix32[pos64_4+1];
+				for(uint8_t i=0; i<  pos; i++) out0>>=8;
+				for(uint8_t i=0; i<4-pos; i++) out1<<=8;
+			}
 		}else{
 			mix[4] = itemNumber; mix[5] = itemNumber;
 			mix[4]+=16; mix[5]+=16;
 			aes(mix8, &seed[16]); aes(&mix8[16], &mix8[16]);
 			aes(&mix8[32], seed);
+			out0 = mix32[7];
+			out1 = mix32[8];
+			for(uint8_t i=0; i<  pos; i++) out0>>=8;
+			for(uint8_t i=0; i<4-pos; i++) out1<<=8;
 		}
+		out0 |= out1;
 	}
 	return out0;
 }
