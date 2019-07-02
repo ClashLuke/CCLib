@@ -107,36 +107,35 @@ void crc32i(uint32_t* in) { // CRC32-Inplace
 #endif
 }
 
-
-uint32_t calcItem32(uint8_t* data, uint32_t itemNumber){
-	uint8_t   item[128] = {0};
-	uint32_t* item_32  = (uint32_t*)item;
-	uint64_t* item_64  = (uint64_t*)item;
-	uint32_t* data_32  = (uint32_t*)data;
-	uint32_t  out0     = 0; 
-	uint32_t  out1     = 0; 
-	uint8_t   innerPos = itemNumber&0x7f;
-	uint8_t   pos      = itemNumber&0x3;
-	itemNumber&=0xfffffff0;
-	if(innerPos>0x7c){
-		calcDatasetItem(data, itemNumber, item_64);
-		out0   = item_32[31];
-		calcDatasetItem(data, 16+itemNumber, item_64);
-		out1   = item_32[ 0];
-		for(uint8_t i=0; i<  pos; i++) out0>>=8;
-		for(uint8_t i=0; i<4-pos; i++) out1<<=8;
-		out0  |= out1;
+uint32_t calcItem32(uint8_t* seed, uint32_t itemNumber){
+	uint64_t  mix[16] = {0};
+	uint8_t*  mix8    = (uint8_t*)mix;
+	uint32_t  out0    = 0; 
+	uint8_t   pos64   = itemNumber&0x3f;
+	itemNumber&=0xffffffc0;
+	itemNumber>>=2;
+	*mix   = itemNumber; mix[1] = itemNumber;
+	mix[2] = itemNumber; mix[3] = itemNumber;
+	if(!(itemNumber&0x3)){
+		aes(mix8, &seed[pos64&0x10]);
 	}else{
-		if(!pos){
-			calcDatasetItem(data, itemNumber, item_64);
-			out0 = item_32[innerPos/4];
-		} else {
-			calcDatasetItem(data, itemNumber, item_64);
-			out0   = item_32[innerPos/4];
-			out1   = item_32[1+(innerPos/4)];
-			for(uint8_t i=0; i<  pos; i++) out0>>=8;
-			for(uint8_t i=0; i<4-pos; i++) out1<<=8;
-			out0  |= out1;
+		//Process inside of each block, same goes for the if above
+		if(pos64<29){
+			aes(mix8, seed); aes(&mix8[16], &seed[16]); 
+		}else if(pos64<45){
+			mix[4] = itemNumber; mix[5] = itemNumber;
+			aes(mix8, seed); aes(&mix8[16], &seed[16]); 
+			aes(&mix8[32], mix8);
+		}else if(pos64<61){
+			mix[4] = itemNumber; mix[5] = itemNumber;
+			mix[6] = itemNumber; mix[7] = itemNumber;
+			aes(mix8, seed); aes(&mix8[16], &seed[16]); 
+			aes(&mix8[32], mix8); aes(&mix8[48], &mix8[16]);
+		}else{
+			mix[4] = itemNumber; mix[5] = itemNumber;
+			mix[4]+=16; mix[5]+=16;
+			aes(mix8, &seed[16]); aes(&mix8[16], &mix8[16]);
+			aes(&mix8[32], seed);
 		}
 	}
 	return out0;
