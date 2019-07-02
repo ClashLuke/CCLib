@@ -108,23 +108,26 @@ void crc32i(uint32_t* in) { // CRC32-Inplace
 }
 
 uint32_t calcItem32(uint8_t* seed, uint32_t itemNumber){
-	uint64_t  mix[16] = {0};
-	uint8_t*  mix8    = (uint8_t*)mix;
-	uint32_t* mix32   = (uint32_t*)mix;
-	uint32_t  out0    = 0; 
-	uint32_t  out1    = 0; 
-	uint8_t   pos     = itemNumber&0x3;
-	uint8_t   pos64   = itemNumber&0x3f;
+	uint64_t  mix[8] = {0};
+	uint8_t*  mix8   = (uint8_t*)mix;
+	uint32_t* mix32  = (uint32_t*)mix;
+	uint32_t  out0   = 0; 
+	uint32_t  out1   = 0; 
+	uint8_t   pos    = itemNumber&0x3;
+	uint8_t   pos64  = itemNumber&0x3f;
 	itemNumber&=0xffffffc0;
 	itemNumber>>=2;
 	*mix   = itemNumber; mix[1] = itemNumber;
 	mix[2] = itemNumber; mix[3] = itemNumber;
 	if(!pos){
-		// Heavy TODO, Testing needed
 		aes(mix8, &seed[pos64&0x10]);
 		uint8_t pos64_4 = pos64>>2;
-		if(pos64>31) aes(&mix8[16], mix8);
-		out0 = mix32[pos64_4];
+		if(pos64>31){
+			aes(&mix8[16], mix8);
+			out0 = mix32[16+(pos64_4&0xf)];
+		} else{
+			out0 = mix32[pos64_4&0xf];
+		}
 	}else{
 		if(pos64<29){
 			if(pos64<13){
