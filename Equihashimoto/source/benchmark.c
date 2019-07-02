@@ -153,6 +153,7 @@ int main(int argc, char *argv[]){
 	printf("\tIterations\n\t\tFull:  %lu\n\t\tLight:  %lu\n", iterations, iterations<<26);
 	printf("\tSeed:  %08x\n", seed);
 	printf("\tRounds:  %u\n", ROUNDS);
+	printf("\tBlock Size:  %ubit\n", LARGEB?64:32);
 	printf("Mining\n");
 	benchmark_mine(seed64_0, printing, iterations);
 	printf("Validation\n");
