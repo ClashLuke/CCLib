@@ -127,8 +127,9 @@ uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t ITER
 		}
 	}
 	uint32_t end_time = (uint32_t)time(NULL);
-	printf("\tHashrate is approximately: %lu H/s\n", iterations/(end_time-current_time));
 	printf("\tCalculation of %lu hashes took:  %us\n",iterations, end_time-current_time);
+	uint64_t out = (10*iterations)/(end_time-current_time);
+	printf("\tHashrate is approximately:  %lu.%lu H/s\n",out/10,out%10);
 	printf("\tResult:  %016jx\n",temp);
 	return 0;
 }
