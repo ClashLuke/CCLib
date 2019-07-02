@@ -105,6 +105,7 @@ uint32_t calcItem32(uint8_t* seed, uint32_t itemNumber){
 	uint64_t  mix[8] = {0};
 	uint8_t*  mix8   = (uint8_t*)mix;
 	uint32_t* mix32  = (uint32_t*)mix;
+	uint32_t* seed_32  = (uint32_t*)seed;
 	uint32_t  out0   = 0; 
 	uint32_t  out1   = 0; 
 	uint8_t   pos    = itemNumber&0x3;
@@ -113,6 +114,12 @@ uint32_t calcItem32(uint8_t* seed, uint32_t itemNumber){
 	itemNumber>>=2;
 	*mix   = itemNumber; mix[1] = itemNumber;
 	mix[2] = itemNumber; mix[3] = itemNumber;
+	itemNumber>>=4;
+	(*seed_32)+=itemNumber; seed_32[1]+=itemNumber;
+	seed_32[2]+=itemNumber; seed_32[3]+=itemNumber;
+	seed_32[4]+=itemNumber; seed_32[5]+=itemNumber;
+	seed_32[6]+=itemNumber; seed_32[7]+=itemNumber;
+	itemNumber<<=4;
 	if(!pos){
 		aes(mix8, &seed[pos64&0x10]);
 		uint8_t pos64_4 = pos64>>2;
@@ -184,6 +191,7 @@ uint32_t calcItem32(uint8_t* seed, uint32_t itemNumber){
 			mix[4] = itemNumber; mix[5] = itemNumber;
 			mix[4]+=16; mix[5]+=16;
 			aes(mix8, &seed[16]); aes(&mix8[16], &mix8[16]);
+			(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
 			aes(&mix8[32], seed);
 			out0 = mix32[7];
 			out1 = mix32[8];
@@ -196,8 +204,9 @@ uint32_t calcItem32(uint8_t* seed, uint32_t itemNumber){
 }
 
 void calcDatasetItem8(uint8_t* seed, uint32_t itemNumber, uint64_t* out){
-	uint64_t mix[128]  = {0};
-	uint8_t* mix8      = (uint8_t*)mix;
+	uint64_t  mix[128] = {0};
+	uint8_t*  mix8     = (uint8_t*)mix;
+	uint32_t* seed_32  = (uint32_t*)seed;
 	*mix     = itemNumber; mix[  2] = itemNumber; mix[  4] = itemNumber; mix[  6] = itemNumber;
 	mix[  8] = itemNumber; mix[ 10] = itemNumber; mix[ 12] = itemNumber; mix[ 14] = itemNumber;
 	mix[ 16] = itemNumber; mix[ 18] = itemNumber; mix[ 20] = itemNumber; mix[ 22] = itemNumber;
@@ -230,36 +239,68 @@ void calcDatasetItem8(uint8_t* seed, uint32_t itemNumber, uint64_t* out){
 	mix[120]+=112; mix[122]+=112; mix[124]+=112; mix[126]+=112;
 	aes(mix8,        seed       ); aes(&mix8[  16], &seed[  16]);
 	aes(&mix8[  32], mix8       ); aes(&mix8[  48], &mix8[  16]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	aes(&mix8[  64], seed       ); aes(&mix8[  80], &seed[  16]);
 	aes(&mix8[  96], &mix8[  64]); aes(&mix8[ 112], &mix8[  80]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	aes(&mix8[ 128], seed       ); aes(&mix8[ 144], &seed[  16]);
 	aes(&mix8[ 160], &mix8[ 128]); aes(&mix8[ 176], &mix8[ 144]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	aes(&mix8[ 192], seed       ); aes(&mix8[ 208], &seed[  16]);
 	aes(&mix8[ 224], &mix8[ 192]); aes(&mix8[ 240], &mix8[ 208]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	aes(&mix8[ 256], seed       ); aes(&mix8[ 272], &seed[  16]);
 	aes(&mix8[ 288], &mix8[ 256]); aes(&mix8[ 304], &mix8[ 272]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	aes(&mix8[ 320], seed       ); aes(&mix8[ 336], &seed[  16]);
 	aes(&mix8[ 352], &mix8[ 320]); aes(&mix8[ 368], &mix8[ 336]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	aes(&mix8[ 384], seed       ); aes(&mix8[ 400], &seed[  16]);
 	aes(&mix8[ 416], &mix8[ 384]); aes(&mix8[ 432], &mix8[ 400]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	aes(&mix8[ 448], seed       ); aes(&mix8[ 464], &seed[  16]);
 	aes(&mix8[ 480], &mix8[ 448]); aes(&mix8[ 496], &mix8[ 464]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	aes(&mix8[ 512], seed       ); aes(&mix8[ 528], &seed[  16]);
 	aes(&mix8[ 544], &mix8[ 512]); aes(&mix8[ 560], &mix8[ 528]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	aes(&mix8[ 576], seed       ); aes(&mix8[ 592], &seed[  16]);
 	aes(&mix8[ 608], &mix8[ 576]); aes(&mix8[ 624], &mix8[ 592]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	aes(&mix8[ 640], seed       ); aes(&mix8[ 656], &seed[  16]);
 	aes(&mix8[ 672], &mix8[ 640]); aes(&mix8[ 688], &mix8[ 656]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	aes(&mix8[ 704], seed       ); aes(&mix8[ 720], &seed[  16]);
 	aes(&mix8[ 736], &mix8[ 704]); aes(&mix8[ 752], &mix8[ 720]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	aes(&mix8[ 768], seed       ); aes(&mix8[ 784], &seed[  16]);
 	aes(&mix8[ 800], &mix8[ 768]); aes(&mix8[ 816], &mix8[ 784]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	aes(&mix8[ 832], seed       ); aes(&mix8[ 848], &seed[  16]);
 	aes(&mix8[ 864], &mix8[ 832]); aes(&mix8[ 880], &mix8[ 848]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	aes(&mix8[ 896], seed       ); aes(&mix8[ 912], &seed[  16]);
 	aes(&mix8[ 928], &mix8[ 896]); aes(&mix8[ 944], &mix8[ 912]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	aes(&mix8[ 960], seed       ); aes(&mix8[ 976], &seed[  16]);
 	aes(&mix8[ 992], &mix8[ 960]); aes(&mix8[1008], &mix8[ 976]);
+	(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
+	seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	memcpy(out, mix, 1024);
 }
 
