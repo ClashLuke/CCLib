@@ -7,11 +7,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "pow.h"
+#include "config.h"
 
 #define MAX32   0xffffffff
-#define MAX32R   0x1fffffff
-//#define REDUCED
-#define ROUNDS 6
 
 void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	uint32_t* out32 = (uint32_t*)out;

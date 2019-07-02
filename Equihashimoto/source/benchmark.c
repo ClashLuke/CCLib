@@ -11,6 +11,7 @@
 #include "hash.h"
 #include "pow.h"
 #include "error.h"
+#include "config.h"
 
 uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t ITERATIONS){
 	uint64_t  result_64[4] = {0};
@@ -113,11 +114,7 @@ int main(int argc, char *argv[]){
 	printf("\tProgressbar: %s\n", printing?"yes":"no");
 	printf("\tIterations\n\t\tFull:  %lu\n\t\tLight: %lu\n", iterations, iterations<<26);
 	printf("\tSeed: %08x\n", seed);
-#ifdef BENCHMARK
-	printf("\tBenchmark: yes\n");
-#else
-	printf("\tBenchmark: no\n");
-#endif
+	printf("\tRounds: %u\n", ROUNDS);
 	printf("Mining\n");
 	benchmark_mine(seed64_0, printing, iterations);
 	printf("Validation\n");
