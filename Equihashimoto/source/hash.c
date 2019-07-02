@@ -10,41 +10,37 @@
 #include "config.h"
 
 #define MAX32   0xffffffff
-#if LARGEB
-#define data_t uint64_t
-#else
-#define data_t uint32_t
-#endif
+
 
 void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
-	data_t* out32 = (data_t*)out;
+	uint32_t* out32 = (uint32_t*)out;
 	uint64_t* dataset64 = (uint64_t*)dataset;
-	data_t  item = 0;
+	uint32_t  item = 0;
 	calcDataset(data, dataset64);
 	for(uint32_t i=0; i<MAX32; i++){
 		// read 64bit and process 32 elements without reading new data?
 		// use 64bit instead of 32bit blocks?
 		for(uint32_t j=1+i; j<MAX32; j++){
-			item = *(data_t*)&dataset[i];
-			if(item==*(data_t*)&dataset[j]){
+			item = *(uint32_t*)&dataset[i];
+			if(item==*(uint32_t*)&dataset[j]){
 			#if ROUNDS > 2
 			for(uint32_t k=1+j; k<MAX32; k++){
-			if(item==*(data_t*)&dataset[k]){
+			if(item==*(uint32_t*)&dataset[k]){
 			#if ROUNDS > 3
 			for(uint32_t l=1+k; l<MAX32; l++){
-			if(item==*(data_t*)&dataset[l]){
+			if(item==*(uint32_t*)&dataset[l]){
 			#if ROUNDS > 4
 			for(uint32_t m=1+l; m<MAX32; m++){
-			if(item==*(data_t*)&dataset[m]){
+			if(item==*(uint32_t*)&dataset[m]){
 			#if ROUNDS > 5
 			for(uint32_t n=1+m; n<MAX32; n++){
-			if(item==*(data_t*)&dataset[n]){
+			if(item==*(uint32_t*)&dataset[n]){
 			#if ROUNDS > 6
 			for(uint32_t o=1+n; o<MAX32; o++){
-			if(item==*(data_t*)&dataset[o]){
+			if(item==*(uint32_t*)&dataset[o]){
 			#if ROUNDS > 7
 			for(uint32_t p=1+o; p<MAX32; p++){
-			if(item==*(data_t*)&dataset[p]){
+			if(item==*(uint32_t*)&dataset[p]){
 			#endif
 			#endif
 			#endif
@@ -107,7 +103,7 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 uint8_t mash_light(uint8_t* data){
 	uint32_t* data32 = (uint32_t*)&data[32];
 	uint32_t  i = calcItem32(data, *data32);
-	uint32_t  j = calcItem32(data, data32[1]);
+	uint32_t  j = calcItem32(data, data32[1]); //change calcItem32 to calcItem
 	#if ROUNDS > 2
 	uint32_t  k = calcItem32(data, data32[2]);
 	#if ROUNDS > 3
