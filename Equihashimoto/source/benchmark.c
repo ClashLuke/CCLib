@@ -89,7 +89,7 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t ITERATIONS
 	uint32_t end_time = (uint32_t)time(NULL);
 	printf("\tCalculation of %lu hashes took: %us\n",ITERATIONS, end_time-current_time);
 	printf("\tDataset generation Time: %us\n",datasetGenerationTime);
-	printf("\tHashrate is approximately: %lu sol/s\n", ITERATIONS/(end_time-current_time-ITERATIONS*datasetGenerationTime));
+	printf("\tHashrate is approximately: %lu s/sol\n", (end_time-current_time-ITERATIONS*datasetGenerationTime)/ITERATIONS);
 	printf("\tResult: %08x",temp[0]);
 	for(uint8_t i=1;i<ROUNDS;i++)printf(".%08x",temp[i]);
 	printf("\n");
@@ -104,8 +104,6 @@ uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t ITER
 	uint64_t  iterations   = ITERATIONS<<26;
 	char      buffer[65]   = {0};
 	for(uint16_t i=0;i<64;i++) buffer[i]=' ';
-	current_time = (uint32_t)time(NULL);
-	printf("\tCache generation took: %us\n",(uint32_t)time(NULL)-current_time);
 	current_time = (uint32_t)time(NULL);
 	if(printing){
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
