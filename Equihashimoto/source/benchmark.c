@@ -89,10 +89,10 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t ITERATIONS
 	}
 	free(dataset);
 	uint32_t end_time = (uint32_t)time(NULL);
-	printf("\tCalculation of %lu hashes took: %us\n",ITERATIONS, end_time-current_time);
-	printf("\tDataset generation Time: %us\n",datasetGenerationTime);
-	printf("\tHashrate is approximately: %lu s/sol\n", (end_time-current_time-ITERATIONS*datasetGenerationTime)/ITERATIONS);
-	printf("\tResult: %08x",temp[0]);
+	printf("\tCalculation of %lu hashes took:  %us\n",ITERATIONS, end_time-current_time);
+	printf("\tDataset generation Time:  %us\n",datasetGenerationTime);
+	printf("\tHashrate is approximately:  %lu s/sol\n", (end_time-current_time-ITERATIONS*datasetGenerationTime)/ITERATIONS);
+	printf("\tResult:  %08x",temp[0]);
 	for(uint8_t i=1;i<ROUNDS;i++)printf(".%08x",temp[i]);
 	printf("\n");
 	return 0;
@@ -127,9 +127,9 @@ uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t ITER
 		}
 	}
 	uint32_t end_time = (uint32_t)time(NULL);
-	printf("\tCalculation of %lu hashes took: %us\n",iterations, end_time-current_time);
 	printf("\tHashrate is approximately: %lu H/s\n", iterations/(end_time-current_time));
-	printf("\tResult: %016jx\n",temp);
+	printf("\tCalculation of %lu hashes took:  %us\n",iterations, end_time-current_time);
+	printf("\tResult:  %016jx\n",temp);
 	return 0;
 }
 
@@ -149,10 +149,10 @@ int main(int argc, char *argv[]){
 	for(uint8_t i=0;i<8;i++) seed32_0[i] = seed32_1[i] = rand();
 	printf("\e[?25l"); // Hide cursor
 	printf("Parameters\n");
-	printf("\tProgressbar: %s\n", printing?"yes":"no");
-	printf("\tIterations\n\t\tFull:  %lu\n\t\tLight: %lu\n", iterations, iterations<<26);
-	printf("\tSeed: %08x\n", seed);
-	printf("\tRounds: %u\n", ROUNDS);
+	printf("\tProgressbar:  %s\n", printing?"yes":"no");
+	printf("\tIterations\n\t\tFull:  %lu\n\t\tLight:  %lu\n", iterations, iterations<<26);
+	printf("\tSeed:  %08x\n", seed);
+	printf("\tRounds:  %u\n", ROUNDS);
 	printf("Mining\n");
 	benchmark_mine(seed64_0, printing, iterations);
 	printf("Validation\n");
