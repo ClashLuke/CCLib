@@ -101,7 +101,43 @@ uint8_t mash_light(uint8_t* data){
 	uint32_t* data32 = (uint32_t*)&data[32];
 	uint32_t  i = calcItem32(data, *data32);
 	uint32_t  j = calcItem32(data, data32[1]);
+	#if ROUNDS > 2
 	uint32_t  k = calcItem32(data, data32[2]);
-	if(i==j && i==k) return 1;
+	#if ROUNDS > 3
+	uint32_t  l = calcItem32(data, data32[3]);
+	#if ROUNDS > 4
+	uint32_t  m = calcItem32(data, data32[4]);
+	#if ROUNDS > 5
+	uint32_t  n = calcItem32(data, data32[5]);
+	#if ROUNDS > 6
+	uint32_t  o = calcItem32(data, data32[6]);
+	#if ROUNDS > 7
+	uint32_t  p = calcItem32(data, data32[7]);
+	#endif
+	#endif
+	#endif
+	#endif
+	#endif
+	#endif
+	if(i==j) 
+	#if ROUNDS > 2
+	if(i==k) 
+	#if ROUNDS > 3
+	if(i==l)
+	#if ROUNDS > 4
+	if(i==m) 
+	#if ROUNDS > 5
+	if(i==n) 
+	#if ROUNDS > 6
+	if(i==o) 
+	#if ROUNDS > 7
+	if(i==p) 
+	return 1;
+	#endif
+	#endif
+	#endif
+	#endif
+	#endif
+	#endif
 	return 0;
 }
