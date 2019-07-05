@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "pow.h"
 #include "config.h"
 
@@ -15,7 +16,8 @@
 void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 	uint32_t* out32 = (uint32_t*)out;
 	uint64_t* dataset64 = (uint64_t*)dataset;
-	uint32_t  item[ROUNDS] = {0};
+	uint32_t  item[ROUNDS-1] = {0};
+	uint8_t   cache[1028]  = {0};
 	calcDataset(data, dataset64);
 	for(uint32_t i=0; i<MAX32; i++){
 		// read 64bit and process 32 elements without reading new data?
@@ -39,25 +41,39 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint8_t* out){
 			for(uint32_t o=1+n; o<MAX32; o++){
 			#if ROUNDS > 7
 			item[6] = item[5] ^ *(uint32_t*)&dataset[o];
-			for(uint32_t p=1+o; p<MAX32; p++){
-			if(item[6] == *(uint32_t*)&dataset[p]){
+			for(uint32_t p=1+o; p<MAX32; p+=1024){
+			memcpy(cache, (uint32_t*)&dataset[p], 1028);
+			for(uint16_t a=0; a<1024; a++){
+			if(item[6] == *(uint32_t*)&cache[a]){
 			#else
-			if(item[5] == *(uint32_t*)&dataset[o]){
+			memcpy(cache, (uint32_t*)&dataset[o], 1028);
+			for(uint16_t a=0; a<1024; a++){
+			if(item[5] == *(uint32_t*)&dataset[a]){
 			#endif
 			#else
-			if(item[4] == *(uint32_t*)&dataset[n]){
+			memcpy(cache, (uint32_t*)&dataset[n], 1028);
+			for(uint16_t a=0; a<1024; a++){
+			if(item[4] == *(uint32_t*)&dataset[a]){
 			#endif
 			#else
-			if(item[3] == *(uint32_t*)&dataset[m]){
+			memcpy(cache, (uint32_t*)&dataset[m], 1028);
+			for(uint16_t a=0; a<1024; a++){
+			if(item[3] == *(uint32_t*)&dataset[a]){
 			#endif
 			#else
-			if(item[2] == *(uint32_t*)&dataset[l]){
+			memcpy(cache, (uint32_t*)&dataset[l], 1028);
+			for(uint16_t a=0; a<1024; a++){
+			if(item[2] == *(uint32_t*)&dataset[a]){
 			#endif
 			#else
-			if(item[1] == *(uint32_t*)&dataset[k]){
+			memcpy(cache, (uint32_t*)&dataset[k], 1028);
+			for(uint16_t a=0; a<1024; a++){
+			if(item[1] == *(uint32_t*)&dataset[a]){
 			#endif
 			#else
-			if(*item   == *(uint32_t*)&dataset[j]){
+			memcpy(cache, (uint32_t*)&dataset[j], 1028);
+			for(uint16_t a=0; a<1024; a++){
+			if(*item   == *(uint32_t*)&dataset[a]){
 			#endif
 			*out32 = i;
 			out32[1] = j;
