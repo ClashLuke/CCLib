@@ -6,7 +6,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define ROUNDS 2 // Rounds are equal to the number of birthdays that 
+#define ROUNDS 3 // Rounds are equal to the number of birthdays that 
 		 // have to be equal in the birthday paradox.
 
 #endif
