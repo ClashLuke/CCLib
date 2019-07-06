@@ -16,6 +16,7 @@ To Do
 - [ ] **Code/Optimisations**
 - [x] Memcpy large blocks to cache instead of accessing one item at a time
 - [ ] Improve dataset generation time (maybe not AES?)
+- [ ] Add changes to dataset generation to dataset-item-generation
 - [ ] Improve dataset generation (smaller blocks -> getting 64bit blocks is faster)
 - [ ] **Readme**
 - [ ] Add "the lower the memory the lower the chance of finding a solution (exponentially)"-text
