@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "config.h"
 #include "error.h"
 #include "aes.h"
 
@@ -110,7 +111,7 @@ uint32_t calcItem32(uint8_t* seed, uint32_t itemNumber){
 	uint32_t  out1   = 0; 
 	uint8_t   pos    = itemNumber&0x3;
 	uint8_t   pos64  = itemNumber&0x3f;
-	itemNumber&=0xffffffc0;
+	itemNumber&=ITEMS-0x3f;
 	itemNumber>>=2;
 	*mix   = itemNumber; mix[1] = itemNumber;
 	mix[2] = itemNumber; mix[3] = itemNumber;
@@ -305,7 +306,7 @@ void calcDatasetItem8(uint8_t* seed, uint32_t itemNumber, uint64_t* out){
 }
 
 void calcDataset(uint8_t* seed, uint64_t* out){
-	for(uint32_t i=0;i<536870912;i+=128) // (1<<32)>>3
+	for(uint32_t i=0;i<1+(ITEMS>>3);i+=128) // (1<<32)>>3
 		calcDatasetItem8(seed, i, &out[i]);
 	
 }
