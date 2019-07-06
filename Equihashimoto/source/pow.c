@@ -189,10 +189,10 @@ uint32_t calcItem32(uint8_t* seed, uint32_t itemNumber){
 		crc32i(out0);
 		crc32i(out1);
 	}
-	for(uint8_t i=0; i<  pos; i++) out0>>=8;
-	for(uint8_t i=0; i<4-pos; i++) out1<<=8;
-	out0 |= out1;
-	return out0;
+	for(uint8_t i=0; i<  pos; i++) (*out0)>>=8;
+	for(uint8_t i=0; i<4-pos; i++) (*out1)<<=8;
+	*out0 |= *out1;
+	return *out0;
 }
 
 void calcDatasetItem8(uint8_t* seed, uint32_t itemNumber, uint64_t* out){
