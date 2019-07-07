@@ -6,6 +6,6 @@
 #ifndef AES_H
 #define AES_H
 
-void aes(uint8_t* state, uint8_t* key);
+void aes(uint8_t* state, const uint8_t* key);
 
 #endif

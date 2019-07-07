@@ -11,13 +11,15 @@
 #include "config.h"
 
 
-void mash_full(uint8_t* data, uint8_t* dataset, uint64_t item, uint64_t difficulty, uint32_t* out){
+void mash_full(const uint8_t* data, uint8_t* dataset){
 	uint64_t  j = 0;
 	uint64_t  k = 0;
-	const uint8_t   cache0[BLOCK+4] = {0};
-	const uint8_t   cache1[BLOCK+8] = {0};
-	const uint32_t* item32       = (uint32_t*)&item; 
-	calcDataset(data, (uint64_t*)dataset);
+	uint8_t   cache0[BLOCK+4] = {0};
+	uint8_t   cache1[BLOCK+8] = {0};
+	const uint64_t  item      = *(uint64_t*)&data[32]; 
+	const uint64_t  diff      = *(uint64_t*)&data[40]; 
+	uint32_t* item32    = (uint32_t*)&data[32]; 
+	calcDataset(data, dataset);
 	for(; j<ITEMS; j+=BLOCK){
 	memcpy(cache0, &dataset[j], BLOCK+4);
 	for(uint32_t a=0; a<BLOCK; a++){
@@ -26,9 +28,9 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint64_t item, uint64_t difficul
 	for(; k<ITEMS; k+=BLOCK){
 	memcpy(cache1, &dataset[k], BLOCK+8);
 	for(uint32_t b=0; b<BLOCK; b++){
-	if((item ^ *(uint64_t*)&cache1[b]) < difficulty){
-	*out   = j+a;
-	out[1] = k+b;
+	if((item ^ *(uint64_t*)&cache1[b]) < diff){
+	*item32   = j+a;
+	item32[1] = k+b;
 	return;
 	}
 	}

@@ -80,7 +80,7 @@ static const uint32_t crc32c_table[256] = {
 	0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
 };
 
-inline static void crc32p(uint32_t* in, uint32_t* out) { // CRC32-Pointer
+inline static void crc32p(const uint32_t* in, uint32_t* out) { // CRC32-Pointer
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
 	__asm__("crc32w %w0,%w0,%w1\n":"+r"(*out):"r"(*in));
 #else
@@ -103,12 +103,12 @@ inline static void crc32i(uint32_t* in) { // CRC32-Inplace
 }
 
 uint32_t calcItem32(uint32_t* seed_32, uint32_t itemNumber){
-	const uint64_t  mix[8]  = {0};
-	const uint8_t*  mix8    = (uint8_t*)mix;
-	const uint32_t* mix32   = (uint32_t*)mix;
-	const uint8_t*  seed    = (uint8_t*)seed_32;
-	const uint32_t  out0[1] = {0}; 
-	const uint32_t  out1[1] = {0}; 
+	uint64_t  mix[8]  = {0};
+	uint8_t*  mix8    = (uint8_t*)mix;
+	uint32_t* mix32   = (uint32_t*)mix;
+	uint8_t*  seed    = (uint8_t*)seed_32;
+	uint32_t  out0[1] = {0}; 
+	uint32_t  out1[1] = {0}; 
 	const uint8_t   pos     = itemNumber&0x3;
 	const uint8_t   pos64   = itemNumber&0x3f;
 	uint8_t         pos1024 = (itemNumber&0x3ff)>>6;
@@ -194,13 +194,13 @@ uint32_t calcItem32(uint32_t* seed_32, uint32_t itemNumber){
 	return *out0;
 }
 
-void calcDataset(uint8_t* seed, uint64_t* out){
-	const uint64_t  mix[512];
-	const uint8_t*  mix8_0   = (uint8_t*)mix;
-	const uint8_t*  mix8_1   = (uint8_t*)&mix[2];
-	const uint8_t*  mix8_2   = (uint8_t*)&mix[4];
-	const uint8_t*  mix8_3   = (uint8_t*)&mix[6];
-	const uint32_t* mix32    = (uint32_t*)mix;
+void calcDataset(const uint8_t* seed, uint8_t* out){
+	uint64_t  mix[512];
+	uint8_t*  mix8_0   = (uint8_t*)mix;
+	uint8_t*  mix8_1   = (uint8_t*)&mix[2];
+	uint8_t*  mix8_2   = (uint8_t*)&mix[4];
+	uint8_t*  mix8_3   = (uint8_t*)&mix[6];
+	uint32_t* mix32    = (uint32_t*)mix;
 	uint32_t  i        = (ITEMS>>12);
 	do{
 		mix[  1] = mix[  3] = mix[  5] = mix[  7] = mix[  9] = mix[ 11] = mix[ 13] =
@@ -237,7 +237,7 @@ void calcDataset(uint8_t* seed, uint64_t* out){
 		mix[104]+=6; mix[106]+=6; mix[108]+=6; mix[110]+=6;
 		mix[112]+=7; mix[114]+=7; mix[116]+=7; mix[118]+=7;
 		mix[120]+=7; mix[122]+=7; mix[124]+=7; mix[126]+=7;
-		out+=0x200;
+		out+=0x1000;
 		aes(mix8_0, seed);   aes(mix8_1, &seed[16]);
 		aes(mix8_2, mix8_0); aes(mix8_3, mix8_1);
 		crc32p(&mix32[ 16], mix32);       crc32p(&mix32[ 17], &mix32[  1]);

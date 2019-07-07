@@ -91,23 +91,22 @@ inline static void crc32i(uint32_t* in) { // CRC32-Inplace
 #endif
 }
 
-uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficulty, uint64_t ITERATIONS, uint64_t nonce){
-	uint64_t* dataset_64   = (uint64_t*)calloc((ITEMS>>3)+1,8);
-	if (!dataset_64) error_exit(1);
+static uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficulty, uint64_t ITERATIONS, uint64_t nonce){
+	uint8_t* dataset   = (uint8_t*)calloc((ITEMS>>3)+1,8);
+	if (!dataset) error_exit(1);
 	uint8_t*  seed         = (uint8_t*)seed_64;
 	uint32_t* seed_32      = (uint32_t*)seed_64;
-	uint32_t* result       = &seed_32[8];
-	uint8_t*  dataset      = (uint8_t*)dataset_64;
 	char      buffer[65]   = {0};
-	uint64_t  iterations   = ITERATIONS>>6;
 	uint32_t  temp[2]      = {0};
-	uint64_t  diff         = 0xFFFFFFFFFFFFFFFF/difficulty;
 	uint8_t   ctr          = COUNT;
 	uint32_t  current_time = 0;
+	const uint64_t  iterations   = ITERATIONS>>6;
+	const uint64_t  diff         = 0xFFFFFFFFFFFFFFFF/difficulty;
+	seed_64[5] = diff;
 	for(uint16_t i=0;i<64;i++) buffer[i]=' ';
 	current_time = (uint32_t)time(NULL);
 	do{
-		calcDataset(seed, dataset_64);
+		calcDataset(seed, dataset);
 		(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
 		seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
 	}while(--ctr);
@@ -117,7 +116,7 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficulty
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 		for(uint8_t j=0;j<64;j++){
 			for(uint64_t i=0;i<iterations;i++){
-				mash_full(seed, dataset, nonce,  diff, result);
+				mash_full(seed, dataset);
 				temp[0] ^= seed_32[8]; temp[1] ^= seed_32[9]; nonce++;
 				(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
 				seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
@@ -128,7 +127,7 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficulty
 		printf("\r%*s\r",80,"");
 	} else {
 		for(uint64_t i=0;i<ITERATIONS;i++){
-			mash_full(seed, dataset, nonce, diff, result);
+			mash_full(seed, dataset);
 			temp[0] ^= seed_32[8]; temp[1] ^= seed_32[9]; nonce++;
 			(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
 			seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
@@ -143,13 +142,13 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficulty
 	return 0;
 }
 
-uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t difficulty, uint64_t ITERATIONS, uint64_t nonce){
+static uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t difficulty, uint64_t ITERATIONS, uint64_t nonce){
 	uint64_t  temp         = 0;
 	uint32_t* seed_32      = (uint32_t*)seed_64;
 	uint32_t  current_time = (uint32_t)time(NULL);
-	uint64_t  iterations   = ITERATIONS<<26;
 	char      buffer[65]   = {0};
-	uint64_t  diff         = 0xFFFFFFFFFFFFFFFF/difficulty;
+	const uint64_t  iterations   = ITERATIONS<<26;
+	const uint64_t  diff         = 0xFFFFFFFFFFFFFFFF/difficulty;
 	for(uint16_t i=0;i<64;i++) buffer[i]=' ';
 	current_time = (uint32_t)time(NULL);
 	if(printing){
