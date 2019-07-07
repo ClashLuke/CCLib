@@ -9,7 +9,7 @@
 #define ITEMS  0xffffffff  // Total number of items in the dataset
                            // may be changed to achieve a different
                            // dataset size.
-
+ 
 #define BLOCK  (1<<20)     // Size of blocks retrieved from memory.
 			   // Bigger blocks allow for less memory
 			   // accesses (less bound to memory latency)
@@ -21,5 +21,8 @@
 			   // the algorithm but not its result. It may
 			   // be used to tune it to its ideal
 			   // parameters on a specific machine.
+
+#define COUNT 32          // Total number of dataset generations before
+			   // calculating the average of all.
 
 #endif
