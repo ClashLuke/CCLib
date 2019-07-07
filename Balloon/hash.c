@@ -301,7 +301,8 @@ void balloon(uint8_t* data, uint8_t* out){
 	aes(&cache[144], &cache[ 96]); aes(&cache[160], &cache[112]); aes(&cache[176], &cache[128]); aes(&cache[192], &cache[144]);
 	aes(&cache[208], &cache[160]); aes(&cache[224], &cache[176]); aes(&cache[240], &cache[192]);
 	
-	for(uint32_t j=1; j<SIZE/4; j+=64){
+#ifdef USE_CRC
+	for(uint32_t j=64; j<SIZE/4; j+=64){
 		j_2 = j>>1;
 		j_4 = j<<2;
 		crc32p(&cache_32[j   ], &cache_32[j+16]); crc32p(&cache_32[j+ 1], &cache_32[j+17]);
@@ -328,14 +329,26 @@ void balloon(uint8_t* data, uint8_t* out){
 		crc32p(&cache_32[j+42], &cache_32[j+58]); crc32p(&cache_32[j+43], &cache_32[j+59]);
 		crc32p(&cache_32[j+44], &cache_32[j+60]); crc32p(&cache_32[j+45], &cache_32[j+61]);
 		crc32p(&cache_32[j+46], &cache_32[j+62]); crc32p(&cache_32[j+47], &cache_32[j+63]);
-		aes(&cache[j_4+ 16], &cache[j_4    ]); aes(&cache[j_4+ 32], &cache[j_4+ 16]);
-		aes(&cache[j_4+ 48], &cache[j_4+ 32]); aes(&cache[j_4+ 64], &cache[j_4+ 48]);
-		aes(&cache[j_4+ 80], &cache[j_4+ 48]); aes(&cache[j_4+ 96], &cache[j_4+ 80]);
-		aes(&cache[j_4+112], &cache[j_4+ 96]); aes(&cache[j_4+128], &cache[j_4+112]);
-		aes(&cache[j_4+144], &cache[j_4+128]); aes(&cache[j_4+160], &cache[j_4+144]);
-		aes(&cache[j_4+176], &cache[j_4+160]); aes(&cache[j_4+192], &cache[j_4+176]);
-		aes(&cache[j_4+208], &cache[j_4+192]); aes(&cache[j_4+224], &cache[j_4+208]);
-		aes(&cache[j_4+240], &cache[j_4+224]); aes(&cache[j_4    ], &cache[j_4+240]); 
+#else
+	for(uint32_t j_2=32; j<SIZE/8; j+=32){
+		j_4 = j_2<<3;
+		cache_64[j_2+ 8] = cache_64[j_2+16] = cache_64[j_2+24] = cache_64[j_2   ];
+		cache_64[j_2+ 9] = cache_64[j_2+17] = cache_64[j_2+25] = cache_64[j_2+ 1];
+		cache_64[j_2+10] = cache_64[j_2+18] = cache_64[j_2+26] = cache_64[j_2+ 2];
+		cache_64[j_2+11] = cache_64[j_2+19] = cache_64[j_2+27] = cache_64[j_2+ 3];
+		cache_64[j_2+12] = cache_64[j_2+20] = cache_64[j_2+28] = cache_64[j_2+ 4];
+		cache_64[j_2+13] = cache_64[j_2+21] = cache_64[j_2+29] = cache_64[j_2+ 5];
+		cache_64[j_2+14] = cache_64[j_2+22] = cache_64[j_2+30] = cache_64[j_2+ 6];
+		cache_64[j_2+15] = cache_64[j_2+23] = cache_64[j_2+31] = cache_64[j_2+ 7];
+#endif
+		aes(&cache[j_4+ 16], &cache[j_4    ]); aes(&cache[j_4+ 32], &cache[j_4+   ]);
+		aes(&cache[j_4+ 48], &cache[j_4+   ]); aes(&cache[j_4+ 64], &cache[j_4+ 16]);
+		aes(&cache[j_4+ 80], &cache[j_4+ 32]); aes(&cache[j_4+ 96], &cache[j_4+ 48]);
+		aes(&cache[j_4+112], &cache[j_4+ 48]); aes(&cache[j_4+128], &cache[j_4+ 80]);
+		aes(&cache[j_4+144], &cache[j_4+ 96]); aes(&cache[j_4+160], &cache[j_4+112]);
+		aes(&cache[j_4+176], &cache[j_4+128]); aes(&cache[j_4+192], &cache[j_4+144]);
+		aes(&cache[j_4+208], &cache[j_4+160]); aes(&cache[j_4+224], &cache[j_4+176]);
+		aes(&cache[j_4+240], &cache[j_4+192]); aes(&cache[j_4    ], &cache[j_4+208]); 
 		cache_64[j_2+16] += cache_64[j_2   ]; cache_64[j_2+17] += cache_64[j_2+ 1];
 		cache_64[j_2+18] += cache_64[j_2+ 2]; cache_64[j_2+19] += cache_64[j_2+ 3];
 		cache_64[j_2+20] += cache_64[j_2+ 4]; cache_64[j_2+21] += cache_64[j_2+ 5];
