@@ -782,9 +782,9 @@ void calcDataset(uint8_t* seed, uint8_t* out){
 	uint32_t* seed_32  = (uint32_t*)seed;
 	uint32_t  max      = (ITEMS>>9);
 	const uint8_t* seed1 = &seed[16];
-	do{
-	out+=0x1000;
+	for(uint32_t i=0;i<max;i+=8){
 	ITEM_CALCULATION()
 	memcpy(out, mix, 4096);
-	}while(--i);
+	out+=0x1000;
+	}
 }
