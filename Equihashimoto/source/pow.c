@@ -205,9 +205,9 @@ static const uint32_t crc32c_table[256] = {
 };
 
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
-#define crc32p(x,y) __asm__("crc32w %w0,%w0,%w1\n":"+r"(y):"r"(x));
+#define crc32p(y,x) __asm__("crc32w %w0,%w0,%w1\n":"+r"(y):"r"(x));
 #else
-#define crc32p(x,y) \
+#define crc32p(y,x) \
 	y=crc32c_table[(x)&0xff]^((x)>>8);\
 	y=crc32c_table[(y)&0xff]^((y)>>8);\
 	y=crc32c_table[(y)&0xff]^((y)>>8);\
