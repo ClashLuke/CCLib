@@ -41,10 +41,10 @@ static const uint8_t SBOX[256] = {
 	state[15] = SBOX[state[15]]; *state = SBOX[*state];
 
 #define SHIFT_ROWS() \
-	a_0 = state[ 5]; b_0 = state[10]; b_0 = state[15];\
-	a_1 = state[ 9]; b_1 = state[14]; b_1 = state[ 3];\
-	a_2 = state[13]; b_2 = state[ 2]; b_2 = state[ 7];\
-	a_3 = state[ 1]; b_3 = state[ 6]; b_3 = state[11];\
+	a_0 = state[ 5]; b_0 = state[10]; c_0 = state[15];\
+	a_1 = state[ 9]; b_1 = state[14]; c_1 = state[ 3];\
+	a_2 = state[13]; b_2 = state[ 2]; c_2 = state[ 7];\
+	a_3 = state[ 1]; b_3 = state[ 6]; c_3 = state[11];\
 	state[ 1] = a_0; state[ 2] = b_0; state[ 3] = c_0;\
 	state[ 5] = a_1; state[ 6] = b_1; state[ 7] = c_1;\
 	state[ 9] = a_2; state[10] = b_2; state[11] = c_2;\
@@ -81,10 +81,10 @@ static const uint8_t SBOX[256] = {
 	if (state[14] & 0x80) b_2 ^= 0x1b; if (state[15] & 0x80) b_3 ^= 0x1b; \
 	state[12] = b_0 ^ a_3 ^ a_2 ^ b_1 ^ a_1; state[13] = b_1 ^ a_0 ^ a_3 ^ b_2 ^ a_2;\
 	state[14] = b_2 ^ a_1 ^ a_0 ^ b_3 ^ a_3; state[15] = b_3 ^ a_2 ^ a_1 ^ b_0 ^ a_0;
-}
+
 #endif // (!defined(__aarch64__) || !defined(__ARM_FEATURE_CRYPTO)) && (!defined(__x86_64__) || !defined(__AES__))
 
-void aes(uint8_t* state, const uint8_t* key)
+static inline void aes(uint8_t* state, const uint8_t* key)
 {
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRYPTO)
 	__asm__ volatile(
