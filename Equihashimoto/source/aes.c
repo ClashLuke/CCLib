@@ -1,19 +1,7 @@
 #include <stdint.h>
 
-// Two round implementation optimized for x86_64+AES-NI and ARMv8+crypto
-// extensions. Test pattern :
-//
-// Plaintext:
-// 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-//
-// Ciphertext (encryption result):
-// 0x16, 0xcd, 0xb8, 0x7a, 0xc6, 0xae, 0xdb, 0x19, 0xe9, 0x32, 0x47, 0x85, 0x39, 0x51, 0x24, 0xe6
-//
-// Plaintext (decryption result):
-// 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-
-/* Rijndael's substitution box for sub_bytes step */
-uint8_t SBOX[256] = {
+#if (!defined(__aarch64__) || !defined(__ARM_FEATURE_CRYPTO)) && (!defined(__x86_64__) || !defined(__AES__))
+static const uint8_t SBOX[256] = {
 	0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
 	0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
 	0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
@@ -32,175 +20,110 @@ uint8_t SBOX[256] = {
 	0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
 };
 
-/*--- The parts below are not used when crypto extensions are available ---*/
-/* Use -march=armv8-a+crypto on ARMv8 to use crypto extensions */
-/* Use -maes on x86_64 to use AES-NI */
-#if defined(RF_NOASM) || (!defined(__aarch64__) || !defined(__ARM_FEATURE_CRYPTO)) && (!defined(__x86_64__) || !defined(__AES__))
+#define ADD_ROUND_KEY(x) \
+	state[ 1] ^= key[x+ 1]; state[ 2] ^= key[x+ 2];\
+	state[ 3] ^= key[x+ 3]; state[ 4] ^= key[x+ 4];\
+	state[ 5] ^= key[x+ 5]; state[ 6] ^= key[x+ 6];\
+	state[ 7] ^= key[x+ 7]; state[ 8] ^= key[x+ 8];\
+	state[ 9] ^= key[x+ 9]; state[10] ^= key[x+10];\
+	state[11] ^= key[x+11]; state[12] ^= key[x+12];\
+	state[13] ^= key[x+13]; state[14] ^= key[x+14];\
+	state[15] ^= key[x+15]; *state ^= key[x]; 
 
-/* shifts to do for shift_rows step */
-uint8_t shifts[16] = {
-	 0,  5, 10, 15,
-	 4,  9, 14,  3,
-	 8, 13,  2,  7,
-	12,  1,  6, 11
-};
+#define SUB_BYTES() \
+	state[ 1] = SBOX[state[ 1]]; state[ 2] = SBOX[state[ 2]];\
+	state[ 3] = SBOX[state[ 3]]; state[ 4] = SBOX[state[ 4]];\
+	state[ 5] = SBOX[state[ 5]]; state[ 6] = SBOX[state[ 6]];\
+	state[ 7] = SBOX[state[ 7]]; state[ 8] = SBOX[state[ 8]];\
+	state[ 9] = SBOX[state[ 9]]; state[10] = SBOX[state[10]];\
+	state[11] = SBOX[state[11]]; state[12] = SBOX[state[12]];\
+	state[13] = SBOX[state[13]]; state[14] = SBOX[state[14]];\
+	state[15] = SBOX[state[15]]; *state = SBOX[*state];
 
-/* add the round key to the state with simple XOR operation */
-static void add_round_key(uint8_t * state, const uint8_t * rkey)
-{
-	uint8_t i;
+#define SHIFT_ROWS() \
+	a_1 = state[ 5]; a_2 = state[10]; a_3 = state[15];\
+	b_1 = state[ 9]; b_2 = state[14]; b_3 = state[ 3];\
+	c_1 = state[13]; c_2 = state[ 2]; c_3 = state[ 7];\
+	d_1 = state[ 1]; d_2 = state[ 6]; d_3 = state[11];\
+	state[ 1] = a_1; state[ 2] = a_2; state[ 3] = a_3;\
+	state[ 5] = b_1; state[ 6] = b_2; state[ 7] = b_3;\
+	state[ 9] = c_1; state[10] = c_2; state[11] = c_3;\
+	state[13] = d_1; state[14] = d_2; state[15] = d_3;
 
-	for (i = 0; i < 16; i++)
-		state[i] ^= rkey[i];
-}
-
-/* substitute all bytes using Rijndael's substitution box */
-void sub_bytes(uint8_t * state)
-{
-	uint8_t i;
-
-	for (i = 0; i < 16; i++)
-		state[i] = SBOX[state[i]];
-}
-
-/* imagine the state not as 1-dimensional, but a 4x4 grid;
- * this step shifts the rows of this grid around */
-void shift_rows(uint8_t * state)
-{
-	uint8_t temp[16];
-	uint8_t i;
-
-	for (i = 0; i < 16; i++)
-		temp[i] = state[shifts[i]];
-
-	for (i = 0; i < 16; i++)
-		state[i] = temp[i];
-}
-
-/* mix columns */
-void mix_columns(uint8_t * state)
-{
-	uint8_t a[4];
-	uint8_t b[4];
-	uint8_t h, i, k;
-
-	for (k = 0; k < 4; k++) {
-		for (i = 0; i < 4; i++) {
-			a[i] = state[i + 4 * k];
-			h = state[i + 4 * k] & 0x80; /* hi bit */
-			b[i] = state[i + 4 * k] << 1;
-
-			if (h == 0x80)
-				b[i] ^= 0x1b; /* Rijndael's Galois field */
-		}
-
-		state[4 * k]     = b[0] ^ a[3] ^ a[2] ^ b[1] ^ a[1];
-		state[1 + 4 * k] = b[1] ^ a[0] ^ a[3] ^ b[2] ^ a[2];
-		state[2 + 4 * k] = b[2] ^ a[1] ^ a[0] ^ b[3] ^ a[3];
-		state[3 + 4 * k] = b[3] ^ a[2] ^ a[1] ^ b[0] ^ a[0];
-	}
+#define MIX_COLLUMS() \
+	a_0 = *state; b_0 = (*state) << 1; a_1 = state[1]; b_1 = state[1] << 1;\
+	a_2 = state[2]; b_2 = state[2] << 1; a_3 = state[3]; b_3 = state[3] << 1;\
+	if ((*state) & 0x80) b_0 ^= 0x1b; if (state[1] & 0x80) b_1 ^= 0x1b; \
+	if (state[2] & 0x80) b_2 ^= 0x1b; if (state[3] & 0x80) b_3 ^= 0x1b; \
+	*state = b_0 ^ a_3 ^ a_2 ^ b_1 ^ a_1; state[1] = b_1 ^ a_0 ^ a_3 ^ b_2 ^ a_2;\
+	state[2] = b_2 ^ a_1 ^ a_0 ^ b_3 ^ a_3; state[3] = b_3 ^ a_2 ^ a_1 ^ b_0 ^ a_0;\
+	a_0 = state[4]; b_0 = state[4] << 1;\
+	a_1 = state[5]; b_1 = state[5] << 1;\
+	a_2 = state[6]; b_2 = state[6] << 1;\
+	a_3 = state[7]; b_3 = state[7] << 1;\
+	if (state[4] & 0x80) b_0 ^= 0x1b; if (state[5] & 0x80) b_1 ^= 0x1b; \
+	if (state[6] & 0x80) b_2 ^= 0x1b; if (state[7] & 0x80) b_3 ^= 0x1b; \
+	state[4] = b_0 ^ a_3 ^ a_2 ^ b_1 ^ a_1; state[5] = b_1 ^ a_0 ^ a_3 ^ b_2 ^ a_2;\
+	state[6] = b_2 ^ a_1 ^ a_0 ^ b_3 ^ a_3; state[7] = b_3 ^ a_2 ^ a_1 ^ b_0 ^ a_0;\
+	a_0 = state[8]; b_0 = state[8] << 1;\
+	a_1 = state[9]; b_1 = state[9] << 1;\
+	a_2 = state[10]; b_2 = state[10] << 1;\
+	a_3 = state[11]; b_3 = state[11] << 1;\
+	if (state[ 8] & 0x80) b_0 ^= 0x1b; if (state[ 9] & 0x80) b_1 ^= 0x1b; \
+	if (state[10] & 0x80) b_2 ^= 0x1b; if (state[11] & 0x80) b_3 ^= 0x1b; \
+	state[ 8] = b_0 ^ a_3 ^ a_2 ^ b_1 ^ a_1; state[ 9] = b_1 ^ a_0 ^ a_3 ^ b_2 ^ a_2;\
+	state[10] = b_2 ^ a_1 ^ a_0 ^ b_3 ^ a_3; state[11] = b_3 ^ a_2 ^ a_1 ^ b_0 ^ a_0;\
+	a_0 = state[12]; b_0 = state[12] << 1;\
+	a_1 = state[13]; b_1 = state[13] << 1;\
+	a_2 = state[14]; b_2 = state[14] << 1;\
+	a_3 = state[15]; b_3 = state[15] << 1;\
+	if (state[12] & 0x80) b_0 ^= 0x1b; if (state[13] & 0x80) b_1 ^= 0x1b; \
+	if (state[14] & 0x80) b_2 ^= 0x1b; if (state[15] & 0x80) b_3 ^= 0x1b; \
+	state[12] = b_0 ^ a_3 ^ a_2 ^ b_1 ^ a_1; state[13] = b_1 ^ a_0 ^ a_3 ^ b_2 ^ a_2;\
+	state[14] = b_2 ^ a_1 ^ a_0 ^ b_3 ^ a_3; state[15] = b_3 ^ a_2 ^ a_1 ^ b_0 ^ a_0;
 }
 #endif // (!defined(__aarch64__) || !defined(__ARM_FEATURE_CRYPTO)) && (!defined(__x86_64__) || !defined(__AES__))
 
-
-/* key schedule stuff */
-
-/* simple function to rotate 4 byte array */
-uint32_t rotate32(uint32_t in)
+void aes(uint8_t* state, const uint8_t* key)
 {
-#if defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	in = (in >> 8) | (in << 24);
-#elif defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	in = (in << 8) | (in >> 24);
-#else
-	uint8_t *b = (uint8_t *)&in, temp = b[0];
-	b[0] = b[1]; b[1] = b[2]; b[2] = b[3]; b[3] = temp;
-#endif
-	return in;
-}
-
-/* key schedule core operation */
-uint32_t sbox(uint32_t in, uint8_t n)
-{
-	in = (SBOX[in & 255]) | (SBOX[(in >> 8) & 255] << 8) | (SBOX[(in >> 16) & 255] << 16) | (SBOX[(in >> 24) & 255] << 24);
-#if defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	in ^= n;
-#elif defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	in ^= n << 24;
-#else
-	*(uint8_t *)&in ^= n;
-#endif
-	return in;
-}
-
-// this version is optimized for exactly two rounds.
-// _state_ must be 16-byte aligned.
-void aes(uint8_t * state, const uint8_t * key)
-{
-	uint32_t key_schedule[12];
-	uint32_t t;
-
-	/* initialize key schedule; its first 16 bytes are the key */
-	key_schedule[0] = ((uint32_t *)key)[0];
-	key_schedule[1] = ((uint32_t *)key)[1];
-	key_schedule[2] = ((uint32_t *)key)[2];
-	key_schedule[3] = ((uint32_t *)key)[3];
-	t = key_schedule[3];
-
-	t = rotate32(t);
-	t = sbox(t, 1);
-	t = key_schedule[4]  = key_schedule[0] ^ t;
-	t = key_schedule[5]  = key_schedule[1] ^ t;
-	t = key_schedule[6]  = key_schedule[2] ^ t;
-	t = key_schedule[7]  = key_schedule[3] ^ t;
-
-	t = rotate32(t);
-	t = sbox(t, 2);
-	t = key_schedule[8]  = key_schedule[4] ^ t;
-	t = key_schedule[9]  = key_schedule[5] ^ t;
-	t = key_schedule[10] = key_schedule[6] ^ t;
-	t = key_schedule[11] = key_schedule[7] ^ t;
-
-	// Use -march=armv8-a+crypto+crc to get this one
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRYPTO)
 	__asm__ volatile(
-		"ld1   {v0.16b},[%0]        \n"
-		"ld1   {v1.16b,v2.16b,v3.16b},[%1]  \n"
-		"aese  v0.16b,v1.16b        \n" // round1: add_round_key,sub_bytes,shift_rows
-		"aesmc v0.16b,v0.16b        \n" // round1: mix_columns
-		"aese  v0.16b,v2.16b        \n" // round2: add_round_key,sub_bytes,shift_rows
-		"eor   v0.16b,v0.16b,v3.16b \n" // finish: add_round_key
-		"st1   {v0.16b},[%0]        \n"
+		"ld1  {v0.16b},[%0]    \n"
+		"ld1  {v1.16b,v2.16b,v3.16b},[%1] \n"
+		"aese v0.16b,v1.16b    \n"
+		"aesmc v0.16b,v0.16b    \n"
+		"aese v0.16b,v2.16b    \n"
+		"eor  v0.16b,v0.16b,v3.16b \n"
+		"st1  {v0.16b},[%0]    \n"
 		: /* only output is in *state */
-		: "r"(state), "r"(key_schedule)
+		: "r"(state), "r"(key)
 		: "v0", "v1", "v2", "v3", "cc", "memory");
 
 	// Use -maes to get this one
 #elif defined(__x86_64__) && defined(__AES__)
 	__asm__ volatile(
-		"movups (%0),  %%xmm0     \n"
-		"movups (%1),  %%xmm1     \n"
-		"pxor   %%xmm1,%%xmm0     \n" // add_round_key(state, key_schedule)
-		"movups 16(%1),%%xmm2     \n"
-		"movups 32(%1),%%xmm1     \n"
-		"aesenc %%xmm2,%%xmm0     \n" // first round
-		"aesenclast %%xmm1,%%xmm0 \n" // final round
-		"movups %%xmm0, (%0)  \n"
+		"movups (%0), %%xmm0   \n"
+		"movups (%1), %%xmm1   \n"
+		"pxor  %%xmm1,%%xmm0   \n"
+		"movups 16(%1),%%xmm2   \n"
+		"movups 32(%1),%%xmm1   \n"
+		"aesenc %%xmm2,%%xmm0   \n" 
+		"aesenclast %%xmm1,%%xmm0 \n"
+		"movups %%xmm0, (%0) \n"
 		: /* only output is in *state */
-		: "r"(state), "r" (key_schedule)
+		: "r"(state), "r" (key)
 		: "xmm0", "xmm1", "xmm2", "cc", "memory");
 #else
-	/* first round of the algorithm */
-	add_round_key(state, (const uint8_t*)&key_schedule[0]);
-	sub_bytes(state);
-	shift_rows(state);
-	mix_columns(state);
-	add_round_key(state, (const uint8_t*)&key_schedule[4]);
-
-	/* final round of the algorithm */
-	sub_bytes(state);
-	shift_rows(state);
-	add_round_key(state, (const uint8_t*)&key_schedule[8]);
+	uint8_t a_0, a_1, a_2, a_3, b_0, b_1, b_2, b_3;
+	uint8_t c_0, c_1, c_2, c_3, d_0, d_1, d_2, d_3;
+	ADD_ROUND_KEY(0)
+	SUB_BYTES()
+	SHIFT_ROWS()
+	MIX_COLLUMS()
+	ADD_ROUND_KEY(16)
+	SUB_BYTES()
+	SHIFT_ROWS()
+	ADD_ROUND_KEY(32)
 #endif
 }
 
