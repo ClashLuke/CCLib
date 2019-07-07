@@ -214,6 +214,16 @@ static const uint32_t crc32c_table[256] = {
 	y=crc32c_table[(y)&0xff]^((y)>>8);
 #endif
 
+#if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
+#define crc32i(y) __asm__("crc32w %w0,%w0,%w1\n":"+r"(y):"r"(y));
+#else
+#define crc32i(y) \
+	y=crc32c_table[(y)&0xff]^((y)>>8);\
+	y=crc32c_table[(y)&0xff]^((y)>>8);\
+	y=crc32c_table[(y)&0xff]^((y)>>8);\
+	y=crc32c_table[(y)&0xff]^((y)>>8);
+#endif
+
 #define ITEM_CALCULATION() \
 	mix[  1] = mix[  3] = mix[  5] = mix[  7] = mix[  9] = mix[ 11] = mix[ 13] =\
 	mix[ 15] = mix[ 17] = mix[ 19] = mix[ 21] = mix[ 23] = mix[ 25] = mix[ 27] =\
