@@ -14,10 +14,7 @@ Using this design, equihashimoto is botnet resistant, has heavy ASIC resistance 
 
 To Do 
 - [ ] **General Optimisations**
-- [x] Memcpy large blocks to cache instead of accessing one item at a time
-- [x] Improve dataset generation time (maybe not AES?)
-- [ ] Add changes to dataset generation to dataset-item-generation
-- [x] Improve AES code
+- [ ] Add dataset item calculation optimisation
 - [ ] Implement cn_slow\_hash AES code
 - [ ] **Readme**
 - [ ] Add "the lower the memory the lower the chance of finding a solution (exponentially)"-text
