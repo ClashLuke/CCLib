@@ -99,6 +99,8 @@ static void benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficu
 	char      buffer[65]   = {0};
 	uint32_t  temp[2]      = {0};
 	uint32_t  current_time = 0;
+	uint32_t  prev         = 0;
+	uint32_t  cnt          = 0;
 	const uint64_t  iterations   = ITERATIONS>>6;
 	const uint64_t  diff         = 0xFFFFFFFFFFFFFFFF/difficulty;
 	seed_64[9] = diff;
@@ -120,8 +122,13 @@ static void benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficu
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 		for(uint8_t j=0; j<64; j++){
 			for(uint64_t i=0;i<iterations;i++){
+				prev=seed_32[16];
 				mash_full(seed, dataset);
-				temp[0] ^= seed_32[16]; temp[1] ^= seed_32[17]; nonce++;
+				if(seed_32[16]!=prev){
+					temp[0] ^= seed_32[16]; temp[1] ^= seed_32[17]; nonce++;
+					cnt++;
+				}
+
 				(*seed_32)++;  seed_32[ 1]++; seed_32[ 2]++; seed_32[ 3]++;
 				seed_32[ 4]++; seed_32[ 5]++; seed_32[ 6]++; seed_32[ 7]++;
 				seed_32[ 8]++; seed_32[ 9]++; seed_32[10]++; seed_32[11]++;
@@ -143,8 +150,9 @@ static void benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficu
 	}
 	free(dataset);
 	uint32_t end_time = (uint32_t)time(NULL);
-	printf("\tCalculation of %lu hashes took:  %us\n",ITERATIONS, end_time-current_time);
-	printf("\tHashrate is approximately:  %lu H/s\n", difficulty*ITERATIONS/(end_time-current_time));
+	printf("\tCalculation of %lu solutions took:  %us\n",ITERATIONS, end_time-current_time);
+	printf("\tHashrate is approximately:  %u s/sol\n", (end_time-current_time)/cnt);
+	printf("\tFound %u solutions for %lu nonces. Rate: %lu%%\n",cnt, ITERATIONS, (100*cnt)/ITERATIONS);
 	printf("\tResult:  %08x,%08x",temp[0],temp[1]);
 	printf("\n");
 }
@@ -161,7 +169,7 @@ static void benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t d
 	if(printing){
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 		for(uint8_t j=0; j<64; j++){
-			for(uint64_t i=0;i<ITERATIONS<<20;i++){
+			for(uint64_t i=0;i<ITERATIONS<<10;i++){
 				uint8_t a = mash_light(seed_32, diff);
 				temp ^= a; nonce++;
 				crc32i(&seed_32[12]); crc32i(&seed_32[13]);
