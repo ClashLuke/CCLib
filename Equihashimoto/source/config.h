@@ -15,7 +15,7 @@
 			   // accesses (less bound to memory latency)
 			   // of larger blocks (more bound to memory
 			   // bandwidth) yet also need more cache.
-			   // Specifically BLOCK*2+12 bytes are
+			   // Specifically BLOCK*2+16 bytes are
 			   // required per thread.
 			   // Changing this will change the speed of
 			   // the algorithm but not its result. It may
