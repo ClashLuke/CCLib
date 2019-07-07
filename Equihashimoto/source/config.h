@@ -6,7 +6,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define ITEMS  0xffffffff  // Total number of items in the dataset
+#define ITEMS  0xffffffffU  // Total number of items in the dataset
                            // may be changed to achieve a different
                            // dataset size.
  
@@ -22,7 +22,7 @@
 			   // be used to tune it to its ideal
 			   // parameters on a specific machine.
 
-#define COUNT 32          // Total number of dataset generations before
+#define COUNT 255          // Total number of dataset generations before
 			   // calculating the average of all.
 
 #endif
