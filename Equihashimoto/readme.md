@@ -13,14 +13,20 @@ Thanks to the underlying design of the birthday paradox, an ASIC for this algori
 Using this design, equihashimoto is botnet resistant, has heavy ASIC resistance and low dataset generation times while being extremely fast verifyable, provably assymetric and provably secure.
 
 To Do 
-- [ ] **Code/Optimisations**
+- [ ] **General Optimisations**
 - [x] Memcpy large blocks to cache instead of accessing one item at a time
-- [ ] Improve dataset generation time (maybe not AES?)
+- [x] Improve dataset generation time (maybe not AES?)
 - [ ] Add changes to dataset generation to dataset-item-generation
 - [ ] Improve dataset generation (smaller blocks -> getting 64bit blocks is faster)
-- [ ] Const correctness
 - [ ] Improve AES code (check out cn_slow\_hash)
+- [ ] **Code style/Optimisations**
+- [ ] Const correctness
 - [ ] Inline functions
+- [ ] Make local functions static
+- [ ] Use downwards-counting while loops instead of upwards counting for loops
+- [ ] Reduce parameter passing (pass one ctx pointer)
+- [ ] Use posix coding standards (U,L,LL)
+- [ ] Prototype functions
 - [ ] **Readme**
 - [ ] Add "the lower the memory the lower the chance of finding a solution (exponentially)"-text
 - [ ] Explain where the expontial growth of time complexity comes from (when reducing the dataset size linearly)
