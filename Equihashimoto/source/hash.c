@@ -24,7 +24,7 @@ void mash_full(const uint8_t* data, uint8_t* dataset){
 	memcpy(cache0, &dataset[j], BLOCK+8);
 	for(uint32_t a=0; a<BLOCK; a++){
 	if(*item32 == *(uint32_t*)&cache0[a]){
-	k = j+a;
+	k = 0;
 	item ^= *(uint64_t*)&cache0[a];
 	for(; k<ITEMS; k+=BLOCK){
 	memcpy(cache1, &dataset[k], BLOCK+8);

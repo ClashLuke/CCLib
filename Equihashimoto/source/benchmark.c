@@ -158,7 +158,6 @@ static void benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t d
 	current_time = (uint32_t)time(NULL);
 	if(printing){
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
-		uint8_t j=64;
 		for(uint8_t j=0; j<64; j++){
 			for(uint64_t i=0;i<ITERATIONS<<20;i++){
 				uint8_t a = mash_light(seed_32, diff);
