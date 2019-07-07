@@ -4,7 +4,6 @@
 
 
 #include <stdint.h>
-#include <stdlib.h>
 #include "config.h"
 
 
@@ -95,8 +94,6 @@ static const uint32_t crc32c_table[256] = {
 	y=crc32c_table[(y)&0xff]^((y)>>8);
 #endif
 
-
-#include <stdint.h>
 
 #if (!defined(__aarch64__) || !defined(__ARM_FEATURE_CRYPTO)) && (!defined(__x86_64__) || !defined(__AES__))
 static const uint8_t SBOX[256] = {
