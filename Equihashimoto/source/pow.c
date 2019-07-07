@@ -102,96 +102,542 @@ inline static void crc32i(uint32_t* in) { // CRC32-Inplace
 #endif
 }
 
-uint32_t calcItem32(uint32_t* seed_32, uint32_t itemNumber){
-	uint64_t  mix[8]  = {0};
-	uint8_t*  mix8    = (uint8_t*)mix;
-	uint32_t* mix32   = (uint32_t*)mix;
-	uint8_t*  seed    = (uint8_t*)seed_32;
-	uint32_t  out0[1] = {0}; 
-	uint32_t  out1[1] = {0}; 
-	const uint8_t   pos     = itemNumber&0x3;
-	const uint8_t   pos64   = itemNumber&0x3f;
-	uint8_t         pos1024 = (itemNumber&0x3ff)>>6;
-	itemNumber&=ITEMS-0x3f;
-	itemNumber>>=2;
-	*mix   = itemNumber; mix[1] = itemNumber;
-	mix[2] = itemNumber; mix[3] = itemNumber;
-	itemNumber>>=4;
-	(*seed_32)+=itemNumber; seed_32[1]+=itemNumber;
-	seed_32[2]+=itemNumber; seed_32[3]+=itemNumber;
-	seed_32[4]+=itemNumber; seed_32[5]+=itemNumber;
-	seed_32[6]+=itemNumber; seed_32[7]+=itemNumber;
-	itemNumber<<=4;
-	if(!pos){
-		aes(mix8, &seed[pos64&0x10]);
-		if(pos64>31){
-			aes(&mix8[16], mix8);
-			*out0 = mix32[16+((pos64>>2)&0xf)];
-		} else{
-			*out0 = mix32[(pos64>>2)&0xf];
-		}
-	}else{
-		if(pos64<29){
-			if(pos64<13){
-				const uint8_t pos64_4 = pos64>>2;
-				aes(mix8, seed);
-				*out0 = mix32[pos64_4  ];
-				*out1 = mix32[pos64_4+1];
-			}else if(pos64>15){	
-				const uint8_t pos64_4 = pos64>>2;	
-				aes(&mix8[16], &seed[16]); 
-				*out0 = mix32[pos64_4  ];
-				*out1 = mix32[pos64_4+1];
-			}else{
-				aes(mix8, seed); aes(&mix8[16], &seed[16]); 
-				*out0 = mix32[3];
-				*out1 = mix32[4];
+#define ITEM_CALCULATION() \
+	mix[  1] = mix[  3] = mix[  5] = mix[  7] = mix[  9] = mix[ 11] = mix[ 13] =\
+	mix[ 15] = mix[ 17] = mix[ 19] = mix[ 21] = mix[ 23] = mix[ 25] = mix[ 27] =\
+	mix[ 29] = mix[ 31] = mix[ 33] = mix[ 35] = mix[ 37] = mix[ 39] = mix[ 41] =\
+	mix[ 43] = mix[ 45] = mix[ 47] = mix[ 49] = mix[ 51] = mix[ 53] = mix[ 55] =\
+	mix[ 57] = mix[ 59] = mix[ 61] = mix[ 63] = mix[ 65] = mix[ 67] = mix[ 69] =\
+	mix[ 71] = mix[ 73] = mix[ 75] = mix[ 77] = mix[ 79] = mix[ 81] = mix[ 83] =\
+	mix[ 85] = mix[ 87] = mix[ 89] = mix[ 91] = mix[ 93] = mix[ 95] = mix[ 97] =\
+	mix[ 99] = mix[101] = mix[103] = mix[105] = mix[107] = mix[109] = mix[111] =\
+	mix[113] = mix[115] = mix[117] = mix[119] = mix[121] = mix[123] = mix[125] =\
+	mix[127] = 0;\
+	*mix     = mix[  2] = mix[  4] = mix[  6] = mix[  8] = mix[ 10] = mix[ 12] =\
+	mix[ 14] = mix[ 16] = mix[ 18] = mix[ 20] = mix[ 22] = mix[ 24] = mix[ 26] =\
+	mix[ 28] = mix[ 30] = mix[ 32] = mix[ 34] = mix[ 36] = mix[ 38] = mix[ 40] =\
+	mix[ 42] = mix[ 44] = mix[ 46] = mix[ 48] = mix[ 50] = mix[ 52] = mix[ 54] =\
+	mix[ 56] = mix[ 58] = mix[ 60] = mix[ 62] = mix[ 64] = mix[ 66] = mix[ 68] =\
+	mix[ 70] = mix[ 72] = mix[ 74] = mix[ 76] = mix[ 78] = mix[ 80] = mix[ 82] =\
+	mix[ 84] = mix[ 86] = mix[ 88] = mix[ 90] = mix[ 92] = mix[ 94] = mix[ 96] =\
+	mix[ 98] = mix[100] = mix[102] = mix[104] = mix[106] = mix[108] = mix[110] =\
+	mix[112] = mix[114] = mix[116] = mix[118] = mix[120] = mix[122] = mix[124] =\
+	mix[126] = i;\
+	mix[ 16]++; mix[ 18]++; mix[ 20]++; mix[ 22]++;\
+	mix[ 24]++; mix[ 26]++; mix[ 28]++; mix[ 30]++;\
+	mix[ 32]+=2; mix[ 34]+=2; mix[ 36]+=2; mix[ 38]+=2;\
+	mix[ 40]+=2; mix[ 42]+=2; mix[ 44]+=2; mix[ 46]+=2;\
+	mix[ 48]+=3; mix[ 50]+=3; mix[ 52]+=3; mix[ 54]+=3;\
+	mix[ 56]+=3; mix[ 58]+=3; mix[ 60]+=3; mix[ 62]+=3;\
+	mix[ 64]+=4; mix[ 66]+=4; mix[ 68]+=4; mix[ 70]+=4;\
+	mix[ 72]+=4; mix[ 74]+=4; mix[ 76]+=4; mix[ 78]+=4;\
+	mix[ 80]+=5; mix[ 82]+=5; mix[ 84]+=5; mix[ 86]+=5;\
+	mix[ 88]+=5; mix[ 90]+=5; mix[ 92]+=5; mix[ 94]+=5;\
+	mix[ 96]+=6; mix[ 96]+=6; mix[ 98]+=6; mix[100]+=6;\
+	mix[104]+=6; mix[106]+=6; mix[108]+=6; mix[110]+=6;\
+	mix[112]+=7; mix[114]+=7; mix[116]+=7; mix[118]+=7;\
+	mix[120]+=7; mix[122]+=7; mix[124]+=7; mix[126]+=7;\
+	aes(mix8_0, seed);   aes(mix8_1, seed1);\
+	aes(mix8_2, mix8_0); aes(mix8_3, mix8_1);\
+	crc32p(&mix32[ 16], mix32);       crc32p(&mix32[ 17], &mix32[  1]);\
+	crc32p(&mix32[ 18], &mix32[  2]); crc32p(&mix32[ 19], &mix32[  3]);\
+	crc32p(&mix32[ 20], &mix32[  4]); crc32p(&mix32[ 21], &mix32[  5]);\
+	crc32p(&mix32[ 22], &mix32[  6]); crc32p(&mix32[ 23], &mix32[  7]);\
+	crc32p(&mix32[ 24], &mix32[  8]); crc32p(&mix32[ 25], &mix32[  9]);\
+	crc32p(&mix32[ 26], &mix32[ 10]); crc32p(&mix32[ 27], &mix32[ 11]);\
+	crc32p(&mix32[ 28], &mix32[ 12]); crc32p(&mix32[ 29], &mix32[ 13]);\
+	crc32p(&mix32[ 30], &mix32[ 14]); crc32p(&mix32[ 31], &mix32[ 15]);\
+	crc32p(&mix32[ 32], &mix32[ 16]); crc32p(&mix32[ 33], &mix32[ 17]);\
+	crc32p(&mix32[ 34], &mix32[ 18]); crc32p(&mix32[ 35], &mix32[ 19]);\
+	crc32p(&mix32[ 36], &mix32[ 20]); crc32p(&mix32[ 37], &mix32[ 21]);\
+	crc32p(&mix32[ 38], &mix32[ 22]); crc32p(&mix32[ 39], &mix32[ 23]);\
+	crc32p(&mix32[ 40], &mix32[ 24]); crc32p(&mix32[ 41], &mix32[ 25]);\
+	crc32p(&mix32[ 42], &mix32[ 26]); crc32p(&mix32[ 43], &mix32[ 27]);\
+	crc32p(&mix32[ 44], &mix32[ 28]); crc32p(&mix32[ 45], &mix32[ 29]);\
+	crc32p(&mix32[ 46], &mix32[ 30]); crc32p(&mix32[ 47], &mix32[ 31]);\
+	crc32p(&mix32[ 48], &mix32[ 32]); crc32p(&mix32[ 49], &mix32[ 33]);\
+	crc32p(&mix32[ 50], &mix32[ 34]); crc32p(&mix32[ 51], &mix32[ 35]);\
+	crc32p(&mix32[ 52], &mix32[ 36]); crc32p(&mix32[ 53], &mix32[ 37]);\
+	crc32p(&mix32[ 54], &mix32[ 38]); crc32p(&mix32[ 55], &mix32[ 39]);\
+	crc32p(&mix32[ 56], &mix32[ 40]); crc32p(&mix32[ 57], &mix32[ 41]);\
+	crc32p(&mix32[ 58], &mix32[ 42]); crc32p(&mix32[ 59], &mix32[ 43]);\
+	crc32p(&mix32[ 60], &mix32[ 44]); crc32p(&mix32[ 61], &mix32[ 45]);\
+	crc32p(&mix32[ 62], &mix32[ 46]); crc32p(&mix32[ 63], &mix32[ 47]);\
+	crc32p(&mix32[ 64], &mix32[ 48]); crc32p(&mix32[ 65], &mix32[ 49]);\
+	crc32p(&mix32[ 66], &mix32[ 50]); crc32p(&mix32[ 67], &mix32[ 51]);\
+	crc32p(&mix32[ 68], &mix32[ 52]); crc32p(&mix32[ 69], &mix32[ 53]);\
+	crc32p(&mix32[ 70], &mix32[ 54]); crc32p(&mix32[ 71], &mix32[ 55]);\
+	crc32p(&mix32[ 72], &mix32[ 56]); crc32p(&mix32[ 73], &mix32[ 57]);\
+	crc32p(&mix32[ 74], &mix32[ 58]); crc32p(&mix32[ 75], &mix32[ 59]);\
+	crc32p(&mix32[ 76], &mix32[ 60]); crc32p(&mix32[ 77], &mix32[ 61]);\
+	crc32p(&mix32[ 78], &mix32[ 62]); crc32p(&mix32[ 79], &mix32[ 63]);\
+	crc32p(&mix32[ 80], &mix32[ 64]); crc32p(&mix32[ 81], &mix32[ 65]);\
+	crc32p(&mix32[ 82], &mix32[ 66]); crc32p(&mix32[ 83], &mix32[ 67]);\
+	crc32p(&mix32[ 84], &mix32[ 68]); crc32p(&mix32[ 85], &mix32[ 69]);\
+	crc32p(&mix32[ 86], &mix32[ 70]); crc32p(&mix32[ 87], &mix32[ 71]);\
+	crc32p(&mix32[ 88], &mix32[ 72]); crc32p(&mix32[ 89], &mix32[ 73]);\
+	crc32p(&mix32[ 90], &mix32[ 74]); crc32p(&mix32[ 91], &mix32[ 75]);\
+	crc32p(&mix32[ 92], &mix32[ 76]); crc32p(&mix32[ 93], &mix32[ 77]);\
+	crc32p(&mix32[ 94], &mix32[ 78]); crc32p(&mix32[ 95], &mix32[ 79]);\
+	crc32p(&mix32[ 96], &mix32[ 80]); crc32p(&mix32[ 97], &mix32[ 81]);\
+	crc32p(&mix32[ 98], &mix32[ 82]); crc32p(&mix32[ 99], &mix32[ 83]);\
+	crc32p(&mix32[100], &mix32[ 84]); crc32p(&mix32[101], &mix32[ 85]);\
+	crc32p(&mix32[102], &mix32[ 86]); crc32p(&mix32[103], &mix32[ 87]);\
+	crc32p(&mix32[104], &mix32[ 88]); crc32p(&mix32[105], &mix32[ 89]);\
+	crc32p(&mix32[106], &mix32[ 90]); crc32p(&mix32[107], &mix32[ 91]);\
+	crc32p(&mix32[108], &mix32[ 92]); crc32p(&mix32[109], &mix32[ 93]);\
+	crc32p(&mix32[110], &mix32[ 94]); crc32p(&mix32[111], &mix32[ 95]);\
+	crc32p(&mix32[112], &mix32[ 96]); crc32p(&mix32[113], &mix32[ 97]);\
+	crc32p(&mix32[114], &mix32[ 98]); crc32p(&mix32[115], &mix32[ 99]);\
+	crc32p(&mix32[116], &mix32[100]); crc32p(&mix32[117], &mix32[101]);\
+	crc32p(&mix32[118], &mix32[102]); crc32p(&mix32[119], &mix32[103]);\
+	crc32p(&mix32[120], &mix32[104]); crc32p(&mix32[121], &mix32[105]);\
+	crc32p(&mix32[122], &mix32[106]); crc32p(&mix32[123], &mix32[107]);\
+	crc32p(&mix32[124], &mix32[108]); crc32p(&mix32[125], &mix32[109]);\
+	crc32p(&mix32[126], &mix32[110]); crc32p(&mix32[127], &mix32[111]);\
+	crc32p(&mix32[128], &mix32[112]); crc32p(&mix32[129], &mix32[113]);\
+	crc32p(&mix32[130], &mix32[114]); crc32p(&mix32[131], &mix32[115]);\
+	crc32p(&mix32[132], &mix32[116]); crc32p(&mix32[133], &mix32[117]);\
+	crc32p(&mix32[134], &mix32[118]); crc32p(&mix32[135], &mix32[119]);\
+	crc32p(&mix32[136], &mix32[120]); crc32p(&mix32[137], &mix32[121]);\
+	crc32p(&mix32[138], &mix32[122]); crc32p(&mix32[139], &mix32[123]);\
+	crc32p(&mix32[140], &mix32[124]); crc32p(&mix32[141], &mix32[125]);\
+	crc32p(&mix32[142], &mix32[126]); crc32p(&mix32[143], &mix32[127]);\
+	crc32p(&mix32[144], &mix32[128]); crc32p(&mix32[145], &mix32[129]);\
+	crc32p(&mix32[146], &mix32[130]); crc32p(&mix32[147], &mix32[131]);\
+	crc32p(&mix32[148], &mix32[132]); crc32p(&mix32[149], &mix32[133]);\
+	crc32p(&mix32[150], &mix32[134]); crc32p(&mix32[151], &mix32[135]);\
+	crc32p(&mix32[152], &mix32[136]); crc32p(&mix32[153], &mix32[137]);\
+	crc32p(&mix32[154], &mix32[138]); crc32p(&mix32[155], &mix32[139]);\
+	crc32p(&mix32[156], &mix32[140]); crc32p(&mix32[157], &mix32[141]);\
+	crc32p(&mix32[158], &mix32[142]); crc32p(&mix32[159], &mix32[143]);\
+	crc32p(&mix32[160], &mix32[144]); crc32p(&mix32[161], &mix32[145]);\
+	crc32p(&mix32[162], &mix32[146]); crc32p(&mix32[163], &mix32[147]);\
+	crc32p(&mix32[164], &mix32[148]); crc32p(&mix32[165], &mix32[149]);\
+	crc32p(&mix32[166], &mix32[150]); crc32p(&mix32[167], &mix32[151]);\
+	crc32p(&mix32[168], &mix32[152]); crc32p(&mix32[169], &mix32[153]);\
+	crc32p(&mix32[170], &mix32[154]); crc32p(&mix32[171], &mix32[155]);\
+	crc32p(&mix32[172], &mix32[156]); crc32p(&mix32[173], &mix32[157]);\
+	crc32p(&mix32[174], &mix32[158]); crc32p(&mix32[175], &mix32[159]);\
+	crc32p(&mix32[176], &mix32[160]); crc32p(&mix32[177], &mix32[161]);\
+	crc32p(&mix32[178], &mix32[162]); crc32p(&mix32[179], &mix32[163]);\
+	crc32p(&mix32[180], &mix32[164]); crc32p(&mix32[181], &mix32[165]);\
+	crc32p(&mix32[182], &mix32[166]); crc32p(&mix32[183], &mix32[167]);\
+	crc32p(&mix32[184], &mix32[168]); crc32p(&mix32[185], &mix32[169]);\
+	crc32p(&mix32[186], &mix32[170]); crc32p(&mix32[187], &mix32[171]);\
+	crc32p(&mix32[188], &mix32[172]); crc32p(&mix32[189], &mix32[173]);\
+	crc32p(&mix32[190], &mix32[174]); crc32p(&mix32[191], &mix32[175]);\
+	crc32p(&mix32[192], &mix32[176]); crc32p(&mix32[193], &mix32[177]);\
+	crc32p(&mix32[194], &mix32[178]); crc32p(&mix32[195], &mix32[179]);\
+	crc32p(&mix32[196], &mix32[180]); crc32p(&mix32[197], &mix32[181]);\
+	crc32p(&mix32[198], &mix32[182]); crc32p(&mix32[199], &mix32[183]);\
+	crc32p(&mix32[200], &mix32[184]); crc32p(&mix32[201], &mix32[185]);\
+	crc32p(&mix32[202], &mix32[186]); crc32p(&mix32[203], &mix32[187]);\
+	crc32p(&mix32[204], &mix32[188]); crc32p(&mix32[205], &mix32[189]);\
+	crc32p(&mix32[206], &mix32[190]); crc32p(&mix32[207], &mix32[191]);\
+	crc32p(&mix32[208], &mix32[192]); crc32p(&mix32[209], &mix32[193]);\
+	crc32p(&mix32[210], &mix32[194]); crc32p(&mix32[211], &mix32[195]);\
+	crc32p(&mix32[212], &mix32[196]); crc32p(&mix32[213], &mix32[197]);\
+	crc32p(&mix32[214], &mix32[198]); crc32p(&mix32[215], &mix32[199]);\
+	crc32p(&mix32[216], &mix32[200]); crc32p(&mix32[217], &mix32[201]);\
+	crc32p(&mix32[218], &mix32[202]); crc32p(&mix32[219], &mix32[203]);\
+	crc32p(&mix32[220], &mix32[204]); crc32p(&mix32[221], &mix32[205]);\
+	crc32p(&mix32[222], &mix32[206]); crc32p(&mix32[223], &mix32[207]);\
+	crc32p(&mix32[224], &mix32[208]); crc32p(&mix32[225], &mix32[209]);\
+	crc32p(&mix32[226], &mix32[210]); crc32p(&mix32[227], &mix32[211]);\
+	crc32p(&mix32[228], &mix32[212]); crc32p(&mix32[229], &mix32[213]);\
+	crc32p(&mix32[230], &mix32[214]); crc32p(&mix32[231], &mix32[215]);\
+	crc32p(&mix32[232], &mix32[216]); crc32p(&mix32[233], &mix32[217]);\
+	crc32p(&mix32[234], &mix32[218]); crc32p(&mix32[235], &mix32[219]);\
+	crc32p(&mix32[236], &mix32[220]); crc32p(&mix32[237], &mix32[221]);\
+	crc32p(&mix32[238], &mix32[222]); crc32p(&mix32[239], &mix32[223]);\
+	crc32p(&mix32[240], &mix32[224]); crc32p(&mix32[241], &mix32[225]);\
+	crc32p(&mix32[242], &mix32[226]); crc32p(&mix32[243], &mix32[227]);\
+	crc32p(&mix32[244], &mix32[228]); crc32p(&mix32[245], &mix32[229]);\
+	crc32p(&mix32[246], &mix32[230]); crc32p(&mix32[247], &mix32[231]);\
+	crc32p(&mix32[248], &mix32[232]); crc32p(&mix32[249], &mix32[233]);\
+	crc32p(&mix32[250], &mix32[234]); crc32p(&mix32[251], &mix32[235]);\
+	crc32p(&mix32[252], &mix32[236]); crc32p(&mix32[253], &mix32[237]);\
+	crc32p(&mix32[254], &mix32[238]); crc32p(&mix32[255], &mix32[239]);\
+	mix[128] = mix[256] = mix[384] = *mix;\
+	mix[129] = mix[257] = mix[385] = mix[  1];\
+	mix[130] = mix[258] = mix[386] = mix[  2];\
+	mix[131] = mix[259] = mix[387] = mix[  3];\
+	mix[132] = mix[260] = mix[388] = mix[  4];\
+	mix[133] = mix[261] = mix[389] = mix[  5];\
+	mix[134] = mix[262] = mix[390] = mix[  6];\
+	mix[135] = mix[263] = mix[391] = mix[  7];\
+	mix[136] = mix[264] = mix[392] = mix[  8];\
+	mix[137] = mix[265] = mix[393] = mix[  9];\
+	mix[138] = mix[266] = mix[394] = mix[ 10];\
+	mix[139] = mix[267] = mix[395] = mix[ 11];\
+	mix[140] = mix[268] = mix[396] = mix[ 12];\
+	mix[141] = mix[269] = mix[397] = mix[ 13];\
+	mix[142] = mix[270] = mix[398] = mix[ 14];\
+	mix[143] = mix[271] = mix[399] = mix[ 15];\
+	mix[144] = mix[272] = mix[400] = mix[ 16];\
+	mix[145] = mix[273] = mix[401] = mix[ 17];\
+	mix[146] = mix[274] = mix[402] = mix[ 18];\
+	mix[147] = mix[275] = mix[403] = mix[ 19];\
+	mix[148] = mix[276] = mix[404] = mix[ 20];\
+	mix[149] = mix[277] = mix[405] = mix[ 21];\
+	mix[150] = mix[278] = mix[406] = mix[ 22];\
+	mix[151] = mix[279] = mix[407] = mix[ 23];\
+	mix[152] = mix[280] = mix[408] = mix[ 24];\
+	mix[153] = mix[281] = mix[409] = mix[ 25];\
+	mix[154] = mix[282] = mix[410] = mix[ 26];\
+	mix[155] = mix[283] = mix[411] = mix[ 27];\
+	mix[156] = mix[284] = mix[412] = mix[ 28];\
+	mix[157] = mix[285] = mix[413] = mix[ 29];\
+	mix[158] = mix[286] = mix[414] = mix[ 30];\
+	mix[159] = mix[287] = mix[415] = mix[ 31];\
+	mix[160] = mix[288] = mix[416] = mix[ 32];\
+	mix[161] = mix[289] = mix[417] = mix[ 33];\
+	mix[162] = mix[290] = mix[418] = mix[ 34];\
+	mix[163] = mix[291] = mix[419] = mix[ 35];\
+	mix[164] = mix[292] = mix[420] = mix[ 36];\
+	mix[165] = mix[293] = mix[421] = mix[ 37];\
+	mix[166] = mix[294] = mix[422] = mix[ 38];\
+	mix[167] = mix[295] = mix[423] = mix[ 39];\
+	mix[168] = mix[296] = mix[424] = mix[ 40];\
+	mix[169] = mix[297] = mix[425] = mix[ 41];\
+	mix[170] = mix[298] = mix[426] = mix[ 42];\
+	mix[171] = mix[299] = mix[427] = mix[ 43];\
+	mix[172] = mix[300] = mix[428] = mix[ 44];\
+	mix[173] = mix[301] = mix[429] = mix[ 45];\
+	mix[174] = mix[302] = mix[430] = mix[ 46];\
+	mix[175] = mix[303] = mix[431] = mix[ 47];\
+	mix[176] = mix[304] = mix[432] = mix[ 48];\
+	mix[177] = mix[305] = mix[433] = mix[ 49];\
+	mix[178] = mix[306] = mix[434] = mix[ 50];\
+	mix[179] = mix[307] = mix[435] = mix[ 51];\
+	mix[180] = mix[308] = mix[436] = mix[ 52];\
+	mix[181] = mix[309] = mix[437] = mix[ 53];\
+	mix[182] = mix[310] = mix[438] = mix[ 54];\
+	mix[183] = mix[311] = mix[439] = mix[ 55];\
+	mix[184] = mix[312] = mix[440] = mix[ 56];\
+	mix[185] = mix[313] = mix[441] = mix[ 57];\
+	mix[186] = mix[314] = mix[442] = mix[ 58];\
+	mix[187] = mix[315] = mix[443] = mix[ 59];\
+	mix[188] = mix[316] = mix[444] = mix[ 60];\
+	mix[189] = mix[317] = mix[445] = mix[ 61];\
+	mix[190] = mix[318] = mix[446] = mix[ 62];\
+	mix[191] = mix[319] = mix[447] = mix[ 63];\
+	mix[192] = mix[320] = mix[448] = mix[ 64];\
+	mix[193] = mix[321] = mix[449] = mix[ 65];\
+	mix[194] = mix[322] = mix[450] = mix[ 66];\
+	mix[195] = mix[323] = mix[451] = mix[ 67];\
+	mix[196] = mix[324] = mix[452] = mix[ 68];\
+	mix[197] = mix[325] = mix[453] = mix[ 69];\
+	mix[198] = mix[326] = mix[454] = mix[ 70];\
+	mix[199] = mix[327] = mix[455] = mix[ 71];\
+	mix[200] = mix[328] = mix[456] = mix[ 72];\
+	mix[201] = mix[329] = mix[457] = mix[ 73];\
+	mix[202] = mix[330] = mix[458] = mix[ 74];\
+	mix[203] = mix[331] = mix[459] = mix[ 75];\
+	mix[204] = mix[332] = mix[460] = mix[ 76];\
+	mix[205] = mix[333] = mix[461] = mix[ 77];\
+	mix[206] = mix[334] = mix[462] = mix[ 78];\
+	mix[207] = mix[335] = mix[463] = mix[ 79];\
+	mix[208] = mix[336] = mix[464] = mix[ 80];\
+	mix[209] = mix[337] = mix[465] = mix[ 81];\
+	mix[210] = mix[338] = mix[466] = mix[ 82];\
+	mix[211] = mix[339] = mix[467] = mix[ 83];\
+	mix[212] = mix[340] = mix[468] = mix[ 84];\
+	mix[213] = mix[341] = mix[469] = mix[ 85];\
+	mix[214] = mix[342] = mix[470] = mix[ 86];\
+	mix[215] = mix[343] = mix[471] = mix[ 87];\
+	mix[216] = mix[344] = mix[472] = mix[ 88];\
+	mix[217] = mix[345] = mix[473] = mix[ 89];\
+	mix[218] = mix[346] = mix[474] = mix[ 90];\
+	mix[219] = mix[347] = mix[475] = mix[ 91];\
+	mix[220] = mix[348] = mix[476] = mix[ 92];\
+	mix[221] = mix[349] = mix[477] = mix[ 93];\
+	mix[222] = mix[350] = mix[478] = mix[ 94];\
+	mix[223] = mix[351] = mix[479] = mix[ 95];\
+	mix[224] = mix[352] = mix[480] = mix[ 96];\
+	mix[225] = mix[353] = mix[481] = mix[ 97];\
+	mix[226] = mix[354] = mix[482] = mix[ 98];\
+	mix[227] = mix[355] = mix[483] = mix[ 99];\
+	mix[228] = mix[356] = mix[484] = mix[100];\
+	mix[229] = mix[357] = mix[485] = mix[101];\
+	mix[230] = mix[358] = mix[486] = mix[102];\
+	mix[231] = mix[359] = mix[487] = mix[103];\
+	mix[232] = mix[360] = mix[488] = mix[104];\
+	mix[233] = mix[361] = mix[489] = mix[105];\
+	mix[234] = mix[362] = mix[490] = mix[106];\
+	mix[235] = mix[363] = mix[491] = mix[107];\
+	mix[236] = mix[364] = mix[492] = mix[108];\
+	mix[237] = mix[365] = mix[493] = mix[109];\
+	mix[238] = mix[366] = mix[494] = mix[110];\
+	mix[239] = mix[367] = mix[495] = mix[111];\
+	mix[240] = mix[368] = mix[496] = mix[112];\
+	mix[241] = mix[369] = mix[497] = mix[113];\
+	mix[242] = mix[370] = mix[498] = mix[114];\
+	mix[243] = mix[371] = mix[499] = mix[115];\
+	mix[244] = mix[372] = mix[500] = mix[116];\
+	mix[245] = mix[373] = mix[501] = mix[117];\
+	mix[246] = mix[374] = mix[502] = mix[118];\
+	mix[247] = mix[375] = mix[503] = mix[119];\
+	mix[248] = mix[376] = mix[504] = mix[120];\
+	mix[249] = mix[377] = mix[505] = mix[121];\
+	mix[250] = mix[378] = mix[506] = mix[122];\
+	mix[251] = mix[379] = mix[507] = mix[123];\
+	mix[252] = mix[380] = mix[508] = mix[124];\
+	mix[253] = mix[381] = mix[509] = mix[125];\
+	mix[254] = mix[382] = mix[510] = mix[126];\
+	mix[255] = mix[383] = mix[511] = mix[127];\
+	mix[128] += mix[  1]; mix[129] += mix[  2];\
+	mix[130] += mix[  3]; mix[131] += mix[  4];\
+	mix[132] += mix[  5]; mix[133] += mix[  6];\
+	mix[134] += mix[  7]; mix[135] += mix[  8];\
+	mix[136] += mix[  9]; mix[137] += mix[ 10];\
+	mix[138] += mix[ 11]; mix[139] += mix[ 12];\
+	mix[140] += mix[ 13]; mix[141] += mix[ 14];\
+	mix[142] += mix[ 15]; mix[143] += mix[ 16];\
+	mix[144] += mix[ 17]; mix[145] += mix[ 18];\
+	mix[146] += mix[ 19]; mix[147] += mix[ 20];\
+	mix[148] += mix[ 21]; mix[149] += mix[ 22];\
+	mix[150] += mix[ 23]; mix[151] += mix[ 24];\
+	mix[152] += mix[ 25]; mix[153] += mix[ 26];\
+	mix[154] += mix[ 27]; mix[155] += mix[ 28];\
+	mix[156] += mix[ 29]; mix[157] += mix[ 30];\
+	mix[158] += mix[ 31]; mix[159] += mix[ 32];\
+	mix[160] += mix[ 33]; mix[161] += mix[ 34];\
+	mix[162] += mix[ 35]; mix[163] += mix[ 36];\
+	mix[164] += mix[ 37]; mix[165] += mix[ 38];\
+	mix[166] += mix[ 39]; mix[167] += mix[ 40];\
+	mix[168] += mix[ 41]; mix[169] += mix[ 42];\
+	mix[170] += mix[ 43]; mix[171] += mix[ 44];\
+	mix[172] += mix[ 45]; mix[173] += mix[ 46];\
+	mix[174] += mix[ 47]; mix[175] += mix[ 48];\
+	mix[176] += mix[ 49]; mix[177] += mix[ 50];\
+	mix[178] += mix[ 51]; mix[179] += mix[ 52];\
+	mix[180] += mix[ 53]; mix[181] += mix[ 54];\
+	mix[182] += mix[ 55]; mix[183] += mix[ 56];\
+	mix[184] += mix[ 57]; mix[185] += mix[ 58];\
+	mix[186] += mix[ 59]; mix[187] += mix[ 60];\
+	mix[188] += mix[ 61]; mix[189] += mix[ 62];\
+	mix[190] += mix[ 63]; mix[191] += mix[ 64];\
+	mix[192] += mix[ 65]; mix[193] += mix[ 66];\
+	mix[194] += mix[ 67]; mix[195] += mix[ 68];\
+	mix[196] += mix[ 69]; mix[197] += mix[ 70];\
+	mix[198] += mix[ 71]; mix[199] += mix[ 72];\
+	mix[200] += mix[ 73]; mix[201] += mix[ 74];\
+	mix[202] += mix[ 75]; mix[203] += mix[ 76];\
+	mix[204] += mix[ 77]; mix[205] += mix[ 78];\
+	mix[206] += mix[ 79]; mix[207] += mix[ 80];\
+	mix[208] += mix[ 81]; mix[209] += mix[ 82];\
+	mix[210] += mix[ 83]; mix[211] += mix[ 84];\
+	mix[212] += mix[ 85]; mix[213] += mix[ 86];\
+	mix[214] += mix[ 87]; mix[215] += mix[ 88];\
+	mix[216] += mix[ 89]; mix[217] += mix[ 90];\
+	mix[218] += mix[ 91]; mix[219] += mix[ 92];\
+	mix[220] += mix[ 93]; mix[221] += mix[ 94];\
+	mix[222] += mix[ 95]; mix[223] += mix[ 96];\
+	mix[224] += mix[ 97]; mix[225] += mix[ 98];\
+	mix[226] += mix[ 99]; mix[227] += mix[100];\
+	mix[228] += mix[101]; mix[229] += mix[102];\
+	mix[230] += mix[103]; mix[231] += mix[104];\
+	mix[232] += mix[105]; mix[233] += mix[106];\
+	mix[234] += mix[107]; mix[235] += mix[108];\
+	mix[236] += mix[109]; mix[237] += mix[110];\
+	mix[238] += mix[111]; mix[239] += mix[112];\
+	mix[240] += mix[113]; mix[241] += mix[114];\
+	mix[242] += mix[115]; mix[243] += mix[116];\
+	mix[244] += mix[117]; mix[245] += mix[118];\
+	mix[246] += mix[119]; mix[247] += mix[120];\
+	mix[248] += mix[121]; mix[249] += mix[122];\
+	mix[250] += mix[123]; mix[251] += mix[124];\
+	mix[252] += mix[125]; mix[253] += mix[126];\
+	mix[254] += mix[127]; mix[255] += mix[128];\
+	mix[256] += mix[129]; mix[257] += mix[130];\
+	mix[258] += mix[131]; mix[259] += mix[132];\
+	mix[260] += mix[133]; mix[261] += mix[134];\
+	mix[262] += mix[135]; mix[263] += mix[136];\
+	mix[264] += mix[137]; mix[265] += mix[138];\
+	mix[266] += mix[139]; mix[267] += mix[140];\
+	mix[268] += mix[141]; mix[269] += mix[142];\
+	mix[270] += mix[143]; mix[271] += mix[144];\
+	mix[272] += mix[145]; mix[273] += mix[146];\
+	mix[274] += mix[147]; mix[275] += mix[148];\
+	mix[276] += mix[149]; mix[277] += mix[150];\
+	mix[278] += mix[151]; mix[279] += mix[152];\
+	mix[280] += mix[153]; mix[281] += mix[154];\
+	mix[282] += mix[155]; mix[283] += mix[156];\
+	mix[284] += mix[157]; mix[285] += mix[158];\
+	mix[286] += mix[159]; mix[287] += mix[160];\
+	mix[288] += mix[161]; mix[289] += mix[162];\
+	mix[290] += mix[163]; mix[291] += mix[164];\
+	mix[292] += mix[165]; mix[293] += mix[166];\
+	mix[294] += mix[167]; mix[295] += mix[168];\
+	mix[296] += mix[169]; mix[297] += mix[170];\
+	mix[298] += mix[171]; mix[299] += mix[172];\
+	mix[300] += mix[173]; mix[301] += mix[174];\
+	mix[302] += mix[175]; mix[303] += mix[176];\
+	mix[304] += mix[177]; mix[305] += mix[178];\
+	mix[306] += mix[179]; mix[307] += mix[180];\
+	mix[308] += mix[181]; mix[309] += mix[182];\
+	mix[310] += mix[183]; mix[311] += mix[184];\
+	mix[312] += mix[185]; mix[313] += mix[186];\
+	mix[314] += mix[187]; mix[315] += mix[188];\
+	mix[316] += mix[189]; mix[317] += mix[190];\
+	mix[318] += mix[191]; mix[319] += mix[192];\
+	mix[320] += mix[193]; mix[321] += mix[194];\
+	mix[322] += mix[195]; mix[323] += mix[196];\
+	mix[324] += mix[197]; mix[325] += mix[198];\
+	mix[326] += mix[199]; mix[327] += mix[200];\
+	mix[328] += mix[201]; mix[329] += mix[202];\
+	mix[330] += mix[203]; mix[331] += mix[204];\
+	mix[332] += mix[205]; mix[333] += mix[206];\
+	mix[334] += mix[207]; mix[335] += mix[208];\
+	mix[336] += mix[209]; mix[337] += mix[210];\
+	mix[338] += mix[211]; mix[339] += mix[212];\
+	mix[340] += mix[213]; mix[341] += mix[214];\
+	mix[342] += mix[215]; mix[343] += mix[216];\
+	mix[344] += mix[217]; mix[345] += mix[218];\
+	mix[346] += mix[219]; mix[347] += mix[220];\
+	mix[348] += mix[221]; mix[349] += mix[222];\
+	mix[350] += mix[223]; mix[351] += mix[224];\
+	mix[352] += mix[225]; mix[353] += mix[226];\
+	mix[354] += mix[227]; mix[355] += mix[228];\
+	mix[356] += mix[229]; mix[357] += mix[230];\
+	mix[358] += mix[231]; mix[359] += mix[232];\
+	mix[360] += mix[233]; mix[361] += mix[234];\
+	mix[362] += mix[235]; mix[363] += mix[236];\
+	mix[364] += mix[237]; mix[365] += mix[238];\
+	mix[366] += mix[239]; mix[367] += mix[240];\
+	mix[368] += mix[241]; mix[369] += mix[242];\
+	mix[370] += mix[243]; mix[371] += mix[244];\
+	mix[372] += mix[245]; mix[373] += mix[246];\
+	mix[374] += mix[247]; mix[375] += mix[248];\
+	mix[376] += mix[249]; mix[377] += mix[250];\
+	mix[378] += mix[251]; mix[379] += mix[252];\
+	mix[380] += mix[253]; mix[381] += mix[254];\
+	mix[382] += mix[255]; mix[383] += mix[256];\
+	mix[384] += mix[257]; mix[385] += mix[258];\
+	mix[386] += mix[259]; mix[387] += mix[260];\
+	mix[388] += mix[261]; mix[389] += mix[262];\
+	mix[390] += mix[263]; mix[391] += mix[264];\
+	mix[392] += mix[265]; mix[393] += mix[266];\
+	mix[394] += mix[267]; mix[395] += mix[268];\
+	mix[396] += mix[269]; mix[397] += mix[270];\
+	mix[398] += mix[271]; mix[399] += mix[272];\
+	mix[400] += mix[273]; mix[401] += mix[274];\
+	mix[402] += mix[275]; mix[403] += mix[276];\
+	mix[404] += mix[277]; mix[405] += mix[278];\
+	mix[406] += mix[279]; mix[407] += mix[280];\
+	mix[408] += mix[281]; mix[409] += mix[282];\
+	mix[410] += mix[283]; mix[411] += mix[284];\
+	mix[412] += mix[285]; mix[413] += mix[286];\
+	mix[414] += mix[287]; mix[415] += mix[288];\
+	mix[416] += mix[289]; mix[417] += mix[290];\
+	mix[418] += mix[291]; mix[419] += mix[292];\
+	mix[420] += mix[293]; mix[421] += mix[294];\
+	mix[422] += mix[295]; mix[423] += mix[296];\
+	mix[424] += mix[297]; mix[425] += mix[298];\
+	mix[426] += mix[299]; mix[427] += mix[300];\
+	mix[428] += mix[301]; mix[429] += mix[302];\
+	mix[430] += mix[303]; mix[431] += mix[304];\
+	mix[432] += mix[305]; mix[433] += mix[306];\
+	mix[434] += mix[307]; mix[435] += mix[308];\
+	mix[436] += mix[309]; mix[437] += mix[310];\
+	mix[438] += mix[311]; mix[439] += mix[312];\
+	mix[440] += mix[313]; mix[441] += mix[314];\
+	mix[442] += mix[315]; mix[443] += mix[316];\
+	mix[444] += mix[317]; mix[445] += mix[318];\
+	mix[446] += mix[319]; mix[447] += mix[320];\
+	mix[448] += mix[321]; mix[449] += mix[322];\
+	mix[450] += mix[323]; mix[451] += mix[324];\
+	mix[452] += mix[325]; mix[453] += mix[326];\
+	mix[454] += mix[327]; mix[455] += mix[328];\
+	mix[456] += mix[329]; mix[457] += mix[330];\
+	mix[458] += mix[331]; mix[459] += mix[332];\
+	mix[460] += mix[333]; mix[461] += mix[334];\
+	mix[462] += mix[335]; mix[463] += mix[336];\
+	mix[464] += mix[337]; mix[465] += mix[338];\
+	mix[466] += mix[339]; mix[467] += mix[340];\
+	mix[468] += mix[341]; mix[469] += mix[342];\
+	mix[470] += mix[343]; mix[471] += mix[344];\
+	mix[472] += mix[345]; mix[473] += mix[346];\
+	mix[474] += mix[347]; mix[475] += mix[348];\
+	mix[476] += mix[349]; mix[477] += mix[350];\
+	mix[478] += mix[351]; mix[479] += mix[352];\
+	mix[480] += mix[353]; mix[481] += mix[354];\
+	mix[482] += mix[355]; mix[483] += mix[356];\
+	mix[484] += mix[357]; mix[485] += mix[358];\
+	mix[486] += mix[359]; mix[487] += mix[360];\
+	mix[488] += mix[361]; mix[489] += mix[362];\
+	mix[490] += mix[363]; mix[491] += mix[364];\
+	mix[492] += mix[365]; mix[493] += mix[366];\
+	mix[494] += mix[367]; mix[495] += mix[368];\
+	mix[496] += mix[369]; mix[497] += mix[370];\
+	mix[498] += mix[371]; mix[499] += mix[372];\
+	mix[500] += mix[373]; mix[501] += mix[374];\
+	mix[502] += mix[375]; mix[503] += mix[376];\
+	mix[504] += mix[377]; mix[505] += mix[378];\
+	mix[506] += mix[379]; mix[507] += mix[380];\
+	mix[508] += mix[381]; mix[509] += mix[382];\
+	mix[510] += mix[383]; mix[511] += *mix;
 
-			}
-		}else if(pos64<45){
-			mix[4] = itemNumber; mix[5] = itemNumber;
-			aes(mix8, seed);
-			aes(&mix8[32], mix8);
-			if(pos64<32){
-				aes(&mix8[16], &seed[16]); 
-				*out0 = mix32[7];
-				*out1 = mix32[8];
-			}else{
-				const uint8_t pos64_4 = pos64>>2;
-				*out0 = mix32[pos64_4  ];
-				*out1 = mix32[pos64_4+1];
-			}
-		}else if(pos64<61){
-			mix[4] = itemNumber; mix[5] = itemNumber;
-			mix[6] = itemNumber; mix[7] = itemNumber;
-			aes(&mix8[16], &seed[16]); aes(&mix8[48], &mix8[16]);
-			if(pos64<48){
-				aes(mix8, seed); aes(&mix8[32], mix8); 
-				*out0 = mix32[11];
-				*out1 = mix32[12];
-			}else{
-				const uint8_t pos64_4 = pos64>>2;
-				*out0 = mix32[pos64_4  ];
-				*out1 = mix32[pos64_4+1];
-			}
-		}else{
-			mix[4] = itemNumber; mix[5] = itemNumber;
-			mix[4]+=16; mix[5]+=16;
-			aes(mix8, &seed[16]); aes(&mix8[16], &mix8[16]);
-			(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
-			aes(&mix8[32], seed);
-			*out0 = mix32[7];
-			*out1 = mix32[8];
+uint32_t calcItem32(uint8_t* seed, uint32_t i){
+	uint64_t  mix[512];
+	uint8_t*  mix8_0 = (uint8_t*)mix;
+	uint8_t*  mix8_1 = (uint8_t*)&mix[2];
+	uint8_t*  mix8_2 = (uint8_t*)&mix[4];
+	uint8_t*  mix8_3 = (uint8_t*)&mix[6];
+	uint32_t* mix32  = (uint32_t*)mix;
+	uint32_t  out0   = 0; 
+	uint32_t  out1   = 0; 
+	const uint8_t pos     = i&0x3;
+	const uint8_t pos4096 = (i&0xfff)>>2;
+	const uint8_t* seed1 = &seed[16];
+	ITEM_CALCULATION()
+	if(pos4096<1023){
+		out0 = mix32[pos4096];
+		out1 = mix32[1+pos4096];
+	}else{
+		out0 = mix32[1023];
+		if(pos){
+			i++;
+			ITEM_CALCULATION()
+			out1 = *mix32;
 		}
 	}
-	do{
-		crc32i(out0);
-		crc32i(out1);
-	}while(--pos1024);
-	for(uint8_t i=0; i<  pos; i++) (*out0)>>=8;
-	for(uint8_t i=0; i<4-pos; i++) (*out1)<<=8;
-	*out0 |= *out1;
-	return *out0;
+	for(uint8_t j=0; j<  pos; j++) (out0)>>=8;
+	for(uint8_t j=0; j<4-pos; j++) (out1)<<=8;
+	out0 |= out1;
+	return out0;
+}
+
+uint64_t calcItem64(uint8_t* seed, uint32_t i){
+	uint64_t  mix[512];
+	uint8_t*  mix8_0 = (uint8_t*)mix;
+	uint8_t*  mix8_1 = (uint8_t*)&mix[2];
+	uint8_t*  mix8_2 = (uint8_t*)&mix[4];
+	uint8_t*  mix8_3 = (uint8_t*)&mix[6];
+	uint32_t* mix32  = (uint32_t*)mix;
+	uint64_t  out0   = 0; 
+	uint64_t  out1   = 0; 
+	const uint8_t pos     = i&0x7;
+	const uint8_t pos4096 = (i&0xfff)>>3;
+	const uint8_t* seed1 = &seed[16];
+	ITEM_CALCULATION()
+	if(pos4096<511){
+		out0 = mix[pos4096];
+		out1 = mix[1+pos4096];
+	}else{
+		out0 = mix[511];
+		if(pos){
+			i++;
+			ITEM_CALCULATION()
+			out1 = *mix32;
+		}
+	}
+	for(uint8_t j=0; j<  pos; j++) (out0)>>=8;
+	for(uint8_t j=0; j<8-pos; j++) (out1)<<=8;
+	out0 |= out1;
+	return out0;
 }
 
 void calcDataset(const uint8_t* seed, uint8_t* out){
@@ -204,483 +650,8 @@ void calcDataset(const uint8_t* seed, uint8_t* out){
 	uint32_t  i        = (ITEMS>>12);
 	const uint8_t* seed1 = &seed[16];
 	do{
-		mix[  1] = mix[  3] = mix[  5] = mix[  7] = mix[  9] = mix[ 11] = mix[ 13] =
-		mix[ 15] = mix[ 17] = mix[ 19] = mix[ 21] = mix[ 23] = mix[ 25] = mix[ 27] =
-		mix[ 29] = mix[ 31] = mix[ 33] = mix[ 35] = mix[ 37] = mix[ 39] = mix[ 41] =
-		mix[ 43] = mix[ 45] = mix[ 47] = mix[ 49] = mix[ 51] = mix[ 53] = mix[ 55] =
-		mix[ 57] = mix[ 59] = mix[ 61] = mix[ 63] = mix[ 65] = mix[ 67] = mix[ 69] =
-		mix[ 71] = mix[ 73] = mix[ 75] = mix[ 77] = mix[ 79] = mix[ 81] = mix[ 83] =
-		mix[ 85] = mix[ 87] = mix[ 89] = mix[ 91] = mix[ 93] = mix[ 95] = mix[ 97] =
-		mix[ 99] = mix[101] = mix[103] = mix[105] = mix[107] = mix[109] = mix[111] =
-		mix[113] = mix[115] = mix[117] = mix[119] = mix[121] = mix[123] = mix[125] =
-		mix[127] = 0;
-		*mix     = mix[  2] = mix[  4] = mix[  6] = mix[  8] = mix[ 10] = mix[ 12] =
-		mix[ 14] = mix[ 16] = mix[ 18] = mix[ 20] = mix[ 22] = mix[ 24] = mix[ 26] =
-		mix[ 28] = mix[ 30] = mix[ 32] = mix[ 34] = mix[ 36] = mix[ 38] = mix[ 40] =
-		mix[ 42] = mix[ 44] = mix[ 46] = mix[ 48] = mix[ 50] = mix[ 52] = mix[ 54] = 
-		mix[ 56] = mix[ 58] = mix[ 60] = mix[ 62] = mix[ 64] = mix[ 66] = mix[ 68] =
-		mix[ 70] = mix[ 72] = mix[ 74] = mix[ 76] = mix[ 78] = mix[ 80] = mix[ 82] =
-		mix[ 84] = mix[ 86] = mix[ 88] = mix[ 90] = mix[ 92] = mix[ 94] = mix[ 96] =
-		mix[ 98] = mix[100] = mix[102] = mix[104] = mix[106] = mix[108] = mix[110] = 
-		mix[112] = mix[114] = mix[116] = mix[118] = mix[120] = mix[122] = mix[124] =
-		mix[126] = i;
-		mix[ 16]++; mix[ 18]++; mix[ 20]++; mix[ 22]++;
-		mix[ 24]++; mix[ 26]++; mix[ 28]++; mix[ 30]++;
-		mix[ 32]+=2; mix[ 34]+=2; mix[ 36]+=2; mix[ 38]+=2;
-		mix[ 40]+=2; mix[ 42]+=2; mix[ 44]+=2; mix[ 46]+=2;
-		mix[ 48]+=3; mix[ 50]+=3; mix[ 52]+=3; mix[ 54]+=3;
-		mix[ 56]+=3; mix[ 58]+=3; mix[ 60]+=3; mix[ 62]+=3;
-		mix[ 64]+=4; mix[ 66]+=4; mix[ 68]+=4; mix[ 70]+=4;
-		mix[ 72]+=4; mix[ 74]+=4; mix[ 76]+=4; mix[ 78]+=4;
-		mix[ 80]+=5; mix[ 82]+=5; mix[ 84]+=5; mix[ 86]+=5;
-		mix[ 88]+=5; mix[ 90]+=5; mix[ 92]+=5; mix[ 94]+=5;
-		mix[ 96]+=6; mix[ 96]+=6; mix[ 98]+=6; mix[100]+=6;
-		mix[104]+=6; mix[106]+=6; mix[108]+=6; mix[110]+=6;
-		mix[112]+=7; mix[114]+=7; mix[116]+=7; mix[118]+=7;
-		mix[120]+=7; mix[122]+=7; mix[124]+=7; mix[126]+=7;
-		out+=0x1000;
-		aes(mix8_0, seed);   aes(mix8_1, seed1);
-		aes(mix8_2, mix8_0); aes(mix8_3, mix8_1);
-		crc32p(&mix32[ 16], mix32);       crc32p(&mix32[ 17], &mix32[  1]);
-		crc32p(&mix32[ 18], &mix32[  2]); crc32p(&mix32[ 19], &mix32[  3]);
-		crc32p(&mix32[ 20], &mix32[  4]); crc32p(&mix32[ 21], &mix32[  5]);
-		crc32p(&mix32[ 22], &mix32[  6]); crc32p(&mix32[ 23], &mix32[  7]);
-		crc32p(&mix32[ 24], &mix32[  8]); crc32p(&mix32[ 25], &mix32[  9]);
-		crc32p(&mix32[ 26], &mix32[ 10]); crc32p(&mix32[ 27], &mix32[ 11]);
-		crc32p(&mix32[ 28], &mix32[ 12]); crc32p(&mix32[ 29], &mix32[ 13]);
-		crc32p(&mix32[ 30], &mix32[ 14]); crc32p(&mix32[ 31], &mix32[ 15]);
-		crc32p(&mix32[ 32], &mix32[ 16]); crc32p(&mix32[ 33], &mix32[ 17]);
-		crc32p(&mix32[ 34], &mix32[ 18]); crc32p(&mix32[ 35], &mix32[ 19]);
-		crc32p(&mix32[ 36], &mix32[ 20]); crc32p(&mix32[ 37], &mix32[ 21]);
-		crc32p(&mix32[ 38], &mix32[ 22]); crc32p(&mix32[ 39], &mix32[ 23]);
-		crc32p(&mix32[ 40], &mix32[ 24]); crc32p(&mix32[ 41], &mix32[ 25]);
-		crc32p(&mix32[ 42], &mix32[ 26]); crc32p(&mix32[ 43], &mix32[ 27]);
-		crc32p(&mix32[ 44], &mix32[ 28]); crc32p(&mix32[ 45], &mix32[ 29]);
-		crc32p(&mix32[ 46], &mix32[ 30]); crc32p(&mix32[ 47], &mix32[ 31]);
-		crc32p(&mix32[ 48], &mix32[ 32]); crc32p(&mix32[ 49], &mix32[ 33]);
-		crc32p(&mix32[ 50], &mix32[ 34]); crc32p(&mix32[ 51], &mix32[ 35]);
-		crc32p(&mix32[ 52], &mix32[ 36]); crc32p(&mix32[ 53], &mix32[ 37]);
-		crc32p(&mix32[ 54], &mix32[ 38]); crc32p(&mix32[ 55], &mix32[ 39]);
-		crc32p(&mix32[ 56], &mix32[ 40]); crc32p(&mix32[ 57], &mix32[ 41]);
-		crc32p(&mix32[ 58], &mix32[ 42]); crc32p(&mix32[ 59], &mix32[ 43]);
-		crc32p(&mix32[ 60], &mix32[ 44]); crc32p(&mix32[ 61], &mix32[ 45]);
-		crc32p(&mix32[ 62], &mix32[ 46]); crc32p(&mix32[ 63], &mix32[ 47]);
-		crc32p(&mix32[ 64], &mix32[ 48]); crc32p(&mix32[ 65], &mix32[ 49]);
-		crc32p(&mix32[ 66], &mix32[ 50]); crc32p(&mix32[ 67], &mix32[ 51]);
-		crc32p(&mix32[ 68], &mix32[ 52]); crc32p(&mix32[ 69], &mix32[ 53]);
-		crc32p(&mix32[ 70], &mix32[ 54]); crc32p(&mix32[ 71], &mix32[ 55]);
-		crc32p(&mix32[ 72], &mix32[ 56]); crc32p(&mix32[ 73], &mix32[ 57]);
-		crc32p(&mix32[ 74], &mix32[ 58]); crc32p(&mix32[ 75], &mix32[ 59]);
-		crc32p(&mix32[ 76], &mix32[ 60]); crc32p(&mix32[ 77], &mix32[ 61]);
-		crc32p(&mix32[ 78], &mix32[ 62]); crc32p(&mix32[ 79], &mix32[ 63]);
-		crc32p(&mix32[ 80], &mix32[ 64]); crc32p(&mix32[ 81], &mix32[ 65]);
-		crc32p(&mix32[ 82], &mix32[ 66]); crc32p(&mix32[ 83], &mix32[ 67]);
-		crc32p(&mix32[ 84], &mix32[ 68]); crc32p(&mix32[ 85], &mix32[ 69]);
-		crc32p(&mix32[ 86], &mix32[ 70]); crc32p(&mix32[ 87], &mix32[ 71]);
-		crc32p(&mix32[ 88], &mix32[ 72]); crc32p(&mix32[ 89], &mix32[ 73]);
-		crc32p(&mix32[ 90], &mix32[ 74]); crc32p(&mix32[ 91], &mix32[ 75]);
-		crc32p(&mix32[ 92], &mix32[ 76]); crc32p(&mix32[ 93], &mix32[ 77]);
-		crc32p(&mix32[ 94], &mix32[ 78]); crc32p(&mix32[ 95], &mix32[ 79]);
-		crc32p(&mix32[ 96], &mix32[ 80]); crc32p(&mix32[ 97], &mix32[ 81]);
-		crc32p(&mix32[ 98], &mix32[ 82]); crc32p(&mix32[ 99], &mix32[ 83]);
-		crc32p(&mix32[100], &mix32[ 84]); crc32p(&mix32[101], &mix32[ 85]);
-		crc32p(&mix32[102], &mix32[ 86]); crc32p(&mix32[103], &mix32[ 87]);
-		crc32p(&mix32[104], &mix32[ 88]); crc32p(&mix32[105], &mix32[ 89]);
-		crc32p(&mix32[106], &mix32[ 90]); crc32p(&mix32[107], &mix32[ 91]);
-		crc32p(&mix32[108], &mix32[ 92]); crc32p(&mix32[109], &mix32[ 93]);
-		crc32p(&mix32[110], &mix32[ 94]); crc32p(&mix32[111], &mix32[ 95]);
-		crc32p(&mix32[112], &mix32[ 96]); crc32p(&mix32[113], &mix32[ 97]);
-		crc32p(&mix32[114], &mix32[ 98]); crc32p(&mix32[115], &mix32[ 99]);
-		crc32p(&mix32[116], &mix32[100]); crc32p(&mix32[117], &mix32[101]);
-		crc32p(&mix32[118], &mix32[102]); crc32p(&mix32[119], &mix32[103]);
-		crc32p(&mix32[120], &mix32[104]); crc32p(&mix32[121], &mix32[105]);
-		crc32p(&mix32[122], &mix32[106]); crc32p(&mix32[123], &mix32[107]);
-		crc32p(&mix32[124], &mix32[108]); crc32p(&mix32[125], &mix32[109]);
-		crc32p(&mix32[126], &mix32[110]); crc32p(&mix32[127], &mix32[111]);
-		crc32p(&mix32[128], &mix32[112]); crc32p(&mix32[129], &mix32[113]);
-		crc32p(&mix32[130], &mix32[114]); crc32p(&mix32[131], &mix32[115]);
-		crc32p(&mix32[132], &mix32[116]); crc32p(&mix32[133], &mix32[117]);
-		crc32p(&mix32[134], &mix32[118]); crc32p(&mix32[135], &mix32[119]);
-		crc32p(&mix32[136], &mix32[120]); crc32p(&mix32[137], &mix32[121]);
-		crc32p(&mix32[138], &mix32[122]); crc32p(&mix32[139], &mix32[123]);
-		crc32p(&mix32[140], &mix32[124]); crc32p(&mix32[141], &mix32[125]);
-		crc32p(&mix32[142], &mix32[126]); crc32p(&mix32[143], &mix32[127]);
-		crc32p(&mix32[144], &mix32[128]); crc32p(&mix32[145], &mix32[129]);
-		crc32p(&mix32[146], &mix32[130]); crc32p(&mix32[147], &mix32[131]);
-		crc32p(&mix32[148], &mix32[132]); crc32p(&mix32[149], &mix32[133]);
-		crc32p(&mix32[150], &mix32[134]); crc32p(&mix32[151], &mix32[135]);
-		crc32p(&mix32[152], &mix32[136]); crc32p(&mix32[153], &mix32[137]);
-		crc32p(&mix32[154], &mix32[138]); crc32p(&mix32[155], &mix32[139]);
-		crc32p(&mix32[156], &mix32[140]); crc32p(&mix32[157], &mix32[141]);
-		crc32p(&mix32[158], &mix32[142]); crc32p(&mix32[159], &mix32[143]);
-		crc32p(&mix32[160], &mix32[144]); crc32p(&mix32[161], &mix32[145]);
-		crc32p(&mix32[162], &mix32[146]); crc32p(&mix32[163], &mix32[147]);
-		crc32p(&mix32[164], &mix32[148]); crc32p(&mix32[165], &mix32[149]);
-		crc32p(&mix32[166], &mix32[150]); crc32p(&mix32[167], &mix32[151]);
-		crc32p(&mix32[168], &mix32[152]); crc32p(&mix32[169], &mix32[153]);
-		crc32p(&mix32[170], &mix32[154]); crc32p(&mix32[171], &mix32[155]);
-		crc32p(&mix32[172], &mix32[156]); crc32p(&mix32[173], &mix32[157]);
-		crc32p(&mix32[174], &mix32[158]); crc32p(&mix32[175], &mix32[159]);
-		crc32p(&mix32[176], &mix32[160]); crc32p(&mix32[177], &mix32[161]);
-		crc32p(&mix32[178], &mix32[162]); crc32p(&mix32[179], &mix32[163]);
-		crc32p(&mix32[180], &mix32[164]); crc32p(&mix32[181], &mix32[165]);
-		crc32p(&mix32[182], &mix32[166]); crc32p(&mix32[183], &mix32[167]);
-		crc32p(&mix32[184], &mix32[168]); crc32p(&mix32[185], &mix32[169]);
-		crc32p(&mix32[186], &mix32[170]); crc32p(&mix32[187], &mix32[171]);
-		crc32p(&mix32[188], &mix32[172]); crc32p(&mix32[189], &mix32[173]);
-		crc32p(&mix32[190], &mix32[174]); crc32p(&mix32[191], &mix32[175]);
-		crc32p(&mix32[192], &mix32[176]); crc32p(&mix32[193], &mix32[177]);
-		crc32p(&mix32[194], &mix32[178]); crc32p(&mix32[195], &mix32[179]);
-		crc32p(&mix32[196], &mix32[180]); crc32p(&mix32[197], &mix32[181]);
-		crc32p(&mix32[198], &mix32[182]); crc32p(&mix32[199], &mix32[183]);
-		crc32p(&mix32[200], &mix32[184]); crc32p(&mix32[201], &mix32[185]);
-		crc32p(&mix32[202], &mix32[186]); crc32p(&mix32[203], &mix32[187]);
-		crc32p(&mix32[204], &mix32[188]); crc32p(&mix32[205], &mix32[189]);
-		crc32p(&mix32[206], &mix32[190]); crc32p(&mix32[207], &mix32[191]);
-		crc32p(&mix32[208], &mix32[192]); crc32p(&mix32[209], &mix32[193]);
-		crc32p(&mix32[210], &mix32[194]); crc32p(&mix32[211], &mix32[195]);
-		crc32p(&mix32[212], &mix32[196]); crc32p(&mix32[213], &mix32[197]);
-		crc32p(&mix32[214], &mix32[198]); crc32p(&mix32[215], &mix32[199]);
-		crc32p(&mix32[216], &mix32[200]); crc32p(&mix32[217], &mix32[201]);
-		crc32p(&mix32[218], &mix32[202]); crc32p(&mix32[219], &mix32[203]);
-		crc32p(&mix32[220], &mix32[204]); crc32p(&mix32[221], &mix32[205]);
-		crc32p(&mix32[222], &mix32[206]); crc32p(&mix32[223], &mix32[207]);
-		crc32p(&mix32[224], &mix32[208]); crc32p(&mix32[225], &mix32[209]);
-		crc32p(&mix32[226], &mix32[210]); crc32p(&mix32[227], &mix32[211]);
-		crc32p(&mix32[228], &mix32[212]); crc32p(&mix32[229], &mix32[213]);
-		crc32p(&mix32[230], &mix32[214]); crc32p(&mix32[231], &mix32[215]);
-		crc32p(&mix32[232], &mix32[216]); crc32p(&mix32[233], &mix32[217]);
-		crc32p(&mix32[234], &mix32[218]); crc32p(&mix32[235], &mix32[219]);
-		crc32p(&mix32[236], &mix32[220]); crc32p(&mix32[237], &mix32[221]);
-		crc32p(&mix32[238], &mix32[222]); crc32p(&mix32[239], &mix32[223]);
-		crc32p(&mix32[240], &mix32[224]); crc32p(&mix32[241], &mix32[225]);
-		crc32p(&mix32[242], &mix32[226]); crc32p(&mix32[243], &mix32[227]);
-		crc32p(&mix32[244], &mix32[228]); crc32p(&mix32[245], &mix32[229]);
-		crc32p(&mix32[246], &mix32[230]); crc32p(&mix32[247], &mix32[231]);
-		crc32p(&mix32[248], &mix32[232]); crc32p(&mix32[249], &mix32[233]);
-		crc32p(&mix32[250], &mix32[234]); crc32p(&mix32[251], &mix32[235]);
-		crc32p(&mix32[252], &mix32[236]); crc32p(&mix32[253], &mix32[237]);
-		crc32p(&mix32[254], &mix32[238]); crc32p(&mix32[255], &mix32[239]);
-		mix[128] = mix[256] = mix[384] = *mix;
-		mix[129] = mix[257] = mix[385] = mix[  1];
-		mix[130] = mix[258] = mix[386] = mix[  2];
-		mix[131] = mix[259] = mix[387] = mix[  3];
-		mix[132] = mix[260] = mix[388] = mix[  4];
-		mix[133] = mix[261] = mix[389] = mix[  5];
-		mix[134] = mix[262] = mix[390] = mix[  6];
-		mix[135] = mix[263] = mix[391] = mix[  7];
-		mix[136] = mix[264] = mix[392] = mix[  8];
-		mix[137] = mix[265] = mix[393] = mix[  9];
-		mix[138] = mix[266] = mix[394] = mix[ 10];
-		mix[139] = mix[267] = mix[395] = mix[ 11];
-		mix[140] = mix[268] = mix[396] = mix[ 12];
-		mix[141] = mix[269] = mix[397] = mix[ 13];
-		mix[142] = mix[270] = mix[398] = mix[ 14];
-		mix[143] = mix[271] = mix[399] = mix[ 15];
-		mix[144] = mix[272] = mix[400] = mix[ 16];
-		mix[145] = mix[273] = mix[401] = mix[ 17];
-		mix[146] = mix[274] = mix[402] = mix[ 18];
-		mix[147] = mix[275] = mix[403] = mix[ 19];
-		mix[148] = mix[276] = mix[404] = mix[ 20];
-		mix[149] = mix[277] = mix[405] = mix[ 21];
-		mix[150] = mix[278] = mix[406] = mix[ 22];
-		mix[151] = mix[279] = mix[407] = mix[ 23];
-		mix[152] = mix[280] = mix[408] = mix[ 24];
-		mix[153] = mix[281] = mix[409] = mix[ 25];
-		mix[154] = mix[282] = mix[410] = mix[ 26];
-		mix[155] = mix[283] = mix[411] = mix[ 27];
-		mix[156] = mix[284] = mix[412] = mix[ 28];
-		mix[157] = mix[285] = mix[413] = mix[ 29];
-		mix[158] = mix[286] = mix[414] = mix[ 30];
-		mix[159] = mix[287] = mix[415] = mix[ 31];
-		mix[160] = mix[288] = mix[416] = mix[ 32];
-		mix[161] = mix[289] = mix[417] = mix[ 33];
-		mix[162] = mix[290] = mix[418] = mix[ 34];
-		mix[163] = mix[291] = mix[419] = mix[ 35];
-		mix[164] = mix[292] = mix[420] = mix[ 36];
-		mix[165] = mix[293] = mix[421] = mix[ 37];
-		mix[166] = mix[294] = mix[422] = mix[ 38];
-		mix[167] = mix[295] = mix[423] = mix[ 39];
-		mix[168] = mix[296] = mix[424] = mix[ 40];
-		mix[169] = mix[297] = mix[425] = mix[ 41];
-		mix[170] = mix[298] = mix[426] = mix[ 42];
-		mix[171] = mix[299] = mix[427] = mix[ 43];
-		mix[172] = mix[300] = mix[428] = mix[ 44];
-		mix[173] = mix[301] = mix[429] = mix[ 45];
-		mix[174] = mix[302] = mix[430] = mix[ 46];
-		mix[175] = mix[303] = mix[431] = mix[ 47];
-		mix[176] = mix[304] = mix[432] = mix[ 48];
-		mix[177] = mix[305] = mix[433] = mix[ 49];
-		mix[178] = mix[306] = mix[434] = mix[ 50];
-		mix[179] = mix[307] = mix[435] = mix[ 51];
-		mix[180] = mix[308] = mix[436] = mix[ 52];
-		mix[181] = mix[309] = mix[437] = mix[ 53];
-		mix[182] = mix[310] = mix[438] = mix[ 54];
-		mix[183] = mix[311] = mix[439] = mix[ 55];
-		mix[184] = mix[312] = mix[440] = mix[ 56];
-		mix[185] = mix[313] = mix[441] = mix[ 57];
-		mix[186] = mix[314] = mix[442] = mix[ 58];
-		mix[187] = mix[315] = mix[443] = mix[ 59];
-		mix[188] = mix[316] = mix[444] = mix[ 60];
-		mix[189] = mix[317] = mix[445] = mix[ 61];
-		mix[190] = mix[318] = mix[446] = mix[ 62];
-		mix[191] = mix[319] = mix[447] = mix[ 63];
-		mix[192] = mix[320] = mix[448] = mix[ 64];
-		mix[193] = mix[321] = mix[449] = mix[ 65];
-		mix[194] = mix[322] = mix[450] = mix[ 66];
-		mix[195] = mix[323] = mix[451] = mix[ 67];
-		mix[196] = mix[324] = mix[452] = mix[ 68];
-		mix[197] = mix[325] = mix[453] = mix[ 69];
-		mix[198] = mix[326] = mix[454] = mix[ 70];
-		mix[199] = mix[327] = mix[455] = mix[ 71];
-		mix[200] = mix[328] = mix[456] = mix[ 72];
-		mix[201] = mix[329] = mix[457] = mix[ 73];
-		mix[202] = mix[330] = mix[458] = mix[ 74];
-		mix[203] = mix[331] = mix[459] = mix[ 75];
-		mix[204] = mix[332] = mix[460] = mix[ 76];
-		mix[205] = mix[333] = mix[461] = mix[ 77];
-		mix[206] = mix[334] = mix[462] = mix[ 78];
-		mix[207] = mix[335] = mix[463] = mix[ 79];
-		mix[208] = mix[336] = mix[464] = mix[ 80];
-		mix[209] = mix[337] = mix[465] = mix[ 81];
-		mix[210] = mix[338] = mix[466] = mix[ 82];
-		mix[211] = mix[339] = mix[467] = mix[ 83];
-		mix[212] = mix[340] = mix[468] = mix[ 84];
-		mix[213] = mix[341] = mix[469] = mix[ 85];
-		mix[214] = mix[342] = mix[470] = mix[ 86];
-		mix[215] = mix[343] = mix[471] = mix[ 87];
-		mix[216] = mix[344] = mix[472] = mix[ 88];
-		mix[217] = mix[345] = mix[473] = mix[ 89];
-		mix[218] = mix[346] = mix[474] = mix[ 90];
-		mix[219] = mix[347] = mix[475] = mix[ 91];
-		mix[220] = mix[348] = mix[476] = mix[ 92];
-		mix[221] = mix[349] = mix[477] = mix[ 93];
-		mix[222] = mix[350] = mix[478] = mix[ 94];
-		mix[223] = mix[351] = mix[479] = mix[ 95];
-		mix[224] = mix[352] = mix[480] = mix[ 96];
-		mix[225] = mix[353] = mix[481] = mix[ 97];
-		mix[226] = mix[354] = mix[482] = mix[ 98];
-		mix[227] = mix[355] = mix[483] = mix[ 99];
-		mix[228] = mix[356] = mix[484] = mix[100];
-		mix[229] = mix[357] = mix[485] = mix[101];
-		mix[230] = mix[358] = mix[486] = mix[102];
-		mix[231] = mix[359] = mix[487] = mix[103];
-		mix[232] = mix[360] = mix[488] = mix[104];
-		mix[233] = mix[361] = mix[489] = mix[105];
-		mix[234] = mix[362] = mix[490] = mix[106];
-		mix[235] = mix[363] = mix[491] = mix[107];
-		mix[236] = mix[364] = mix[492] = mix[108];
-		mix[237] = mix[365] = mix[493] = mix[109];
-		mix[238] = mix[366] = mix[494] = mix[110];
-		mix[239] = mix[367] = mix[495] = mix[111];
-		mix[240] = mix[368] = mix[496] = mix[112];
-		mix[241] = mix[369] = mix[497] = mix[113];
-		mix[242] = mix[370] = mix[498] = mix[114];
-		mix[243] = mix[371] = mix[499] = mix[115];
-		mix[244] = mix[372] = mix[500] = mix[116];
-		mix[245] = mix[373] = mix[501] = mix[117];
-		mix[246] = mix[374] = mix[502] = mix[118];
-		mix[247] = mix[375] = mix[503] = mix[119];
-		mix[248] = mix[376] = mix[504] = mix[120];
-		mix[249] = mix[377] = mix[505] = mix[121];
-		mix[250] = mix[378] = mix[506] = mix[122];
-		mix[251] = mix[379] = mix[507] = mix[123];
-		mix[252] = mix[380] = mix[508] = mix[124];
-		mix[253] = mix[381] = mix[509] = mix[125];
-		mix[254] = mix[382] = mix[510] = mix[126];
-		mix[255] = mix[383] = mix[511] = mix[127];
-		mix[128] += mix[  1]; mix[129] += mix[  2];
-		mix[130] += mix[  3]; mix[131] += mix[  4];
-		mix[132] += mix[  5]; mix[133] += mix[  6];
-		mix[134] += mix[  7]; mix[135] += mix[  8];
-		mix[136] += mix[  9]; mix[137] += mix[ 10];
-		mix[138] += mix[ 11]; mix[139] += mix[ 12];
-		mix[140] += mix[ 13]; mix[141] += mix[ 14];
-		mix[142] += mix[ 15]; mix[143] += mix[ 16];
-		mix[144] += mix[ 17]; mix[145] += mix[ 18];
-		mix[146] += mix[ 19]; mix[147] += mix[ 20];
-		mix[148] += mix[ 21]; mix[149] += mix[ 22];
-		mix[150] += mix[ 23]; mix[151] += mix[ 24];
-		mix[152] += mix[ 25]; mix[153] += mix[ 26];
-		mix[154] += mix[ 27]; mix[155] += mix[ 28];
-		mix[156] += mix[ 29]; mix[157] += mix[ 30];
-		mix[158] += mix[ 31]; mix[159] += mix[ 32];
-		mix[160] += mix[ 33]; mix[161] += mix[ 34];
-		mix[162] += mix[ 35]; mix[163] += mix[ 36];
-		mix[164] += mix[ 37]; mix[165] += mix[ 38];
-		mix[166] += mix[ 39]; mix[167] += mix[ 40];
-		mix[168] += mix[ 41]; mix[169] += mix[ 42];
-		mix[170] += mix[ 43]; mix[171] += mix[ 44];
-		mix[172] += mix[ 45]; mix[173] += mix[ 46];
-		mix[174] += mix[ 47]; mix[175] += mix[ 48];
-		mix[176] += mix[ 49]; mix[177] += mix[ 50];
-		mix[178] += mix[ 51]; mix[179] += mix[ 52];
-		mix[180] += mix[ 53]; mix[181] += mix[ 54];
-		mix[182] += mix[ 55]; mix[183] += mix[ 56];
-		mix[184] += mix[ 57]; mix[185] += mix[ 58];
-		mix[186] += mix[ 59]; mix[187] += mix[ 60];
-		mix[188] += mix[ 61]; mix[189] += mix[ 62];
-		mix[190] += mix[ 63]; mix[191] += mix[ 64];
-		mix[192] += mix[ 65]; mix[193] += mix[ 66];
-		mix[194] += mix[ 67]; mix[195] += mix[ 68];
-		mix[196] += mix[ 69]; mix[197] += mix[ 70];
-		mix[198] += mix[ 71]; mix[199] += mix[ 72];
-		mix[200] += mix[ 73]; mix[201] += mix[ 74];
-		mix[202] += mix[ 75]; mix[203] += mix[ 76];
-		mix[204] += mix[ 77]; mix[205] += mix[ 78];
-		mix[206] += mix[ 79]; mix[207] += mix[ 80];
-		mix[208] += mix[ 81]; mix[209] += mix[ 82];
-		mix[210] += mix[ 83]; mix[211] += mix[ 84];
-		mix[212] += mix[ 85]; mix[213] += mix[ 86];
-		mix[214] += mix[ 87]; mix[215] += mix[ 88];
-		mix[216] += mix[ 89]; mix[217] += mix[ 90];
-		mix[218] += mix[ 91]; mix[219] += mix[ 92];
-		mix[220] += mix[ 93]; mix[221] += mix[ 94];
-		mix[222] += mix[ 95]; mix[223] += mix[ 96];
-		mix[224] += mix[ 97]; mix[225] += mix[ 98];
-		mix[226] += mix[ 99]; mix[227] += mix[100];
-		mix[228] += mix[101]; mix[229] += mix[102];
-		mix[230] += mix[103]; mix[231] += mix[104];
-		mix[232] += mix[105]; mix[233] += mix[106];
-		mix[234] += mix[107]; mix[235] += mix[108];
-		mix[236] += mix[109]; mix[237] += mix[110];
-		mix[238] += mix[111]; mix[239] += mix[112];
-		mix[240] += mix[113]; mix[241] += mix[114];
-		mix[242] += mix[115]; mix[243] += mix[116];
-		mix[244] += mix[117]; mix[245] += mix[118];
-		mix[246] += mix[119]; mix[247] += mix[120];
-		mix[248] += mix[121]; mix[249] += mix[122];
-		mix[250] += mix[123]; mix[251] += mix[124];
-		mix[252] += mix[125]; mix[253] += mix[126];
-		mix[254] += mix[127]; mix[255] += mix[128];
-		mix[256] += mix[129]; mix[257] += mix[130];
-		mix[258] += mix[131]; mix[259] += mix[132];
-		mix[260] += mix[133]; mix[261] += mix[134];
-		mix[262] += mix[135]; mix[263] += mix[136];
-		mix[264] += mix[137]; mix[265] += mix[138];
-		mix[266] += mix[139]; mix[267] += mix[140];
-		mix[268] += mix[141]; mix[269] += mix[142];
-		mix[270] += mix[143]; mix[271] += mix[144];
-		mix[272] += mix[145]; mix[273] += mix[146];
-		mix[274] += mix[147]; mix[275] += mix[148];
-		mix[276] += mix[149]; mix[277] += mix[150];
-		mix[278] += mix[151]; mix[279] += mix[152];
-		mix[280] += mix[153]; mix[281] += mix[154];
-		mix[282] += mix[155]; mix[283] += mix[156];
-		mix[284] += mix[157]; mix[285] += mix[158];
-		mix[286] += mix[159]; mix[287] += mix[160];
-		mix[288] += mix[161]; mix[289] += mix[162];
-		mix[290] += mix[163]; mix[291] += mix[164];
-		mix[292] += mix[165]; mix[293] += mix[166];
-		mix[294] += mix[167]; mix[295] += mix[168];
-		mix[296] += mix[169]; mix[297] += mix[170];
-		mix[298] += mix[171]; mix[299] += mix[172];
-		mix[300] += mix[173]; mix[301] += mix[174];
-		mix[302] += mix[175]; mix[303] += mix[176];
-		mix[304] += mix[177]; mix[305] += mix[178];
-		mix[306] += mix[179]; mix[307] += mix[180];
-		mix[308] += mix[181]; mix[309] += mix[182];
-		mix[310] += mix[183]; mix[311] += mix[184];
-		mix[312] += mix[185]; mix[313] += mix[186];
-		mix[314] += mix[187]; mix[315] += mix[188];
-		mix[316] += mix[189]; mix[317] += mix[190];
-		mix[318] += mix[191]; mix[319] += mix[192];
-		mix[320] += mix[193]; mix[321] += mix[194];
-		mix[322] += mix[195]; mix[323] += mix[196];
-		mix[324] += mix[197]; mix[325] += mix[198];
-		mix[326] += mix[199]; mix[327] += mix[200];
-		mix[328] += mix[201]; mix[329] += mix[202];
-		mix[330] += mix[203]; mix[331] += mix[204];
-		mix[332] += mix[205]; mix[333] += mix[206];
-		mix[334] += mix[207]; mix[335] += mix[208];
-		mix[336] += mix[209]; mix[337] += mix[210];
-		mix[338] += mix[211]; mix[339] += mix[212];
-		mix[340] += mix[213]; mix[341] += mix[214];
-		mix[342] += mix[215]; mix[343] += mix[216];
-		mix[344] += mix[217]; mix[345] += mix[218];
-		mix[346] += mix[219]; mix[347] += mix[220];
-		mix[348] += mix[221]; mix[349] += mix[222];
-		mix[350] += mix[223]; mix[351] += mix[224];
-		mix[352] += mix[225]; mix[353] += mix[226];
-		mix[354] += mix[227]; mix[355] += mix[228];
-		mix[356] += mix[229]; mix[357] += mix[230];
-		mix[358] += mix[231]; mix[359] += mix[232];
-		mix[360] += mix[233]; mix[361] += mix[234];
-		mix[362] += mix[235]; mix[363] += mix[236];
-		mix[364] += mix[237]; mix[365] += mix[238];
-		mix[366] += mix[239]; mix[367] += mix[240];
-		mix[368] += mix[241]; mix[369] += mix[242];
-		mix[370] += mix[243]; mix[371] += mix[244];
-		mix[372] += mix[245]; mix[373] += mix[246];
-		mix[374] += mix[247]; mix[375] += mix[248];
-		mix[376] += mix[249]; mix[377] += mix[250];
-		mix[378] += mix[251]; mix[379] += mix[252];
-		mix[380] += mix[253]; mix[381] += mix[254];
-		mix[382] += mix[255]; mix[383] += mix[256];
-		mix[384] += mix[257]; mix[385] += mix[258];
-		mix[386] += mix[259]; mix[387] += mix[260];
-		mix[388] += mix[261]; mix[389] += mix[262];
-		mix[390] += mix[263]; mix[391] += mix[264];
-		mix[392] += mix[265]; mix[393] += mix[266];
-		mix[394] += mix[267]; mix[395] += mix[268];
-		mix[396] += mix[269]; mix[397] += mix[270];
-		mix[398] += mix[271]; mix[399] += mix[272];
-		mix[400] += mix[273]; mix[401] += mix[274];
-		mix[402] += mix[275]; mix[403] += mix[276];
-		mix[404] += mix[277]; mix[405] += mix[278];
-		mix[406] += mix[279]; mix[407] += mix[280];
-		mix[408] += mix[281]; mix[409] += mix[282];
-		mix[410] += mix[283]; mix[411] += mix[284];
-		mix[412] += mix[285]; mix[413] += mix[286];
-		mix[414] += mix[287]; mix[415] += mix[288];
-		mix[416] += mix[289]; mix[417] += mix[290];
-		mix[418] += mix[291]; mix[419] += mix[292];
-		mix[420] += mix[293]; mix[421] += mix[294];
-		mix[422] += mix[295]; mix[423] += mix[296];
-		mix[424] += mix[297]; mix[425] += mix[298];
-		mix[426] += mix[299]; mix[427] += mix[300];
-		mix[428] += mix[301]; mix[429] += mix[302];
-		mix[430] += mix[303]; mix[431] += mix[304];
-		mix[432] += mix[305]; mix[433] += mix[306];
-		mix[434] += mix[307]; mix[435] += mix[308];
-		mix[436] += mix[309]; mix[437] += mix[310];
-		mix[438] += mix[311]; mix[439] += mix[312];
-		mix[440] += mix[313]; mix[441] += mix[314];
-		mix[442] += mix[315]; mix[443] += mix[316];
-		mix[444] += mix[317]; mix[445] += mix[318];
-		mix[446] += mix[319]; mix[447] += mix[320];
-		mix[448] += mix[321]; mix[449] += mix[322];
-		mix[450] += mix[323]; mix[451] += mix[324];
-		mix[452] += mix[325]; mix[453] += mix[326];
-		mix[454] += mix[327]; mix[455] += mix[328];
-		mix[456] += mix[329]; mix[457] += mix[330];
-		mix[458] += mix[331]; mix[459] += mix[332];
-		mix[460] += mix[333]; mix[461] += mix[334];
-		mix[462] += mix[335]; mix[463] += mix[336];
-		mix[464] += mix[337]; mix[465] += mix[338];
-		mix[466] += mix[339]; mix[467] += mix[340];
-		mix[468] += mix[341]; mix[469] += mix[342];
-		mix[470] += mix[343]; mix[471] += mix[344];
-		mix[472] += mix[345]; mix[473] += mix[346];
-		mix[474] += mix[347]; mix[475] += mix[348];
-		mix[476] += mix[349]; mix[477] += mix[350];
-		mix[478] += mix[351]; mix[479] += mix[352];
-		mix[480] += mix[353]; mix[481] += mix[354];
-		mix[482] += mix[355]; mix[483] += mix[356];
-		mix[484] += mix[357]; mix[485] += mix[358];
-		mix[486] += mix[359]; mix[487] += mix[360];
-		mix[488] += mix[361]; mix[489] += mix[362];
-		mix[490] += mix[363]; mix[491] += mix[364];
-		mix[492] += mix[365]; mix[493] += mix[366];
-		mix[494] += mix[367]; mix[495] += mix[368];
-		mix[496] += mix[369]; mix[497] += mix[370];
-		mix[498] += mix[371]; mix[499] += mix[372];
-		mix[500] += mix[373]; mix[501] += mix[374];
-		mix[502] += mix[375]; mix[503] += mix[376];
-		mix[504] += mix[377]; mix[505] += mix[378];
-		mix[506] += mix[379]; mix[507] += mix[380];
-		mix[508] += mix[381]; mix[509] += mix[382];
-		mix[510] += mix[383]; mix[511] += *mix;
-		memcpy(out, mix, 4096);
+	out+=0x1000;
+	ITEM_CALCULATION()
+	memcpy(out, mix, 4096);
 	}while(--i);
 }
