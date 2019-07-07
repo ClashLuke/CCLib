@@ -22,6 +22,7 @@
 			   // be used to tune it to its ideal
 			   // parameters on a specific machine.
 
+//#define BENCHMARK_DATASET_GENERATION
 #define COUNT 255          // Total number of dataset generations before
 			   // calculating the average of all.
 

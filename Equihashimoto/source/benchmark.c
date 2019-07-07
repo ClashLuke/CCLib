@@ -98,13 +98,14 @@ static void benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficu
 	uint32_t* seed_32      = (uint32_t*)seed_64;
 	char      buffer[65]   = {0};
 	uint32_t  temp[2]      = {0};
-	uint8_t   ctr          = COUNT;
 	uint32_t  current_time = 0;
 	const uint64_t  iterations   = ITERATIONS>>6;
 	const uint64_t  diff         = 0xFFFFFFFFFFFFFFFF/difficulty;
 	seed_64[9] = diff;
 	for(uint16_t i=0;i<64;i++) buffer[i]=' ';
 	current_time = (uint32_t)time(NULL);
+#ifdef BENCHMARK_DATASET_GENERATION
+	uint8_t   ctr          = COUNT;
 	do{
 		calcDataset(seed, dataset);
 		(*seed_32)++;  seed_32[ 1]++; seed_32[ 2]++; seed_32[ 3]++;
@@ -114,6 +115,7 @@ static void benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficu
 	}while(--ctr);
 	printf("\tGenerating %u datasets took %us\n",COUNT,(uint32_t)time(NULL)-current_time);
 	current_time = (uint32_t)time(NULL);
+#endif
 	if(printing){
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 		for(uint8_t j=0; j<64; j++){
