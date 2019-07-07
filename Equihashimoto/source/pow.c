@@ -199,7 +199,7 @@ void calcDataset(uint8_t* seed, uint64_t* out){
 	uint64_t  mix[128];
 	uint8_t*  mix8     = (uint8_t*)mix;
 	uint32_t* mix32    = (uint32_t*)mix;
-	for(uint32_t i=0;i<1+(ITEMS>>3);i+=128){// (1<<32)>>3
+	for(uint32_t i=0;i<1+(ITEMS>>3);i+=128){ // do/while loop is 33% slower
 		*mix     = mix[  2] = mix[  4] = mix[  6] = mix[  8] = mix[ 10] = mix[ 12] =
 		mix[ 14] = mix[ 16] = mix[ 18] = mix[ 20] = mix[ 22] = mix[ 24] = mix[ 26] =
 		mix[ 28] = mix[ 30] = mix[ 32] = mix[ 34] = mix[ 36] = mix[ 38] = mix[ 40] =
