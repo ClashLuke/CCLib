@@ -18,6 +18,9 @@ To Do
 - [ ] Improve dataset generation time (maybe not AES?)
 - [ ] Add changes to dataset generation to dataset-item-generation
 - [ ] Improve dataset generation (smaller blocks -> getting 64bit blocks is faster)
+- [ ] Const correctness
+- [ ] Improve AES code (check out cn_slow\_hash)
+- [ ] Inline functions
 - [ ] **Readme**
 - [ ] Add "the lower the memory the lower the chance of finding a solution (exponentially)"-text
 - [ ] Explain where the expontial growth of time complexity comes from (when reducing the dataset size linearly)
