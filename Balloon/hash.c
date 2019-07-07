@@ -341,8 +341,8 @@ void balloon(uint8_t* data, uint8_t* out){
 		cache_64[j_2+14] = cache_64[j_2+22] = cache_64[j_2+30] = cache_64[j_2+ 6];
 		cache_64[j_2+15] = cache_64[j_2+23] = cache_64[j_2+31] = cache_64[j_2+ 7];
 #endif
-		aes(&cache[j_4+ 16], &cache[j_4    ]); aes(&cache[j_4+ 32], &cache[j_4+   ]);
-		aes(&cache[j_4+ 48], &cache[j_4+   ]); aes(&cache[j_4+ 64], &cache[j_4+ 16]);
+		aes(&cache[j_4+ 16], &cache[j_4    ]); aes(&cache[j_4+ 32], &cache[j_4    ]);
+		aes(&cache[j_4+ 48], &cache[j_4    ]); aes(&cache[j_4+ 64], &cache[j_4+ 16]);
 		aes(&cache[j_4+ 80], &cache[j_4+ 32]); aes(&cache[j_4+ 96], &cache[j_4+ 48]);
 		aes(&cache[j_4+112], &cache[j_4+ 48]); aes(&cache[j_4+128], &cache[j_4+ 80]);
 		aes(&cache[j_4+144], &cache[j_4+ 96]); aes(&cache[j_4+160], &cache[j_4+112]);
