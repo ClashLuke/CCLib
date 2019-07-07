@@ -12,7 +12,7 @@ Thanks to the underlying design of the birthday paradox, an ASIC for this algori
 
 Using this design, equihashimoto is botnet resistant, has heavy ASIC resistance and low dataset generation times while being extremely fast verifyable, provably assymetric and provably secure.
 
-To Do 
+###ToDo
 - [ ] **General Optimisations**
 - [ ] Add dataset item calculation optimisation
 - [ ] Implement cn_slow\_hash AES code
@@ -23,4 +23,5 @@ To Do
 - [ ] Explain how that's an improvement compared to equihash
 - [ ] Explain new approach properly
 - [ ] Add references
+- [ ] Add proper benchmark
 
