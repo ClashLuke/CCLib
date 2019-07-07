@@ -12,11 +12,11 @@
 
 
 void mash_full(uint8_t* data, uint8_t* dataset, uint64_t item, uint64_t difficulty, uint32_t* out){
-	uint64_t  j            = 0;
-	uint64_t  k            = 0;
-	uint8_t   cache0[BLOCK+4] = {0};
-	uint8_t   cache1[BLOCK+8] = {0};
-	uint32_t* item32       = (uint32_t*)&item; 
+	uint64_t  j = 0;
+	uint64_t  k = 0;
+	const uint8_t   cache0[BLOCK+4] = {0};
+	const uint8_t   cache1[BLOCK+8] = {0};
+	const uint32_t* item32       = (uint32_t*)&item; 
 	calcDataset(data, (uint64_t*)dataset);
 	for(; j<ITEMS; j+=BLOCK){
 	memcpy(cache0, &dataset[j], BLOCK+4);

@@ -6,7 +6,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define ITEMS  0xffffffffU  // Total number of items in the dataset
+#define ITEMS  0xffffffffU // Total number of items in the dataset
                            // may be changed to achieve a different
                            // dataset size.
  
