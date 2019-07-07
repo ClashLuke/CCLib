@@ -14,6 +14,7 @@ Using this design, equihashimoto is botnet resistant, has heavy ASIC resistance 
 
 ###ToDo
 - [ ] **General Optimisations**
+- [ ] Merge stacked seed CRCing into code
 - [ ] Add dataset item calculation optimisation
 - [ ] Implement cn_slow\_hash AES code
 - [ ] **Readme**
