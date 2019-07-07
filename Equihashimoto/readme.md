@@ -17,12 +17,12 @@ To Do
 - [x] Memcpy large blocks to cache instead of accessing one item at a time
 - [x] Improve dataset generation time (maybe not AES?)
 - [ ] Add changes to dataset generation to dataset-item-generation
-- [ ] Improve dataset generation (smaller blocks -> getting 64bit blocks is faster)
-- [ ] Improve AES code (check out cn_slow\_hash)
+- [x] Improve AES code
+- [ ] Implement cn_slow\_hash AES code
 - [ ] **Code style/Optimisations**
-- [ ] Const correctness
-- [ ] Inline functions
-- [ ] Make local functions static
+- [x] Const correctness
+- [x] Inline functions
+- [x] Make local functions static
 - [ ] Use downwards-counting while loops instead of upwards counting for loops
 - [ ] Reduce parameter passing (pass one ctx pointer)
 - [ ] Use posix coding standards (U,L,LL)
