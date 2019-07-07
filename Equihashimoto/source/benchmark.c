@@ -152,7 +152,7 @@ static void benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t d
 	uint32_t* seed_32      = (uint32_t*)seed_64;
 	uint32_t  current_time = (uint32_t)time(NULL);
 	char      buffer[65]   = {0};
-	const uint64_t  iterations   = ITERATIONS<<26;
+	const uint64_t  iterations   = ITERATIONS<<16;
 	const uint64_t  diff         = 0xFFFFFFFFFFFFFFFF/difficulty;
 	for(uint16_t i=0;i<64;i++) buffer[i]=' ';
 	current_time = (uint32_t)time(NULL);
@@ -202,7 +202,7 @@ int main(int argc, char *argv[]){
 	for(uint8_t i=0; i<iterShifts; i++) iterations<<=1;
 	for(uint8_t i=0; i<diffShifts; i++) difficulty<<=1;
 	nonce+=rand();
-	for(uint8_t i=0;i<16;i++) seed32_0[i] = seed32_1[i] = rand();
+	for(uint8_t i=0;i<18;i++) seed32_0[i] = seed32_1[i] = rand();
 	printf("\e[?25l"); // Hide cursor
 	printf("Parameters\n");
 	printf("\tProgressbar:  %s\n", printing?"yes":"no");
