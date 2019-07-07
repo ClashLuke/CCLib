@@ -6,6 +6,6 @@
 #ifndef MASH_H
 #define MASH_H
 
-void mash_full(const uint8_t* data, uint8_t* dataset);
+void mash_full(uint8_t* data, uint8_t* dataset);
 
 #endif
