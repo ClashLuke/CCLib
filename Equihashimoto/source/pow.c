@@ -195,77 +195,67 @@ uint32_t calcItem32(uint32_t* seed_32, uint32_t itemNumber){
 	return *out0;
 }
 
-void calcDatasetItem8(uint8_t* seed, uint32_t itemNumber, uint64_t* out){
-	uint64_t  mix[128] = {0};
+void calcDataset(uint8_t* seed, uint64_t* out){
+	uint64_t  mix[128];
 	uint8_t*  mix8     = (uint8_t*)mix;
 	uint32_t* mix32    = (uint32_t*)mix;
-	*mix     = itemNumber; mix[  2] = itemNumber; mix[  4] = itemNumber; mix[  6] = itemNumber;
-	mix[  8] = itemNumber; mix[ 10] = itemNumber; mix[ 12] = itemNumber; mix[ 14] = itemNumber;
-	mix[ 16] = itemNumber; mix[ 18] = itemNumber; mix[ 20] = itemNumber; mix[ 22] = itemNumber;
-	mix[ 24] = itemNumber; mix[ 26] = itemNumber; mix[ 28] = itemNumber; mix[ 30] = itemNumber;
-	mix[ 32] = itemNumber; mix[ 34] = itemNumber; mix[ 36] = itemNumber; mix[ 38] = itemNumber;
-	mix[ 40] = itemNumber; mix[ 42] = itemNumber; mix[ 44] = itemNumber; mix[ 46] = itemNumber;
-	mix[ 48] = itemNumber; mix[ 50] = itemNumber; mix[ 52] = itemNumber; mix[ 54] = itemNumber;
-	mix[ 56] = itemNumber; mix[ 58] = itemNumber; mix[ 60] = itemNumber; mix[ 62] = itemNumber;
-	mix[ 64] = itemNumber; mix[ 66] = itemNumber; mix[ 68] = itemNumber; mix[ 70] = itemNumber;
-	mix[ 72] = itemNumber; mix[ 74] = itemNumber; mix[ 76] = itemNumber; mix[ 78] = itemNumber;
-	mix[ 80] = itemNumber; mix[ 82] = itemNumber; mix[ 84] = itemNumber; mix[ 86] = itemNumber;
-	mix[ 88] = itemNumber; mix[ 90] = itemNumber; mix[ 92] = itemNumber; mix[ 94] = itemNumber;
-	mix[ 96] = itemNumber; mix[ 98] = itemNumber; mix[100] = itemNumber; mix[102] = itemNumber;
-	mix[104] = itemNumber; mix[106] = itemNumber; mix[108] = itemNumber; mix[110] = itemNumber;
-	mix[112] = itemNumber; mix[114] = itemNumber; mix[116] = itemNumber; mix[118] = itemNumber;
-	mix[120] = itemNumber; mix[122] = itemNumber; mix[124] = itemNumber; mix[126] = itemNumber;
-	mix[ 16]+=16; mix[ 18]+=16; mix[ 20]+=16; mix[ 22]+=16;
-	mix[ 24]+=16; mix[ 26]+=16; mix[ 28]+=16; mix[ 30]+=16;
-	mix[ 32]+=32; mix[ 34]+=32; mix[ 36]+=32; mix[ 38]+=32;
-	mix[ 40]+=32; mix[ 42]+=32; mix[ 44]+=32; mix[ 46]+=32;
-	mix[ 48]+=48; mix[ 50]+=48; mix[ 52]+=48; mix[ 54]+=48;
-	mix[ 56]+=48; mix[ 58]+=48; mix[ 60]+=48; mix[ 62]+=48;
-	mix[ 64]+=64; mix[ 66]+=64; mix[ 68]+=64; mix[ 70]+=64;
-	mix[ 72]+=64; mix[ 74]+=64; mix[ 76]+=64; mix[ 78]+=64;
-	mix[ 80]+=80; mix[ 82]+=80; mix[ 84]+=80; mix[ 86]+=80;
-	mix[ 88]+=80; mix[ 90]+=80; mix[ 92]+=80; mix[ 94]+=80;
-	mix[ 96]+=96; mix[ 96]+=96; mix[ 98]+=96; mix[100]+=96;
-	mix[104]+=96; mix[106]+=96; mix[108]+=96; mix[110]+=96;
-	mix[112]+=112; mix[114]+=112; mix[116]+=112; mix[118]+=112;
-	mix[120]+=112; mix[122]+=112; mix[124]+=112; mix[126]+=112;
-	aes(mix8,        seed       ); aes(&mix8[  16], &seed[  16]);
-	aes(&mix8[  32], mix8       ); aes(&mix8[  48], &mix8[  16]);
-	crc32p(mix32,       &mix32[ 16]); crc32p(&mix32[  4], &mix32[ 20]);
-	crc32p(&mix32[  8], &mix32[ 24]); crc32p(&mix32[ 12], &mix32[ 28]);
-	crc32p(&mix32[ 16], &mix32[ 32]); crc32p(&mix32[ 20], &mix32[ 36]);
-	crc32p(&mix32[ 24], &mix32[ 40]); crc32p(&mix32[ 28], &mix32[ 44]);
-	crc32p(&mix32[ 32], &mix32[ 48]); crc32p(&mix32[ 36], &mix32[ 52]);
-	crc32p(&mix32[ 40], &mix32[ 56]); crc32p(&mix32[ 44], &mix32[ 60]);
-	crc32p(&mix32[ 48], &mix32[ 64]); crc32p(&mix32[ 52], &mix32[ 68]);
-	crc32p(&mix32[ 56], &mix32[ 72]); crc32p(&mix32[ 60], &mix32[ 76]);
-	crc32p(&mix32[ 64], &mix32[ 80]); crc32p(&mix32[ 68], &mix32[ 84]);
-	crc32p(&mix32[ 72], &mix32[ 88]); crc32p(&mix32[ 76], &mix32[ 92]);
-	crc32p(&mix32[ 80], &mix32[ 96]); crc32p(&mix32[ 84], &mix32[100]);
-	crc32p(&mix32[ 88], &mix32[104]); crc32p(&mix32[ 92], &mix32[108]);
-	crc32p(&mix32[ 96], &mix32[112]); crc32p(&mix32[100], &mix32[116]);
-	crc32p(&mix32[104], &mix32[120]); crc32p(&mix32[108], &mix32[124]);
-	crc32p(&mix32[112], &mix32[128]); crc32p(&mix32[116], &mix32[132]);
-	crc32p(&mix32[120], &mix32[136]); crc32p(&mix32[124], &mix32[140]);
-	crc32p(&mix32[128], &mix32[144]); crc32p(&mix32[132], &mix32[148]);
-	crc32p(&mix32[136], &mix32[152]); crc32p(&mix32[140], &mix32[156]);
-	crc32p(&mix32[144], &mix32[160]); crc32p(&mix32[148], &mix32[164]);
-	crc32p(&mix32[152], &mix32[168]); crc32p(&mix32[156], &mix32[172]);
-	crc32p(&mix32[160], &mix32[176]); crc32p(&mix32[164], &mix32[180]);
-	crc32p(&mix32[168], &mix32[184]); crc32p(&mix32[172], &mix32[188]);
-	crc32p(&mix32[176], &mix32[192]); crc32p(&mix32[180], &mix32[196]);
-	crc32p(&mix32[184], &mix32[200]); crc32p(&mix32[188], &mix32[204]);
-	crc32p(&mix32[192], &mix32[208]); crc32p(&mix32[196], &mix32[212]);
-	crc32p(&mix32[200], &mix32[216]); crc32p(&mix32[204], &mix32[220]);
-	crc32p(&mix32[208], &mix32[224]); crc32p(&mix32[212], &mix32[228]);
-	crc32p(&mix32[216], &mix32[232]); crc32p(&mix32[220], &mix32[236]);
-	crc32p(&mix32[224], &mix32[240]); crc32p(&mix32[228], &mix32[244]);
-	crc32p(&mix32[232], &mix32[248]); crc32p(&mix32[236], &mix32[252]);
-	memcpy(out, mix, 1024);
-}
-
-void calcDataset(uint8_t* seed, uint64_t* out){
-	for(uint32_t i=0;i<1+(ITEMS>>3);i+=128) // (1<<32)>>3
-		calcDatasetItem8(seed, i, &out[i]);
-	
+	for(uint32_t i=0;i<1+(ITEMS>>3);i+=128){// (1<<32)>>3
+		*mix     = mix[  2] = mix[  4] = mix[  6] = mix[  8] = mix[ 10] = mix[ 12] =
+		mix[ 14] = mix[ 16] = mix[ 18] = mix[ 20] = mix[ 22] = mix[ 24] = mix[ 26] =
+		mix[ 28] = mix[ 30] = mix[ 32] = mix[ 34] = mix[ 36] = mix[ 38] = mix[ 40] =
+		mix[ 42] = mix[ 44] = mix[ 46] = mix[ 48] = mix[ 50] = mix[ 52] = mix[ 54] = 
+		mix[ 56] = mix[ 58] = mix[ 60] = mix[ 62] = mix[ 64] = mix[ 66] = mix[ 68] =
+		mix[ 70] = mix[ 72] = mix[ 74] = mix[ 76] = mix[ 78] = mix[ 80] = mix[ 82] =
+		mix[ 84] = mix[ 86] = mix[ 88] = mix[ 90] = mix[ 92] = mix[ 94] = mix[ 96] =
+		mix[ 98] = mix[100] = mix[102] = mix[104] = mix[106] = mix[108] = mix[110] = 
+		mix[112] = mix[114] = mix[116] = mix[118] = mix[120] = mix[122] = mix[124] =
+		mix[126] = i;
+		mix[ 16]+=16; mix[ 18]+=16; mix[ 20]+=16; mix[ 22]+=16;
+		mix[ 24]+=16; mix[ 26]+=16; mix[ 28]+=16; mix[ 30]+=16;
+		mix[ 32]+=32; mix[ 34]+=32; mix[ 36]+=32; mix[ 38]+=32;
+		mix[ 40]+=32; mix[ 42]+=32; mix[ 44]+=32; mix[ 46]+=32;
+		mix[ 48]+=48; mix[ 50]+=48; mix[ 52]+=48; mix[ 54]+=48;
+		mix[ 56]+=48; mix[ 58]+=48; mix[ 60]+=48; mix[ 62]+=48;
+		mix[ 64]+=64; mix[ 66]+=64; mix[ 68]+=64; mix[ 70]+=64;
+		mix[ 72]+=64; mix[ 74]+=64; mix[ 76]+=64; mix[ 78]+=64;
+		mix[ 80]+=80; mix[ 82]+=80; mix[ 84]+=80; mix[ 86]+=80;
+		mix[ 88]+=80; mix[ 90]+=80; mix[ 92]+=80; mix[ 94]+=80;
+		mix[ 96]+=96; mix[ 96]+=96; mix[ 98]+=96; mix[100]+=96;
+		mix[104]+=96; mix[106]+=96; mix[108]+=96; mix[110]+=96;
+		mix[112]+=112; mix[114]+=112; mix[116]+=112; mix[118]+=112;
+		mix[120]+=112; mix[122]+=112; mix[124]+=112; mix[126]+=112;
+		aes(mix8,        seed       ); aes(&mix8[  16], &seed[  16]);
+		aes(&mix8[  32], mix8       ); aes(&mix8[  48], &mix8[  16]);
+		crc32p(mix32,       &mix32[ 16]); crc32p(&mix32[  4], &mix32[ 20]);
+		crc32p(&mix32[  8], &mix32[ 24]); crc32p(&mix32[ 12], &mix32[ 28]);
+		crc32p(&mix32[ 16], &mix32[ 32]); crc32p(&mix32[ 20], &mix32[ 36]);
+		crc32p(&mix32[ 24], &mix32[ 40]); crc32p(&mix32[ 28], &mix32[ 44]);
+		crc32p(&mix32[ 32], &mix32[ 48]); crc32p(&mix32[ 36], &mix32[ 52]);
+		crc32p(&mix32[ 40], &mix32[ 56]); crc32p(&mix32[ 44], &mix32[ 60]);
+		crc32p(&mix32[ 48], &mix32[ 64]); crc32p(&mix32[ 52], &mix32[ 68]);
+		crc32p(&mix32[ 56], &mix32[ 72]); crc32p(&mix32[ 60], &mix32[ 76]);
+		crc32p(&mix32[ 64], &mix32[ 80]); crc32p(&mix32[ 68], &mix32[ 84]);
+		crc32p(&mix32[ 72], &mix32[ 88]); crc32p(&mix32[ 76], &mix32[ 92]);
+		crc32p(&mix32[ 80], &mix32[ 96]); crc32p(&mix32[ 84], &mix32[100]);
+		crc32p(&mix32[ 88], &mix32[104]); crc32p(&mix32[ 92], &mix32[108]);
+		crc32p(&mix32[ 96], &mix32[112]); crc32p(&mix32[100], &mix32[116]);
+		crc32p(&mix32[104], &mix32[120]); crc32p(&mix32[108], &mix32[124]);
+		crc32p(&mix32[112], &mix32[128]); crc32p(&mix32[116], &mix32[132]);
+		crc32p(&mix32[120], &mix32[136]); crc32p(&mix32[124], &mix32[140]);
+		crc32p(&mix32[128], &mix32[144]); crc32p(&mix32[132], &mix32[148]);
+		crc32p(&mix32[136], &mix32[152]); crc32p(&mix32[140], &mix32[156]);
+		crc32p(&mix32[144], &mix32[160]); crc32p(&mix32[148], &mix32[164]);
+		crc32p(&mix32[152], &mix32[168]); crc32p(&mix32[156], &mix32[172]);
+		crc32p(&mix32[160], &mix32[176]); crc32p(&mix32[164], &mix32[180]);
+		crc32p(&mix32[168], &mix32[184]); crc32p(&mix32[172], &mix32[188]);
+		crc32p(&mix32[176], &mix32[192]); crc32p(&mix32[180], &mix32[196]);
+		crc32p(&mix32[184], &mix32[200]); crc32p(&mix32[188], &mix32[204]);
+		crc32p(&mix32[192], &mix32[208]); crc32p(&mix32[196], &mix32[212]);
+		crc32p(&mix32[200], &mix32[216]); crc32p(&mix32[204], &mix32[220]);
+		crc32p(&mix32[208], &mix32[224]); crc32p(&mix32[212], &mix32[228]);
+		crc32p(&mix32[216], &mix32[232]); crc32p(&mix32[220], &mix32[236]);
+		crc32p(&mix32[224], &mix32[240]); crc32p(&mix32[228], &mix32[244]);
+		crc32p(&mix32[232], &mix32[248]); crc32p(&mix32[236], &mix32[252]);
+		memcpy(&out[i], mix, 1024);
+	}	
 }
