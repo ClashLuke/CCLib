@@ -23,7 +23,7 @@ To Do
 - [x] Const correctness
 - [x] Inline functions
 - [x] Make local functions static
-- [ ] Use downwards-counting while loops instead of upwards counting for loops
+- [x] Use downwards-counting while loops instead of upwards counting for loops
 - [ ] Reduce parameter passing (pass one ctx pointer)
 - [ ] Use posix coding standards (U,L,LL)
 - [ ] Prototype functions

@@ -116,7 +116,8 @@ static uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t dif
 	current_time = (uint32_t)time(NULL);
 	if(printing){
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
-		for(uint8_t j=0;j<64;j++){
+		uint8_t j=64;
+		do{
 			for(uint64_t i=0;i<iterations;i++){
 				mash_full(seed, dataset);
 				temp[0] ^= seed_32[12]; temp[1] ^= seed_32[13]; nonce++;
@@ -127,7 +128,7 @@ static uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t dif
 			}
 			buffer[j] = '#';
 			printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
-		}
+		}while(--j);
 		printf("\r%*s\r",80,"");
 	} else {
 		for(uint64_t i=0;i<ITERATIONS;i++){
@@ -159,7 +160,8 @@ static uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64
 	current_time = (uint32_t)time(NULL);
 	if(printing){
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
-		for(uint8_t j=0;j<64;j++){
+		uint8_t j=64;
+		do{
 			for(uint64_t i=0;i<ITERATIONS<<20;i++){
 				uint8_t a = mash_light(seed_32, diff);
 				temp ^= a; nonce++;
@@ -167,7 +169,7 @@ static uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64
 			}
 			buffer[j] = '#';
 			printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
-		}
+		}while(--j);
 		printf("\r%*s\r",80,"");
 	} else {
 		for(uint64_t i=0;i<iterations;i++){
