@@ -712,6 +712,7 @@ static const uint32_t crc32c_table[256] = {
 
 uint32_t calcItem32(uint8_t* seed, uint32_t i){
 	uint64_t  mix[512];
+	uint32_t* seed_32 = (uint32_t*)seed;
 	uint8_t*  mix8_0 = (uint8_t*)mix;
 	uint8_t*  mix8_1 = (uint8_t*)&mix[2];
 	uint8_t*  mix8_2 = (uint8_t*)&mix[4];
@@ -742,6 +743,7 @@ uint32_t calcItem32(uint8_t* seed, uint32_t i){
 
 uint64_t calcItem64(uint8_t* seed, uint32_t i){
 	uint64_t  mix[512];
+	uint32_t* seed_32 = (uint32_t*)seed;
 	uint8_t*  mix8_0 = (uint8_t*)mix;
 	uint8_t*  mix8_1 = (uint8_t*)&mix[2];
 	uint8_t*  mix8_2 = (uint8_t*)&mix[4];
@@ -770,14 +772,15 @@ uint64_t calcItem64(uint8_t* seed, uint32_t i){
 	return out0;
 }
 
-void calcDataset(const uint8_t* seed, uint8_t* out){
+void calcDataset(uint8_t* seed, uint8_t* out){
 	uint64_t  mix[512];
 	uint8_t*  mix8_0   = (uint8_t*)mix;
 	uint8_t*  mix8_1   = (uint8_t*)&mix[2];
 	uint8_t*  mix8_2   = (uint8_t*)&mix[4];
 	uint8_t*  mix8_3   = (uint8_t*)&mix[6];
 	uint32_t* mix32    = (uint32_t*)mix;
-	uint32_t  i        = (ITEMS>>12);
+	uint32_t* seed_32  = (uint32_t*)seed;
+	uint32_t  max      = (ITEMS>>9);
 	const uint8_t* seed1 = &seed[16];
 	do{
 	out+=0x1000;
