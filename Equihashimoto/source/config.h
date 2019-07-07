@@ -10,7 +10,7 @@
                            // may be changed to achieve a different
                            // dataset size.
  
-#define BLOCK  (1<<20)     // Size of blocks retrieved from memory.
+#define BLOCK  (65536)     // Size of blocks retrieved from memory.
 			   // Bigger blocks allow for less memory
 			   // accesses (less bound to memory latency)
 			   // of larger blocks (more bound to memory
