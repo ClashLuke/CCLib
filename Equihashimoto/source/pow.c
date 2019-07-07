@@ -102,11 +102,11 @@ void crc32i(uint32_t* in) { // CRC32-Inplace
 #endif
 }
 
-uint32_t calcItem32(uint8_t* seed, uint32_t itemNumber){
+uint32_t calcItem32(uint32_t* seed_32, uint32_t itemNumber){
 	uint64_t  mix[8]  = {0};
 	uint8_t*  mix8    = (uint8_t*)mix;
 	uint32_t* mix32   = (uint32_t*)mix;
-	uint32_t* seed_32 = (uint32_t*)seed;
+	uint8_t*  seed    = (uint8_t*)seed_32;
 	uint32_t  out0[1] = {0}; 
 	uint32_t  out1[1] = {0}; 
 	uint8_t   pos     = itemNumber&0x3;

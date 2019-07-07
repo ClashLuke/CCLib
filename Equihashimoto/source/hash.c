@@ -40,6 +40,4 @@ void mash_full(uint8_t* data, uint8_t* dataset, uint64_t item, uint64_t difficul
 
 
 
-inline uint8_t mash_light(uint32_t* data, uint64_t difficulty){
-	return (calcItem32(data, *data[8]) ^ calcItem32(data, *data[9])) < difficulty;
-}
+
