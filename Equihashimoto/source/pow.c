@@ -185,10 +185,10 @@ uint32_t calcItem32(uint32_t* seed_32, uint32_t itemNumber){
 			*out1 = mix32[8];
 		}
 	}
-	for(uint8_t i=0; i<pos1024; i++){
+	do{
 		crc32i(out0);
 		crc32i(out1);
-	}
+	}while(--pos1024);
 	for(uint8_t i=0; i<  pos; i++) (*out0)>>=8;
 	for(uint8_t i=0; i<4-pos; i++) (*out1)<<=8;
 	*out0 |= *out1;
@@ -197,9 +197,23 @@ uint32_t calcItem32(uint32_t* seed_32, uint32_t itemNumber){
 
 void calcDataset(uint8_t* seed, uint64_t* out){
 	uint64_t  mix[128];
-	uint8_t*  mix8     = (uint8_t*)mix;
+	uint8_t*  mix8_0   = (uint8_t*)mix;
+	uint8_t*  mix8_1   = (uint8_t*)&mix[2];
+	uint8_t*  mix8_2   = (uint8_t*)&mix[4];
+	uint8_t*  mix8_3   = (uint8_t*)&mix[6];
 	uint32_t* mix32    = (uint32_t*)mix;
-	for(uint32_t i=0;i<1+(ITEMS>>3);i+=128){ // do/while loop is 33% slower
+	uint32_t  i        = (ITEMS>>10);
+	do{
+		mix[  1] = mix[  3] = mix[  5] = mix[  7] = mix[  9] = mix[ 11] = mix[ 13] =
+		mix[ 15] = mix[ 17] = mix[ 19] = mix[ 21] = mix[ 23] = mix[ 25] = mix[ 27] =
+		mix[ 29] = mix[ 31] = mix[ 33] = mix[ 35] = mix[ 37] = mix[ 39] = mix[ 41] =
+		mix[ 43] = mix[ 45] = mix[ 47] = mix[ 49] = mix[ 51] = mix[ 53] = mix[ 55] =
+		mix[ 57] = mix[ 59] = mix[ 61] = mix[ 63] = mix[ 65] = mix[ 67] = mix[ 69] =
+		mix[ 71] = mix[ 73] = mix[ 75] = mix[ 77] = mix[ 79] = mix[ 81] = mix[ 83] =
+		mix[ 85] = mix[ 87] = mix[ 89] = mix[ 91] = mix[ 93] = mix[ 95] = mix[ 97] =
+		mix[ 99] = mix[101] = mix[103] = mix[105] = mix[107] = mix[109] = mix[111] =
+		mix[113] = mix[115] = mix[117] = mix[119] = mix[121] = mix[123] = mix[125] =
+		mix[127] = 0;
 		*mix     = mix[  2] = mix[  4] = mix[  6] = mix[  8] = mix[ 10] = mix[ 12] =
 		mix[ 14] = mix[ 16] = mix[ 18] = mix[ 20] = mix[ 22] = mix[ 24] = mix[ 26] =
 		mix[ 28] = mix[ 30] = mix[ 32] = mix[ 34] = mix[ 36] = mix[ 38] = mix[ 40] =
@@ -210,22 +224,23 @@ void calcDataset(uint8_t* seed, uint64_t* out){
 		mix[ 98] = mix[100] = mix[102] = mix[104] = mix[106] = mix[108] = mix[110] = 
 		mix[112] = mix[114] = mix[116] = mix[118] = mix[120] = mix[122] = mix[124] =
 		mix[126] = i;
-		mix[ 16]+=16; mix[ 18]+=16; mix[ 20]+=16; mix[ 22]+=16;
-		mix[ 24]+=16; mix[ 26]+=16; mix[ 28]+=16; mix[ 30]+=16;
-		mix[ 32]+=32; mix[ 34]+=32; mix[ 36]+=32; mix[ 38]+=32;
-		mix[ 40]+=32; mix[ 42]+=32; mix[ 44]+=32; mix[ 46]+=32;
-		mix[ 48]+=48; mix[ 50]+=48; mix[ 52]+=48; mix[ 54]+=48;
-		mix[ 56]+=48; mix[ 58]+=48; mix[ 60]+=48; mix[ 62]+=48;
-		mix[ 64]+=64; mix[ 66]+=64; mix[ 68]+=64; mix[ 70]+=64;
-		mix[ 72]+=64; mix[ 74]+=64; mix[ 76]+=64; mix[ 78]+=64;
-		mix[ 80]+=80; mix[ 82]+=80; mix[ 84]+=80; mix[ 86]+=80;
-		mix[ 88]+=80; mix[ 90]+=80; mix[ 92]+=80; mix[ 94]+=80;
-		mix[ 96]+=96; mix[ 96]+=96; mix[ 98]+=96; mix[100]+=96;
-		mix[104]+=96; mix[106]+=96; mix[108]+=96; mix[110]+=96;
-		mix[112]+=112; mix[114]+=112; mix[116]+=112; mix[118]+=112;
-		mix[120]+=112; mix[122]+=112; mix[124]+=112; mix[126]+=112;
-		aes(mix8,        seed       ); aes(&mix8[  16], &seed[  16]);
-		aes(&mix8[  32], mix8       ); aes(&mix8[  48], &mix8[  16]);
+		mix[ 16]++; mix[ 18]++; mix[ 20]++; mix[ 22]++;
+		mix[ 24]++; mix[ 26]++; mix[ 28]++; mix[ 30]++;
+		mix[ 32]+=2; mix[ 34]+=2; mix[ 36]+=2; mix[ 38]+=2;
+		mix[ 40]+=2; mix[ 42]+=2; mix[ 44]+=2; mix[ 46]+=2;
+		mix[ 48]+=3; mix[ 50]+=3; mix[ 52]+=3; mix[ 54]+=3;
+		mix[ 56]+=3; mix[ 58]+=3; mix[ 60]+=3; mix[ 62]+=3;
+		mix[ 64]+=4; mix[ 66]+=4; mix[ 68]+=4; mix[ 70]+=4;
+		mix[ 72]+=4; mix[ 74]+=4; mix[ 76]+=4; mix[ 78]+=4;
+		mix[ 80]+=5; mix[ 82]+=5; mix[ 84]+=5; mix[ 86]+=5;
+		mix[ 88]+=5; mix[ 90]+=5; mix[ 92]+=5; mix[ 94]+=5;
+		mix[ 96]+=6; mix[ 96]+=6; mix[ 98]+=6; mix[100]+=6;
+		mix[104]+=6; mix[106]+=6; mix[108]+=6; mix[110]+=6;
+		mix[112]+=7; mix[114]+=7; mix[116]+=7; mix[118]+=7;
+		mix[120]+=7; mix[122]+=7; mix[124]+=7; mix[126]+=7;
+		out+=0x80;
+		aes(mix8_0, seed);   aes(mix8_1, &seed[16]);
+		aes(mix8_2, mix8_0); aes(mix8_3, mix8_1);
 		crc32p(mix32,       &mix32[ 16]); crc32p(&mix32[  4], &mix32[ 20]);
 		crc32p(&mix32[  8], &mix32[ 24]); crc32p(&mix32[ 12], &mix32[ 28]);
 		crc32p(&mix32[ 16], &mix32[ 32]); crc32p(&mix32[ 20], &mix32[ 36]);
@@ -256,6 +271,6 @@ void calcDataset(uint8_t* seed, uint64_t* out){
 		crc32p(&mix32[216], &mix32[232]); crc32p(&mix32[220], &mix32[236]);
 		crc32p(&mix32[224], &mix32[240]); crc32p(&mix32[228], &mix32[244]);
 		crc32p(&mix32[232], &mix32[248]); crc32p(&mix32[236], &mix32[252]);
-		memcpy(&out[i], mix, 1024);
-	}	
+		memcpy(out, mix, 1024);
+	}while(--i);
 }
