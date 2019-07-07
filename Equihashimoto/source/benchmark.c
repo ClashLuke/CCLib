@@ -24,6 +24,7 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficulty
 	char      buffer[65]   = {0};
 	uint64_t  iterations   = ITERATIONS>>6;
 	uint32_t  temp[2]      = {0};
+	uint64_t  diff         = 0xFFFFFFFFFFFFFFFF/difficulty;
 	for(uint16_t i=0;i<64;i++) buffer[i]=' ';
 	current_time = (uint32_t)time(NULL);
 	calcDataset(seed, dataset_64);
@@ -33,7 +34,7 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficulty
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 		for(uint8_t j=0;j<64;j++){
 			for(uint64_t i=0;i<iterations;i++){
-				mash_full(seed, dataset, nonce,  difficulty, result);
+				mash_full(seed, dataset, nonce,  diff, result);
 				temp[0] ^= seed_32[8]; temp[1] ^= seed_32[9]; nonce++;
 				(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
 				seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
@@ -44,7 +45,7 @@ uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficulty
 		printf("\r%*s\r",80,"");
 	} else {
 		for(uint64_t i=0;i<ITERATIONS;i++){
-			mash_full(seed, dataset, nonce, difficulty, result);
+			mash_full(seed, dataset, nonce, diff, result);
 			temp[0] ^= seed_32[8]; temp[1] ^= seed_32[9]; nonce++;
 			(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
 			seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
@@ -67,13 +68,14 @@ uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t diff
 	uint32_t  current_time = (uint32_t)time(NULL);
 	uint64_t  iterations   = ITERATIONS<<26;
 	char      buffer[65]   = {0};
+	uint64_t  diff         = 0xFFFFFFFFFFFFFFFF/difficulty;
 	for(uint16_t i=0;i<64;i++) buffer[i]=' ';
 	current_time = (uint32_t)time(NULL);
 	if(printing){
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 		for(uint8_t j=0;j<64;j++){
 			for(uint64_t i=0;i<ITERATIONS<<20;i++){
-				uint8_t a = mash_light(seed, difficulty);
+				uint8_t a = mash_light(seed, diff);
 				temp ^= a; nonce++;
 				crc32i(&seed_32[8]); crc32i(&seed_32[9]); crc32i(&seed_32[10]);
 			}
@@ -83,7 +85,7 @@ uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t diff
 		printf("\r%*s\r",80,"");
 	} else {
 		for(uint64_t i=0;i<iterations;i++){
-			uint8_t a = mash_light(seed, difficulty);
+			uint8_t a = mash_light(seed, diff);
 			temp ^= a; nonce++;
 			crc32i(&seed_32[8]); crc32i(&seed_32[9]); crc32i(&seed_32[10]);
 		}
