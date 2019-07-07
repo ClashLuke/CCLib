@@ -80,27 +80,15 @@ static const uint32_t crc32c_table[256] = {
 	0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
 };
 
-inline static void crc32p(const uint32_t* in, uint32_t* out) { // CRC32-Pointer
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
-	__asm__("crc32w %w0,%w0,%w1\n":"+r"(*out):"r"(*in));
+#define crc32p(x,y) __asm__("crc32w %w0,%w0,%w1\n":"+r"(y):"r"(x));
 #else
-	*out=crc32c_table[(*in )&0xff]^((*in )>>8);
-	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
-	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
-	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
+#define crc32p(x,y) \
+	y=crc32c_table[(x)&0xff]^((x)>>8);\
+	y=crc32c_table[(y)&0xff]^((y)>>8);\
+	y=crc32c_table[(y)&0xff]^((y)>>8);\
+	y=crc32c_table[(y)&0xff]^((y)>>8);
 #endif
-}
-
-inline static void crc32i(uint32_t* in) { // CRC32-Inplace
-#if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
-	__asm__("crc32w %w0,%w0,%w1\n":"+r"(*in):"r"(*in));
-#else
-	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
-	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
-	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
-	*in=crc32c_table[(*in)&0xff]^((*in)>>8);
-#endif
-}
 
 #define ITEM_CALCULATION() \
 	mix[  1] = mix[  3] = mix[  5] = mix[  7] = mix[  9] = mix[ 11] = mix[ 13] =\
@@ -139,126 +127,126 @@ inline static void crc32i(uint32_t* in) { // CRC32-Inplace
 	mix[120]+=7; mix[122]+=7; mix[124]+=7; mix[126]+=7;\
 	aes(mix8_0, seed);   aes(mix8_1, seed1);\
 	aes(mix8_2, mix8_0); aes(mix8_3, mix8_1);\
-	crc32p(&mix32[ 16], mix32);       crc32p(&mix32[ 17], &mix32[  1]);\
-	crc32p(&mix32[ 18], &mix32[  2]); crc32p(&mix32[ 19], &mix32[  3]);\
-	crc32p(&mix32[ 20], &mix32[  4]); crc32p(&mix32[ 21], &mix32[  5]);\
-	crc32p(&mix32[ 22], &mix32[  6]); crc32p(&mix32[ 23], &mix32[  7]);\
-	crc32p(&mix32[ 24], &mix32[  8]); crc32p(&mix32[ 25], &mix32[  9]);\
-	crc32p(&mix32[ 26], &mix32[ 10]); crc32p(&mix32[ 27], &mix32[ 11]);\
-	crc32p(&mix32[ 28], &mix32[ 12]); crc32p(&mix32[ 29], &mix32[ 13]);\
-	crc32p(&mix32[ 30], &mix32[ 14]); crc32p(&mix32[ 31], &mix32[ 15]);\
-	crc32p(&mix32[ 32], &mix32[ 16]); crc32p(&mix32[ 33], &mix32[ 17]);\
-	crc32p(&mix32[ 34], &mix32[ 18]); crc32p(&mix32[ 35], &mix32[ 19]);\
-	crc32p(&mix32[ 36], &mix32[ 20]); crc32p(&mix32[ 37], &mix32[ 21]);\
-	crc32p(&mix32[ 38], &mix32[ 22]); crc32p(&mix32[ 39], &mix32[ 23]);\
-	crc32p(&mix32[ 40], &mix32[ 24]); crc32p(&mix32[ 41], &mix32[ 25]);\
-	crc32p(&mix32[ 42], &mix32[ 26]); crc32p(&mix32[ 43], &mix32[ 27]);\
-	crc32p(&mix32[ 44], &mix32[ 28]); crc32p(&mix32[ 45], &mix32[ 29]);\
-	crc32p(&mix32[ 46], &mix32[ 30]); crc32p(&mix32[ 47], &mix32[ 31]);\
-	crc32p(&mix32[ 48], &mix32[ 32]); crc32p(&mix32[ 49], &mix32[ 33]);\
-	crc32p(&mix32[ 50], &mix32[ 34]); crc32p(&mix32[ 51], &mix32[ 35]);\
-	crc32p(&mix32[ 52], &mix32[ 36]); crc32p(&mix32[ 53], &mix32[ 37]);\
-	crc32p(&mix32[ 54], &mix32[ 38]); crc32p(&mix32[ 55], &mix32[ 39]);\
-	crc32p(&mix32[ 56], &mix32[ 40]); crc32p(&mix32[ 57], &mix32[ 41]);\
-	crc32p(&mix32[ 58], &mix32[ 42]); crc32p(&mix32[ 59], &mix32[ 43]);\
-	crc32p(&mix32[ 60], &mix32[ 44]); crc32p(&mix32[ 61], &mix32[ 45]);\
-	crc32p(&mix32[ 62], &mix32[ 46]); crc32p(&mix32[ 63], &mix32[ 47]);\
-	crc32p(&mix32[ 64], &mix32[ 48]); crc32p(&mix32[ 65], &mix32[ 49]);\
-	crc32p(&mix32[ 66], &mix32[ 50]); crc32p(&mix32[ 67], &mix32[ 51]);\
-	crc32p(&mix32[ 68], &mix32[ 52]); crc32p(&mix32[ 69], &mix32[ 53]);\
-	crc32p(&mix32[ 70], &mix32[ 54]); crc32p(&mix32[ 71], &mix32[ 55]);\
-	crc32p(&mix32[ 72], &mix32[ 56]); crc32p(&mix32[ 73], &mix32[ 57]);\
-	crc32p(&mix32[ 74], &mix32[ 58]); crc32p(&mix32[ 75], &mix32[ 59]);\
-	crc32p(&mix32[ 76], &mix32[ 60]); crc32p(&mix32[ 77], &mix32[ 61]);\
-	crc32p(&mix32[ 78], &mix32[ 62]); crc32p(&mix32[ 79], &mix32[ 63]);\
-	crc32p(&mix32[ 80], &mix32[ 64]); crc32p(&mix32[ 81], &mix32[ 65]);\
-	crc32p(&mix32[ 82], &mix32[ 66]); crc32p(&mix32[ 83], &mix32[ 67]);\
-	crc32p(&mix32[ 84], &mix32[ 68]); crc32p(&mix32[ 85], &mix32[ 69]);\
-	crc32p(&mix32[ 86], &mix32[ 70]); crc32p(&mix32[ 87], &mix32[ 71]);\
-	crc32p(&mix32[ 88], &mix32[ 72]); crc32p(&mix32[ 89], &mix32[ 73]);\
-	crc32p(&mix32[ 90], &mix32[ 74]); crc32p(&mix32[ 91], &mix32[ 75]);\
-	crc32p(&mix32[ 92], &mix32[ 76]); crc32p(&mix32[ 93], &mix32[ 77]);\
-	crc32p(&mix32[ 94], &mix32[ 78]); crc32p(&mix32[ 95], &mix32[ 79]);\
-	crc32p(&mix32[ 96], &mix32[ 80]); crc32p(&mix32[ 97], &mix32[ 81]);\
-	crc32p(&mix32[ 98], &mix32[ 82]); crc32p(&mix32[ 99], &mix32[ 83]);\
-	crc32p(&mix32[100], &mix32[ 84]); crc32p(&mix32[101], &mix32[ 85]);\
-	crc32p(&mix32[102], &mix32[ 86]); crc32p(&mix32[103], &mix32[ 87]);\
-	crc32p(&mix32[104], &mix32[ 88]); crc32p(&mix32[105], &mix32[ 89]);\
-	crc32p(&mix32[106], &mix32[ 90]); crc32p(&mix32[107], &mix32[ 91]);\
-	crc32p(&mix32[108], &mix32[ 92]); crc32p(&mix32[109], &mix32[ 93]);\
-	crc32p(&mix32[110], &mix32[ 94]); crc32p(&mix32[111], &mix32[ 95]);\
-	crc32p(&mix32[112], &mix32[ 96]); crc32p(&mix32[113], &mix32[ 97]);\
-	crc32p(&mix32[114], &mix32[ 98]); crc32p(&mix32[115], &mix32[ 99]);\
-	crc32p(&mix32[116], &mix32[100]); crc32p(&mix32[117], &mix32[101]);\
-	crc32p(&mix32[118], &mix32[102]); crc32p(&mix32[119], &mix32[103]);\
-	crc32p(&mix32[120], &mix32[104]); crc32p(&mix32[121], &mix32[105]);\
-	crc32p(&mix32[122], &mix32[106]); crc32p(&mix32[123], &mix32[107]);\
-	crc32p(&mix32[124], &mix32[108]); crc32p(&mix32[125], &mix32[109]);\
-	crc32p(&mix32[126], &mix32[110]); crc32p(&mix32[127], &mix32[111]);\
-	crc32p(&mix32[128], &mix32[112]); crc32p(&mix32[129], &mix32[113]);\
-	crc32p(&mix32[130], &mix32[114]); crc32p(&mix32[131], &mix32[115]);\
-	crc32p(&mix32[132], &mix32[116]); crc32p(&mix32[133], &mix32[117]);\
-	crc32p(&mix32[134], &mix32[118]); crc32p(&mix32[135], &mix32[119]);\
-	crc32p(&mix32[136], &mix32[120]); crc32p(&mix32[137], &mix32[121]);\
-	crc32p(&mix32[138], &mix32[122]); crc32p(&mix32[139], &mix32[123]);\
-	crc32p(&mix32[140], &mix32[124]); crc32p(&mix32[141], &mix32[125]);\
-	crc32p(&mix32[142], &mix32[126]); crc32p(&mix32[143], &mix32[127]);\
-	crc32p(&mix32[144], &mix32[128]); crc32p(&mix32[145], &mix32[129]);\
-	crc32p(&mix32[146], &mix32[130]); crc32p(&mix32[147], &mix32[131]);\
-	crc32p(&mix32[148], &mix32[132]); crc32p(&mix32[149], &mix32[133]);\
-	crc32p(&mix32[150], &mix32[134]); crc32p(&mix32[151], &mix32[135]);\
-	crc32p(&mix32[152], &mix32[136]); crc32p(&mix32[153], &mix32[137]);\
-	crc32p(&mix32[154], &mix32[138]); crc32p(&mix32[155], &mix32[139]);\
-	crc32p(&mix32[156], &mix32[140]); crc32p(&mix32[157], &mix32[141]);\
-	crc32p(&mix32[158], &mix32[142]); crc32p(&mix32[159], &mix32[143]);\
-	crc32p(&mix32[160], &mix32[144]); crc32p(&mix32[161], &mix32[145]);\
-	crc32p(&mix32[162], &mix32[146]); crc32p(&mix32[163], &mix32[147]);\
-	crc32p(&mix32[164], &mix32[148]); crc32p(&mix32[165], &mix32[149]);\
-	crc32p(&mix32[166], &mix32[150]); crc32p(&mix32[167], &mix32[151]);\
-	crc32p(&mix32[168], &mix32[152]); crc32p(&mix32[169], &mix32[153]);\
-	crc32p(&mix32[170], &mix32[154]); crc32p(&mix32[171], &mix32[155]);\
-	crc32p(&mix32[172], &mix32[156]); crc32p(&mix32[173], &mix32[157]);\
-	crc32p(&mix32[174], &mix32[158]); crc32p(&mix32[175], &mix32[159]);\
-	crc32p(&mix32[176], &mix32[160]); crc32p(&mix32[177], &mix32[161]);\
-	crc32p(&mix32[178], &mix32[162]); crc32p(&mix32[179], &mix32[163]);\
-	crc32p(&mix32[180], &mix32[164]); crc32p(&mix32[181], &mix32[165]);\
-	crc32p(&mix32[182], &mix32[166]); crc32p(&mix32[183], &mix32[167]);\
-	crc32p(&mix32[184], &mix32[168]); crc32p(&mix32[185], &mix32[169]);\
-	crc32p(&mix32[186], &mix32[170]); crc32p(&mix32[187], &mix32[171]);\
-	crc32p(&mix32[188], &mix32[172]); crc32p(&mix32[189], &mix32[173]);\
-	crc32p(&mix32[190], &mix32[174]); crc32p(&mix32[191], &mix32[175]);\
-	crc32p(&mix32[192], &mix32[176]); crc32p(&mix32[193], &mix32[177]);\
-	crc32p(&mix32[194], &mix32[178]); crc32p(&mix32[195], &mix32[179]);\
-	crc32p(&mix32[196], &mix32[180]); crc32p(&mix32[197], &mix32[181]);\
-	crc32p(&mix32[198], &mix32[182]); crc32p(&mix32[199], &mix32[183]);\
-	crc32p(&mix32[200], &mix32[184]); crc32p(&mix32[201], &mix32[185]);\
-	crc32p(&mix32[202], &mix32[186]); crc32p(&mix32[203], &mix32[187]);\
-	crc32p(&mix32[204], &mix32[188]); crc32p(&mix32[205], &mix32[189]);\
-	crc32p(&mix32[206], &mix32[190]); crc32p(&mix32[207], &mix32[191]);\
-	crc32p(&mix32[208], &mix32[192]); crc32p(&mix32[209], &mix32[193]);\
-	crc32p(&mix32[210], &mix32[194]); crc32p(&mix32[211], &mix32[195]);\
-	crc32p(&mix32[212], &mix32[196]); crc32p(&mix32[213], &mix32[197]);\
-	crc32p(&mix32[214], &mix32[198]); crc32p(&mix32[215], &mix32[199]);\
-	crc32p(&mix32[216], &mix32[200]); crc32p(&mix32[217], &mix32[201]);\
-	crc32p(&mix32[218], &mix32[202]); crc32p(&mix32[219], &mix32[203]);\
-	crc32p(&mix32[220], &mix32[204]); crc32p(&mix32[221], &mix32[205]);\
-	crc32p(&mix32[222], &mix32[206]); crc32p(&mix32[223], &mix32[207]);\
-	crc32p(&mix32[224], &mix32[208]); crc32p(&mix32[225], &mix32[209]);\
-	crc32p(&mix32[226], &mix32[210]); crc32p(&mix32[227], &mix32[211]);\
-	crc32p(&mix32[228], &mix32[212]); crc32p(&mix32[229], &mix32[213]);\
-	crc32p(&mix32[230], &mix32[214]); crc32p(&mix32[231], &mix32[215]);\
-	crc32p(&mix32[232], &mix32[216]); crc32p(&mix32[233], &mix32[217]);\
-	crc32p(&mix32[234], &mix32[218]); crc32p(&mix32[235], &mix32[219]);\
-	crc32p(&mix32[236], &mix32[220]); crc32p(&mix32[237], &mix32[221]);\
-	crc32p(&mix32[238], &mix32[222]); crc32p(&mix32[239], &mix32[223]);\
-	crc32p(&mix32[240], &mix32[224]); crc32p(&mix32[241], &mix32[225]);\
-	crc32p(&mix32[242], &mix32[226]); crc32p(&mix32[243], &mix32[227]);\
-	crc32p(&mix32[244], &mix32[228]); crc32p(&mix32[245], &mix32[229]);\
-	crc32p(&mix32[246], &mix32[230]); crc32p(&mix32[247], &mix32[231]);\
-	crc32p(&mix32[248], &mix32[232]); crc32p(&mix32[249], &mix32[233]);\
-	crc32p(&mix32[250], &mix32[234]); crc32p(&mix32[251], &mix32[235]);\
-	crc32p(&mix32[252], &mix32[236]); crc32p(&mix32[253], &mix32[237]);\
-	crc32p(&mix32[254], &mix32[238]); crc32p(&mix32[255], &mix32[239]);\
+	crc32p(mix32[ 16], *mix32);       crc32p(mix32[ 17], mix32[  1]);\
+	crc32p(mix32[ 18], mix32[  2]); crc32p(mix32[ 19], mix32[  3]);\
+	crc32p(mix32[ 20], mix32[  4]); crc32p(mix32[ 21], mix32[  5]);\
+	crc32p(mix32[ 22], mix32[  6]); crc32p(mix32[ 23], mix32[  7]);\
+	crc32p(mix32[ 24], mix32[  8]); crc32p(mix32[ 25], mix32[  9]);\
+	crc32p(mix32[ 26], mix32[ 10]); crc32p(mix32[ 27], mix32[ 11]);\
+	crc32p(mix32[ 28], mix32[ 12]); crc32p(mix32[ 29], mix32[ 13]);\
+	crc32p(mix32[ 30], mix32[ 14]); crc32p(mix32[ 31], mix32[ 15]);\
+	crc32p(mix32[ 32], mix32[ 16]); crc32p(mix32[ 33], mix32[ 17]);\
+	crc32p(mix32[ 34], mix32[ 18]); crc32p(mix32[ 35], mix32[ 19]);\
+	crc32p(mix32[ 36], mix32[ 20]); crc32p(mix32[ 37], mix32[ 21]);\
+	crc32p(mix32[ 38], mix32[ 22]); crc32p(mix32[ 39], mix32[ 23]);\
+	crc32p(mix32[ 40], mix32[ 24]); crc32p(mix32[ 41], mix32[ 25]);\
+	crc32p(mix32[ 42], mix32[ 26]); crc32p(mix32[ 43], mix32[ 27]);\
+	crc32p(mix32[ 44], mix32[ 28]); crc32p(mix32[ 45], mix32[ 29]);\
+	crc32p(mix32[ 46], mix32[ 30]); crc32p(mix32[ 47], mix32[ 31]);\
+	crc32p(mix32[ 48], mix32[ 32]); crc32p(mix32[ 49], mix32[ 33]);\
+	crc32p(mix32[ 50], mix32[ 34]); crc32p(mix32[ 51], mix32[ 35]);\
+	crc32p(mix32[ 52], mix32[ 36]); crc32p(mix32[ 53], mix32[ 37]);\
+	crc32p(mix32[ 54], mix32[ 38]); crc32p(mix32[ 55], mix32[ 39]);\
+	crc32p(mix32[ 56], mix32[ 40]); crc32p(mix32[ 57], mix32[ 41]);\
+	crc32p(mix32[ 58], mix32[ 42]); crc32p(mix32[ 59], mix32[ 43]);\
+	crc32p(mix32[ 60], mix32[ 44]); crc32p(mix32[ 61], mix32[ 45]);\
+	crc32p(mix32[ 62], mix32[ 46]); crc32p(mix32[ 63], mix32[ 47]);\
+	crc32p(mix32[ 64], mix32[ 48]); crc32p(mix32[ 65], mix32[ 49]);\
+	crc32p(mix32[ 66], mix32[ 50]); crc32p(mix32[ 67], mix32[ 51]);\
+	crc32p(mix32[ 68], mix32[ 52]); crc32p(mix32[ 69], mix32[ 53]);\
+	crc32p(mix32[ 70], mix32[ 54]); crc32p(mix32[ 71], mix32[ 55]);\
+	crc32p(mix32[ 72], mix32[ 56]); crc32p(mix32[ 73], mix32[ 57]);\
+	crc32p(mix32[ 74], mix32[ 58]); crc32p(mix32[ 75], mix32[ 59]);\
+	crc32p(mix32[ 76], mix32[ 60]); crc32p(mix32[ 77], mix32[ 61]);\
+	crc32p(mix32[ 78], mix32[ 62]); crc32p(mix32[ 79], mix32[ 63]);\
+	crc32p(mix32[ 80], mix32[ 64]); crc32p(mix32[ 81], mix32[ 65]);\
+	crc32p(mix32[ 82], mix32[ 66]); crc32p(mix32[ 83], mix32[ 67]);\
+	crc32p(mix32[ 84], mix32[ 68]); crc32p(mix32[ 85], mix32[ 69]);\
+	crc32p(mix32[ 86], mix32[ 70]); crc32p(mix32[ 87], mix32[ 71]);\
+	crc32p(mix32[ 88], mix32[ 72]); crc32p(mix32[ 89], mix32[ 73]);\
+	crc32p(mix32[ 90], mix32[ 74]); crc32p(mix32[ 91], mix32[ 75]);\
+	crc32p(mix32[ 92], mix32[ 76]); crc32p(mix32[ 93], mix32[ 77]);\
+	crc32p(mix32[ 94], mix32[ 78]); crc32p(mix32[ 95], mix32[ 79]);\
+	crc32p(mix32[ 96], mix32[ 80]); crc32p(mix32[ 97], mix32[ 81]);\
+	crc32p(mix32[ 98], mix32[ 82]); crc32p(mix32[ 99], mix32[ 83]);\
+	crc32p(mix32[100], mix32[ 84]); crc32p(mix32[101], mix32[ 85]);\
+	crc32p(mix32[102], mix32[ 86]); crc32p(mix32[103], mix32[ 87]);\
+	crc32p(mix32[104], mix32[ 88]); crc32p(mix32[105], mix32[ 89]);\
+	crc32p(mix32[106], mix32[ 90]); crc32p(mix32[107], mix32[ 91]);\
+	crc32p(mix32[108], mix32[ 92]); crc32p(mix32[109], mix32[ 93]);\
+	crc32p(mix32[110], mix32[ 94]); crc32p(mix32[111], mix32[ 95]);\
+	crc32p(mix32[112], mix32[ 96]); crc32p(mix32[113], mix32[ 97]);\
+	crc32p(mix32[114], mix32[ 98]); crc32p(mix32[115], mix32[ 99]);\
+	crc32p(mix32[116], mix32[100]); crc32p(mix32[117], mix32[101]);\
+	crc32p(mix32[118], mix32[102]); crc32p(mix32[119], mix32[103]);\
+	crc32p(mix32[120], mix32[104]); crc32p(mix32[121], mix32[105]);\
+	crc32p(mix32[122], mix32[106]); crc32p(mix32[123], mix32[107]);\
+	crc32p(mix32[124], mix32[108]); crc32p(mix32[125], mix32[109]);\
+	crc32p(mix32[126], mix32[110]); crc32p(mix32[127], mix32[111]);\
+	crc32p(mix32[128], mix32[112]); crc32p(mix32[129], mix32[113]);\
+	crc32p(mix32[130], mix32[114]); crc32p(mix32[131], mix32[115]);\
+	crc32p(mix32[132], mix32[116]); crc32p(mix32[133], mix32[117]);\
+	crc32p(mix32[134], mix32[118]); crc32p(mix32[135], mix32[119]);\
+	crc32p(mix32[136], mix32[120]); crc32p(mix32[137], mix32[121]);\
+	crc32p(mix32[138], mix32[122]); crc32p(mix32[139], mix32[123]);\
+	crc32p(mix32[140], mix32[124]); crc32p(mix32[141], mix32[125]);\
+	crc32p(mix32[142], mix32[126]); crc32p(mix32[143], mix32[127]);\
+	crc32p(mix32[144], mix32[128]); crc32p(mix32[145], mix32[129]);\
+	crc32p(mix32[146], mix32[130]); crc32p(mix32[147], mix32[131]);\
+	crc32p(mix32[148], mix32[132]); crc32p(mix32[149], mix32[133]);\
+	crc32p(mix32[150], mix32[134]); crc32p(mix32[151], mix32[135]);\
+	crc32p(mix32[152], mix32[136]); crc32p(mix32[153], mix32[137]);\
+	crc32p(mix32[154], mix32[138]); crc32p(mix32[155], mix32[139]);\
+	crc32p(mix32[156], mix32[140]); crc32p(mix32[157], mix32[141]);\
+	crc32p(mix32[158], mix32[142]); crc32p(mix32[159], mix32[143]);\
+	crc32p(mix32[160], mix32[144]); crc32p(mix32[161], mix32[145]);\
+	crc32p(mix32[162], mix32[146]); crc32p(mix32[163], mix32[147]);\
+	crc32p(mix32[164], mix32[148]); crc32p(mix32[165], mix32[149]);\
+	crc32p(mix32[166], mix32[150]); crc32p(mix32[167], mix32[151]);\
+	crc32p(mix32[168], mix32[152]); crc32p(mix32[169], mix32[153]);\
+	crc32p(mix32[170], mix32[154]); crc32p(mix32[171], mix32[155]);\
+	crc32p(mix32[172], mix32[156]); crc32p(mix32[173], mix32[157]);\
+	crc32p(mix32[174], mix32[158]); crc32p(mix32[175], mix32[159]);\
+	crc32p(mix32[176], mix32[160]); crc32p(mix32[177], mix32[161]);\
+	crc32p(mix32[178], mix32[162]); crc32p(mix32[179], mix32[163]);\
+	crc32p(mix32[180], mix32[164]); crc32p(mix32[181], mix32[165]);\
+	crc32p(mix32[182], mix32[166]); crc32p(mix32[183], mix32[167]);\
+	crc32p(mix32[184], mix32[168]); crc32p(mix32[185], mix32[169]);\
+	crc32p(mix32[186], mix32[170]); crc32p(mix32[187], mix32[171]);\
+	crc32p(mix32[188], mix32[172]); crc32p(mix32[189], mix32[173]);\
+	crc32p(mix32[190], mix32[174]); crc32p(mix32[191], mix32[175]);\
+	crc32p(mix32[192], mix32[176]); crc32p(mix32[193], mix32[177]);\
+	crc32p(mix32[194], mix32[178]); crc32p(mix32[195], mix32[179]);\
+	crc32p(mix32[196], mix32[180]); crc32p(mix32[197], mix32[181]);\
+	crc32p(mix32[198], mix32[182]); crc32p(mix32[199], mix32[183]);\
+	crc32p(mix32[200], mix32[184]); crc32p(mix32[201], mix32[185]);\
+	crc32p(mix32[202], mix32[186]); crc32p(mix32[203], mix32[187]);\
+	crc32p(mix32[204], mix32[188]); crc32p(mix32[205], mix32[189]);\
+	crc32p(mix32[206], mix32[190]); crc32p(mix32[207], mix32[191]);\
+	crc32p(mix32[208], mix32[192]); crc32p(mix32[209], mix32[193]);\
+	crc32p(mix32[210], mix32[194]); crc32p(mix32[211], mix32[195]);\
+	crc32p(mix32[212], mix32[196]); crc32p(mix32[213], mix32[197]);\
+	crc32p(mix32[214], mix32[198]); crc32p(mix32[215], mix32[199]);\
+	crc32p(mix32[216], mix32[200]); crc32p(mix32[217], mix32[201]);\
+	crc32p(mix32[218], mix32[202]); crc32p(mix32[219], mix32[203]);\
+	crc32p(mix32[220], mix32[204]); crc32p(mix32[221], mix32[205]);\
+	crc32p(mix32[222], mix32[206]); crc32p(mix32[223], mix32[207]);\
+	crc32p(mix32[224], mix32[208]); crc32p(mix32[225], mix32[209]);\
+	crc32p(mix32[226], mix32[210]); crc32p(mix32[227], mix32[211]);\
+	crc32p(mix32[228], mix32[212]); crc32p(mix32[229], mix32[213]);\
+	crc32p(mix32[230], mix32[214]); crc32p(mix32[231], mix32[215]);\
+	crc32p(mix32[232], mix32[216]); crc32p(mix32[233], mix32[217]);\
+	crc32p(mix32[234], mix32[218]); crc32p(mix32[235], mix32[219]);\
+	crc32p(mix32[236], mix32[220]); crc32p(mix32[237], mix32[221]);\
+	crc32p(mix32[238], mix32[222]); crc32p(mix32[239], mix32[223]);\
+	crc32p(mix32[240], mix32[224]); crc32p(mix32[241], mix32[225]);\
+	crc32p(mix32[242], mix32[226]); crc32p(mix32[243], mix32[227]);\
+	crc32p(mix32[244], mix32[228]); crc32p(mix32[245], mix32[229]);\
+	crc32p(mix32[246], mix32[230]); crc32p(mix32[247], mix32[231]);\
+	crc32p(mix32[248], mix32[232]); crc32p(mix32[249], mix32[233]);\
+	crc32p(mix32[250], mix32[234]); crc32p(mix32[251], mix32[235]);\
+	crc32p(mix32[252], mix32[236]); crc32p(mix32[253], mix32[237]);\
+	crc32p(mix32[254], mix32[238]); crc32p(mix32[255], mix32[239]);\
 	mix[128] = mix[256] = mix[384] = *mix;\
 	mix[129] = mix[257] = mix[385] = mix[  1];\
 	mix[130] = mix[258] = mix[386] = mix[  2];\
