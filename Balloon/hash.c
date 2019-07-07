@@ -7,7 +7,7 @@
 #include "config.h"
 
 
-uint32_t crc32c_table[256] = {
+static const uint32_t crc32c_table[256] = {
 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
 	0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
 	0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,
@@ -74,40 +74,26 @@ uint32_t crc32c_table[256] = {
 	0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
 };
 
-uint32_t crc32r(uint32_t msg) { //CRC32-return
-	uint32_t crc = 0xFFFFFFFF;
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
-	__asm__("crc32w %w0,%w0,%w1\n":"+r"(crc):"r"(msg));
+#define crc32p(x,y) __asm__("crc32w %w0,%w0,%w1\n":"+r"(y):"r"(x));
 #else
-	crc=crc32c_table[msg&0xff]^(msg>>8);
-	crc=crc32c_table[crc&0xff]^(crc>>8);
-	crc=crc32c_table[crc&0xff]^(crc>>8);
-	crc=crc32c_table[crc&0xff]^(crc>>8);
+#define crc32p(x,y) \
+	y=crc32c_table[(x)&0xff]^((x)>>8);\
+	y=crc32c_table[(y)&0xff]^((y)>>8);\
+	y=crc32c_table[(y)&0xff]^((y)>>8);\
+	y=crc32c_table[(y)&0xff]^((y)>>8);
 #endif
-	return crc^0xFFFFFFFF;
-}
 
-void crc32p(uint32_t* in, uint32_t* out) { // CRC32-Pointer
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
-	__asm__("crc32w %w0,%w0,%w1\n":"+r"(*out):"r"(*in));
+#define crc32i(y) __asm__("crc32w %w0,%w0,%w1\n":"+r"(y):"r"(y));
 #else
-	*out=crc32c_table[(*in )&0xff]^((*in )>>8);
-	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
-	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
-	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
+#define crc32i(y) \
+	y=crc32c_table[(y)&0xff]^((y)>>8);\
+	y=crc32c_table[(y)&0xff]^((y)>>8);\
+	y=crc32c_table[(y)&0xff]^((y)>>8);\
+	y=crc32c_table[(y)&0xff]^((y)>>8);
 #endif
-}
 
-void crc32i(uint32_t* out) { // CRC32-Inplace
-#if defined(__aarch64__) && defined(__ARM_FEATURE_CRC32)
-	__asm__("crc32w %w0,%w0,%w1\n":"+r"(*out):"r"(*in));
-#else
-	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
-	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
-	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
-	*out=crc32c_table[(*out)&0xff]^((*out)>>8);
-#endif
-}
 
 #include <stdint.h>
 
@@ -152,10 +138,10 @@ static const uint8_t SBOX[256] = {
 	state[15] = SBOX[state[15]]; *state = SBOX[*state];
 
 #define SHIFT_ROWS() \
-	a_0 = state[ 5]; b_0 = state[10]; b_0 = state[15];\
-	a_1 = state[ 9]; b_1 = state[14]; b_1 = state[ 3];\
-	a_2 = state[13]; b_2 = state[ 2]; b_2 = state[ 7];\
-	a_3 = state[ 1]; b_3 = state[ 6]; b_3 = state[11];\
+	a_0 = state[ 5]; b_0 = state[10]; c_0 = state[15];\
+	a_1 = state[ 9]; b_1 = state[14]; c_1 = state[ 3];\
+	a_2 = state[13]; b_2 = state[ 2]; c_2 = state[ 7];\
+	a_3 = state[ 1]; b_3 = state[ 6]; c_3 = state[11];\
 	state[ 1] = a_0; state[ 2] = b_0; state[ 3] = c_0;\
 	state[ 5] = a_1; state[ 6] = b_1; state[ 7] = c_1;\
 	state[ 9] = a_2; state[10] = b_2; state[11] = c_2;\
@@ -192,10 +178,10 @@ static const uint8_t SBOX[256] = {
 	if (state[14] & 0x80) b_2 ^= 0x1b; if (state[15] & 0x80) b_3 ^= 0x1b; \
 	state[12] = b_0 ^ a_3 ^ a_2 ^ b_1 ^ a_1; state[13] = b_1 ^ a_0 ^ a_3 ^ b_2 ^ a_2;\
 	state[14] = b_2 ^ a_1 ^ a_0 ^ b_3 ^ a_3; state[15] = b_3 ^ a_2 ^ a_1 ^ b_0 ^ a_0;
-}
+
 #endif // (!defined(__aarch64__) || !defined(__ARM_FEATURE_CRYPTO)) && (!defined(__x86_64__) || !defined(__AES__))
 
-void aes(uint8_t* state, const uint8_t* key)
+static inline void aes(uint8_t* state, const uint8_t* key)
 {
 #if defined(__aarch64__) && defined(__ARM_FEATURE_CRYPTO)
 	__asm__ volatile(
@@ -239,10 +225,10 @@ void aes(uint8_t* state, const uint8_t* key)
 
 
 // Input will always be 64 byte, output will be 32 byte
-void balloon(uint8_t* data, uint8_t* out){
+void balloon(const uint8_t* data, uint8_t* out){
 	uint64_t  cache_64[SIZE/8] = {0};
 	uint64_t* out_64       = (uint64_t*)out;
-	uint32_t* data_32      = (uint32_t*)data;
+	const uint32_t* data_32      = (const uint32_t*)data;
 	uint8_t*  cache        = (uint8_t*)cache_64;
 	uint32_t* cache_32     = (uint32_t*)cache_64;
 	uint32_t  mask         = (SIZE/4)-1;
@@ -251,37 +237,37 @@ void balloon(uint8_t* data, uint8_t* out){
 #ifdef USE_CRC
 	uint32_t  j_2          = 0;
 #endif
-	crc32p(data_32,       cache_32    ); crc32p(&data_32[ 1], &cache_32[ 2]);
+	crc32p(*data_32,   *cache_32    ); crc32p(data_32[ 1], cache_32[ 2]);
 #if INPUT_SIZE > 1
-	crc32p(&data_32[ 2], &cache_32[ 4]); crc32p(&data_32[ 3], &cache_32[ 6]);
+	crc32p(data_32[ 2], cache_32[ 4]); crc32p(data_32[ 3], cache_32[ 6]);
 #if INPUT_SIZE > 2
-	crc32p(&data_32[ 4], &cache_32[ 8]); crc32p(&data_32[ 5], &cache_32[10]);
+	crc32p(data_32[ 4], cache_32[ 8]); crc32p(data_32[ 5], cache_32[10]);
 #if INPUT_SIZE > 3
-	crc32p(&data_32[ 6], &cache_32[12]); crc32p(&data_32[ 7], &cache_32[14]);
+	crc32p(data_32[ 6], cache_32[12]); crc32p(data_32[ 7], cache_32[14]);
 #if INPUT_SIZE > 4
-	crc32p(&data_32[ 8], &cache_32[16]); crc32p(&data_32[ 9], &cache_32[18]);
+	crc32p(data_32[ 8], cache_32[16]); crc32p(data_32[ 9], cache_32[18]);
 #if INPUT_SIZE > 5
-	crc32p(&data_32[10], &cache_32[20]); crc32p(&data_32[11], &cache_32[22]);
+	crc32p(data_32[10], cache_32[20]); crc32p(data_32[11], cache_32[22]);
 #if INPUT_SIZE > 6
-	crc32p(&data_32[12], &cache_32[24]); crc32p(&data_32[13], &cache_32[26]);
+	crc32p(data_32[12], cache_32[24]); crc32p(data_32[13], cache_32[26]);
 #if INPUT_SIZE > 7
-	crc32p(&data_32[14], &cache_32[28]); crc32p(&data_32[15], &cache_32[30]);
+	crc32p(data_32[14], cache_32[28]); crc32p(data_32[15], cache_32[30]);
 #if INPUT_SIZE > 8
-	crc32p(&data_32[16], &cache_32[32]); crc32p(&data_32[17], &cache_32[34]);
+	crc32p(data_32[16], cache_32[32]); crc32p(data_32[17], cache_32[34]);
 #if INPUT_SIZE > 9
-	crc32p(&data_32[18], &cache_32[36]); crc32p(&data_32[19], &cache_32[38]);
+	crc32p(data_32[18], cache_32[36]); crc32p(data_32[19], cache_32[38]);
 #if INPUT_SIZE > 10
-	crc32p(&data_32[20], &cache_32[40]); crc32p(&data_32[21], &cache_32[42]);
+	crc32p(data_32[20], cache_32[40]); crc32p(data_32[21], cache_32[42]);
 #if INPUT_SIZE > 11
-	crc32p(&data_32[22], &cache_32[44]); crc32p(&data_32[23], &cache_32[46]);
+	crc32p(data_32[22], cache_32[44]); crc32p(data_32[23], cache_32[46]);
 #if INPUT_SIZE > 12
-	crc32p(&data_32[24], &cache_32[48]); crc32p(&data_32[25], &cache_32[50]);
+	crc32p(data_32[24], cache_32[48]); crc32p(data_32[25], cache_32[50]);
 #if INPUT_SIZE > 13
-	crc32p(&data_32[26], &cache_32[52]); crc32p(&data_32[27], &cache_32[54]);
+	crc32p(data_32[26], cache_32[52]); crc32p(data_32[27], cache_32[54]);
 #if INPUT_SIZE > 14
-	crc32p(&data_32[28], &cache_32[56]); crc32p(&data_32[29], &cache_32[58]);
+	crc32p(data_32[28], cache_32[56]); crc32p(data_32[29], cache_32[58]);
 #if INPUT_SIZE > 15
-	crc32p(&data_32[30], &cache_32[60]); crc32p(&data_32[31], &cache_32[62]);
+	crc32p(data_32[30], cache_32[60]); crc32p(data_32[31], cache_32[62]);
 #endif
 #endif
 #endif
@@ -306,30 +292,30 @@ void balloon(uint8_t* data, uint8_t* out){
 	for(uint32_t j=64; j<SIZE/4; j+=64){
 		j_2 = j>>1;
 		j_4 = j<<2;
-		crc32p(&cache_32[j   ], &cache_32[j+16]); crc32p(&cache_32[j+ 1], &cache_32[j+17]);
-		crc32p(&cache_32[j+ 2], &cache_32[j+18]); crc32p(&cache_32[j+ 3], &cache_32[j+19]);
-		crc32p(&cache_32[j+ 4], &cache_32[j+20]); crc32p(&cache_32[j+ 5], &cache_32[j+21]);
-		crc32p(&cache_32[j+ 6], &cache_32[j+22]); crc32p(&cache_32[j+ 7], &cache_32[j+23]);
-		crc32p(&cache_32[j+ 8], &cache_32[j+24]); crc32p(&cache_32[j+ 9], &cache_32[j+25]);
-		crc32p(&cache_32[j+10], &cache_32[j+26]); crc32p(&cache_32[j+11], &cache_32[j+27]);
-		crc32p(&cache_32[j+12], &cache_32[j+28]); crc32p(&cache_32[j+13], &cache_32[j+29]);
-		crc32p(&cache_32[j+14], &cache_32[j+30]); crc32p(&cache_32[j+15], &cache_32[j+31]);
-		crc32p(&cache_32[j+16], &cache_32[j+32]); crc32p(&cache_32[j+17], &cache_32[j+33]);
-		crc32p(&cache_32[j+18], &cache_32[j+34]); crc32p(&cache_32[j+19], &cache_32[j+35]);
-		crc32p(&cache_32[j+20], &cache_32[j+36]); crc32p(&cache_32[j+21], &cache_32[j+37]);
-		crc32p(&cache_32[j+22], &cache_32[j+38]); crc32p(&cache_32[j+23], &cache_32[j+39]);
-		crc32p(&cache_32[j+24], &cache_32[j+40]); crc32p(&cache_32[j+25], &cache_32[j+41]);
-		crc32p(&cache_32[j+26], &cache_32[j+42]); crc32p(&cache_32[j+27], &cache_32[j+43]);
-		crc32p(&cache_32[j+28], &cache_32[j+44]); crc32p(&cache_32[j+29], &cache_32[j+45]);
-		crc32p(&cache_32[j+30], &cache_32[j+46]); crc32p(&cache_32[j+31], &cache_32[j+47]);
-		crc32p(&cache_32[j+32], &cache_32[j+48]); crc32p(&cache_32[j+33], &cache_32[j+49]);
-		crc32p(&cache_32[j+34], &cache_32[j+50]); crc32p(&cache_32[j+35], &cache_32[j+51]);
-		crc32p(&cache_32[j+36], &cache_32[j+52]); crc32p(&cache_32[j+37], &cache_32[j+53]);
-		crc32p(&cache_32[j+38], &cache_32[j+54]); crc32p(&cache_32[j+39], &cache_32[j+55]);
-		crc32p(&cache_32[j+40], &cache_32[j+56]); crc32p(&cache_32[j+41], &cache_32[j+57]);
-		crc32p(&cache_32[j+42], &cache_32[j+58]); crc32p(&cache_32[j+43], &cache_32[j+59]);
-		crc32p(&cache_32[j+44], &cache_32[j+60]); crc32p(&cache_32[j+45], &cache_32[j+61]);
-		crc32p(&cache_32[j+46], &cache_32[j+62]); crc32p(&cache_32[j+47], &cache_32[j+63]);
+		crc32p(cache_32[j   ], cache_32[j+16]); crc32p(cache_32[j+ 1], cache_32[j+17]);
+		crc32p(cache_32[j+ 2], cache_32[j+18]); crc32p(cache_32[j+ 3], cache_32[j+19]);
+		crc32p(cache_32[j+ 4], cache_32[j+20]); crc32p(cache_32[j+ 5], cache_32[j+21]);
+		crc32p(cache_32[j+ 6], cache_32[j+22]); crc32p(cache_32[j+ 7], cache_32[j+23]);
+		crc32p(cache_32[j+ 8], cache_32[j+24]); crc32p(cache_32[j+ 9], cache_32[j+25]);
+		crc32p(cache_32[j+10], cache_32[j+26]); crc32p(cache_32[j+11], cache_32[j+27]);
+		crc32p(cache_32[j+12], cache_32[j+28]); crc32p(cache_32[j+13], cache_32[j+29]);
+		crc32p(cache_32[j+14], cache_32[j+30]); crc32p(cache_32[j+15], cache_32[j+31]);
+		crc32p(cache_32[j+16], cache_32[j+32]); crc32p(cache_32[j+17], cache_32[j+33]);
+		crc32p(cache_32[j+18], cache_32[j+34]); crc32p(cache_32[j+19], cache_32[j+35]);
+		crc32p(cache_32[j+20], cache_32[j+36]); crc32p(cache_32[j+21], cache_32[j+37]);
+		crc32p(cache_32[j+22], cache_32[j+38]); crc32p(cache_32[j+23], cache_32[j+39]);
+		crc32p(cache_32[j+24], cache_32[j+40]); crc32p(cache_32[j+25], cache_32[j+41]);
+		crc32p(cache_32[j+26], cache_32[j+42]); crc32p(cache_32[j+27], cache_32[j+43]);
+		crc32p(cache_32[j+28], cache_32[j+44]); crc32p(cache_32[j+29], cache_32[j+45]);
+		crc32p(cache_32[j+30], cache_32[j+46]); crc32p(cache_32[j+31], cache_32[j+47]);
+		crc32p(cache_32[j+32], cache_32[j+48]); crc32p(cache_32[j+33], cache_32[j+49]);
+		crc32p(cache_32[j+34], cache_32[j+50]); crc32p(cache_32[j+35], cache_32[j+51]);
+		crc32p(cache_32[j+36], cache_32[j+52]); crc32p(cache_32[j+37], cache_32[j+53]);
+		crc32p(cache_32[j+38], cache_32[j+54]); crc32p(cache_32[j+39], cache_32[j+55]);
+		crc32p(cache_32[j+40], cache_32[j+56]); crc32p(cache_32[j+41], cache_32[j+57]);
+		crc32p(cache_32[j+42], cache_32[j+58]); crc32p(cache_32[j+43], cache_32[j+59]);
+		crc32p(cache_32[j+44], cache_32[j+60]); crc32p(cache_32[j+45], cache_32[j+61]);
+		crc32p(cache_32[j+46], cache_32[j+62]); crc32p(cache_32[j+47], cache_32[j+63]);
 #else
 	for(uint32_t j_2=32; j_2<SIZE/8; j_2+=32){
 		j_4 = j_2<<3;
@@ -359,27 +345,27 @@ void balloon(uint8_t* data, uint8_t* out){
 		cache_64[j_2+28] += cache_64[j_2+12]; cache_64[j_2+29] += cache_64[j_2+13];
 		cache_64[j_2+30] += cache_64[j_2+14]; cache_64[j_2+31] += cache_64[j_2+15];
 	}
-	crc32p(cache_32,       prevItem    ); crc32p(&cache_32[ 1], &prevItem[ 1]);
-	crc32p(&cache_32[ 2], &prevItem[ 2]); crc32p(&cache_32[ 3], &prevItem[ 3]);
-	crc32p(&cache_32[ 4], &prevItem[ 4]); crc32p(&cache_32[ 5], &prevItem[ 5]);
-	crc32p(&cache_32[ 6], &prevItem[ 6]); crc32p(&cache_32[ 7], &prevItem[ 7]);
-	crc32p(&cache_32[ 8], &prevItem[ 8]); crc32p(&cache_32[ 9], &prevItem[ 9]);
-	crc32p(&cache_32[10], &prevItem[10]); crc32p(&cache_32[11], &prevItem[11]);
-	crc32p(&cache_32[12], &prevItem[12]); crc32p(&cache_32[13], &prevItem[13]);
-	crc32p(&cache_32[14], &prevItem[14]); crc32p(&cache_32[15], &prevItem[15]);
+	crc32p(*cache_32,    *prevItem   ); crc32p(cache_32[ 1], prevItem[ 1]);
+	crc32p(cache_32[ 2], prevItem[ 2]); crc32p(cache_32[ 3], prevItem[ 3]);
+	crc32p(cache_32[ 4], prevItem[ 4]); crc32p(cache_32[ 5], prevItem[ 5]);
+	crc32p(cache_32[ 6], prevItem[ 6]); crc32p(cache_32[ 7], prevItem[ 7]);
+	crc32p(cache_32[ 8], prevItem[ 8]); crc32p(cache_32[ 9], prevItem[ 9]);
+	crc32p(cache_32[10], prevItem[10]); crc32p(cache_32[11], prevItem[11]);
+	crc32p(cache_32[12], prevItem[12]); crc32p(cache_32[13], prevItem[13]);
+	crc32p(cache_32[14], prevItem[14]); crc32p(cache_32[15], prevItem[15]);
 	for(uint32_t j=0; j<ITER; j+=16){
 		*prevItem    &=mask; prevItem[ 1] &=mask; prevItem[ 2] &=mask; prevItem[ 3] &=mask;
 		prevItem[ 4] &=mask; prevItem[ 5] &=mask; prevItem[ 6] &=mask; prevItem[ 7] &=mask;
 		prevItem[ 8] &=mask; prevItem[ 9] &=mask; prevItem[10] &=mask; prevItem[11] &=mask;
 		prevItem[12] &=mask; prevItem[13] &=mask; prevItem[14] &=mask; prevItem[15] &=mask;
-		crc32i(&cache_32[*prevItem   ]); crc32i(&cache_32[prevItem[ 1]]);
-		crc32i(&cache_32[prevItem[ 2]]); crc32i(&cache_32[prevItem[ 3]]);
-		crc32i(&cache_32[prevItem[ 4]]); crc32i(&cache_32[prevItem[ 5]]);
-		crc32i(&cache_32[prevItem[ 6]]); crc32i(&cache_32[prevItem[ 7]]);
-		crc32i(&cache_32[prevItem[ 8]]); crc32i(&cache_32[prevItem[ 9]]);
-		crc32i(&cache_32[prevItem[10]]); crc32i(&cache_32[prevItem[11]]);
-		crc32i(&cache_32[prevItem[12]]); crc32i(&cache_32[prevItem[13]]);
-		crc32i(&cache_32[prevItem[14]]); crc32i(&cache_32[prevItem[15]]);
+		crc32i(cache_32[*prevItem   ]); crc32i(cache_32[prevItem[ 1]]);
+		crc32i(cache_32[prevItem[ 2]]); crc32i(cache_32[prevItem[ 3]]);
+		crc32i(cache_32[prevItem[ 4]]); crc32i(cache_32[prevItem[ 5]]);
+		crc32i(cache_32[prevItem[ 6]]); crc32i(cache_32[prevItem[ 7]]);
+		crc32i(cache_32[prevItem[ 8]]); crc32i(cache_32[prevItem[ 9]]);
+		crc32i(cache_32[prevItem[10]]); crc32i(cache_32[prevItem[11]]);
+		crc32i(cache_32[prevItem[12]]); crc32i(cache_32[prevItem[13]]);
+		crc32i(cache_32[prevItem[14]]); crc32i(cache_32[prevItem[15]]);
 	}
 	for(uint32_t j=0; j<SIZE/8; j+=OUTPUT_SIZE*2){
 		 *out_64   += cache_64[j  ]; out_64[1] += cache_64[j+1];
