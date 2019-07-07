@@ -6,8 +6,6 @@
 #ifndef POW_H
 #define POW_H
 
-void crc32p(uint32_t* in, uint32_t* out);
-void crc32i(uint32_t* in);
 uint32_t calcItem32(uint32_t* seed, uint32_t itemNumber);
 void calcDatasetItem8(uint8_t* seed, uint32_t itemNumber, uint64_t* out);
 void calcDataset(uint8_t* seed, uint64_t* out);
