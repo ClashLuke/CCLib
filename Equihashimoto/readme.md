@@ -19,14 +19,14 @@ To Do
 - [ ] Add changes to dataset generation to dataset-item-generation
 - [x] Improve AES code
 - [ ] Implement cn_slow\_hash AES code
-- [ ] **Code style/Optimisations**
+- [x] **Code style/Optimisations**
 - [x] Const correctness
 - [x] Inline functions
 - [x] Make local functions static
 - [x] Use downwards-counting while loops instead of upwards counting for loops
-- [ ] Reduce parameter passing (pass one ctx pointer)
-- [ ] Use posix coding standards (U,L,LL)
-- [ ] Prototype functions
+- [x] Reduce parameter passing (pass one ctx pointer)
+- [x] Use posix coding standards (U,L,LL)
+- [x] Prototype functions
 - [ ] **Readme**
 - [ ] Add "the lower the memory the lower the chance of finding a solution (exponentially)"-text
 - [ ] Explain where the expontial growth of time complexity comes from (when reducing the dataset size linearly)

@@ -91,7 +91,7 @@ inline static void crc32i(uint32_t* in) { // CRC32-Inplace
 #endif
 }
 
-static uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficulty, uint64_t ITERATIONS, uint64_t nonce){
+static void benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficulty, uint64_t ITERATIONS, uint64_t nonce){
 	uint8_t* dataset   = (uint8_t*)calloc((ITEMS>>3)+1,8);
 	if (!dataset) error_exit(1);
 	uint8_t*  seed         = (uint8_t*)seed_64;
@@ -146,10 +146,9 @@ static uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t dif
 	printf("\tHashrate is approximately:  %lu H/s\n", difficulty*ITERATIONS/(end_time-current_time));
 	printf("\tResult:  %08x,%08x",temp[0],temp[1]);
 	printf("\n");
-	return 0;
 }
 
-static uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t difficulty, uint64_t ITERATIONS, uint64_t nonce){
+static void benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t difficulty, uint64_t ITERATIONS, uint64_t nonce){
 	uint64_t  temp         = 0;
 	uint32_t* seed_32      = (uint32_t*)seed_64;
 	uint32_t  current_time = (uint32_t)time(NULL);
@@ -183,7 +182,6 @@ static uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64
 	uint64_t out = (10*iterations)/(end_time-current_time);
 	printf("\tHashrate is approximately:  %lu.%lu H/s\n",out/10,out%10);
 	printf("\tResult:  %016jx\n",temp);
-	return 0;
 }
 
 
