@@ -259,9 +259,17 @@ static const uint32_t crc32c_table[256] = {
 	mix[104]+=6; mix[106]+=6; mix[108]+=6; mix[110]+=6;\
 	mix[112]+=7; mix[114]+=7; mix[116]+=7; mix[118]+=7;\
 	mix[120]+=7; mix[122]+=7; mix[124]+=7; mix[126]+=7;\
-	aes(mix8_0, seed);   aes(mix8_1, seed1);\
-	aes(mix8_2, mix8_0); aes(mix8_3, mix8_1);\
-	crc32p(mix32[ 16], *mix32);       crc32p(mix32[ 17], mix32[  1]);\
+	aes(mix8_0, seed); aes(mix8_1, seed1);\
+	crc32i(*seed_32);    crc32i(seed_32[ 1]); crc32i(seed_32[ 2]); crc32i(seed_32[ 3]);\
+	crc32i(seed_32[ 4]); crc32i(seed_32[ 5]); crc32i(seed_32[ 6]); crc32i(seed_32[ 7]);\
+	crc32i(seed_32[ 8]); crc32i(seed_32[ 9]); crc32i(seed_32[10]); crc32i(seed_32[11]);\
+	crc32i(seed_32[12]); crc32i(seed_32[13]); crc32i(seed_32[14]); crc32i(seed_32[15]);\
+	aes(mix8_2, seed); aes(mix8_3, seed1);\
+	crc32i(*seed_32);    crc32i(seed_32[ 1]); crc32i(seed_32[ 2]); crc32i(seed_32[ 3]);\
+	crc32i(seed_32[ 4]); crc32i(seed_32[ 5]); crc32i(seed_32[ 6]); crc32i(seed_32[ 7]);\
+	crc32i(seed_32[ 8]); crc32i(seed_32[ 9]); crc32i(seed_32[10]); crc32i(seed_32[11]);\
+	crc32i(seed_32[12]); crc32i(seed_32[13]); crc32i(seed_32[14]); crc32i(seed_32[15]);\
+	crc32p(mix32[ 16], *mix32);     crc32p(mix32[ 17], mix32[  1]);\
 	crc32p(mix32[ 18], mix32[  2]); crc32p(mix32[ 19], mix32[  3]);\
 	crc32p(mix32[ 20], mix32[  4]); crc32p(mix32[ 21], mix32[  5]);\
 	crc32p(mix32[ 22], mix32[  6]); crc32p(mix32[ 23], mix32[  7]);\
