@@ -16,9 +16,9 @@ void mash_full(const uint8_t* data, uint8_t* dataset){
 	uint64_t  k = 0;
 	uint8_t   cache0[BLOCK+4] = {0};
 	uint8_t   cache1[BLOCK+8] = {0};
-	const uint64_t  item      = *(uint64_t*)&data[32]; 
-	const uint64_t  diff      = *(uint64_t*)&data[40]; 
-	uint32_t* item32    = (uint32_t*)&data[32]; 
+	const uint64_t  item      = *(uint64_t*)&data[64]; 
+	const uint64_t  diff      = *(uint64_t*)&data[72]; 
+	uint32_t* item32    = (uint32_t*)&data[64]; 
 	calcDataset(data, dataset);
 	for(; j<ITEMS; j+=BLOCK){
 	memcpy(cache0, &dataset[j], BLOCK+4);

@@ -202,6 +202,7 @@ void calcDataset(const uint8_t* seed, uint8_t* out){
 	uint8_t*  mix8_3   = (uint8_t*)&mix[6];
 	uint32_t* mix32    = (uint32_t*)mix;
 	uint32_t  i        = (ITEMS>>12);
+	const uint8_t* seed1 = &seed[16];
 	do{
 		mix[  1] = mix[  3] = mix[  5] = mix[  7] = mix[  9] = mix[ 11] = mix[ 13] =
 		mix[ 15] = mix[ 17] = mix[ 19] = mix[ 21] = mix[ 23] = mix[ 25] = mix[ 27] =
@@ -238,7 +239,7 @@ void calcDataset(const uint8_t* seed, uint8_t* out){
 		mix[112]+=7; mix[114]+=7; mix[116]+=7; mix[118]+=7;
 		mix[120]+=7; mix[122]+=7; mix[124]+=7; mix[126]+=7;
 		out+=0x1000;
-		aes(mix8_0, seed);   aes(mix8_1, &seed[16]);
+		aes(mix8_0, seed);   aes(mix8_1, seed1);
 		aes(mix8_2, mix8_0); aes(mix8_3, mix8_1);
 		crc32p(&mix32[ 16], mix32);       crc32p(&mix32[ 17], &mix32[  1]);
 		crc32p(&mix32[ 18], &mix32[  2]); crc32p(&mix32[ 19], &mix32[  3]);

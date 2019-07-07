@@ -102,13 +102,15 @@ static uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t dif
 	uint32_t  current_time = 0;
 	const uint64_t  iterations   = ITERATIONS>>6;
 	const uint64_t  diff         = 0xFFFFFFFFFFFFFFFF/difficulty;
-	seed_64[5] = diff;
+	seed_64[9] = diff;
 	for(uint16_t i=0;i<64;i++) buffer[i]=' ';
 	current_time = (uint32_t)time(NULL);
 	do{
 		calcDataset(seed, dataset);
-		(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
-		seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
+		(*seed_32)++;  seed_32[ 1]++; seed_32[ 2]++; seed_32[ 3]++;
+		seed_32[ 4]++; seed_32[ 5]++; seed_32[ 6]++; seed_32[ 7]++;
+		seed_32[ 8]++; seed_32[ 9]++; seed_32[10]++; seed_32[11]++;
+		seed_32[12]++; seed_32[13]++; seed_32[14]++; seed_32[15]++;
 	}while(--ctr);
 	printf("\tGenerating %u datasets took %us\n",COUNT,(uint32_t)time(NULL)-current_time);
 	current_time = (uint32_t)time(NULL);
@@ -117,9 +119,11 @@ static uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t dif
 		for(uint8_t j=0;j<64;j++){
 			for(uint64_t i=0;i<iterations;i++){
 				mash_full(seed, dataset);
-				temp[0] ^= seed_32[8]; temp[1] ^= seed_32[9]; nonce++;
-				(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
-				seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
+				temp[0] ^= seed_32[12]; temp[1] ^= seed_32[13]; nonce++;
+				(*seed_32)++;  seed_32[ 1]++; seed_32[ 2]++; seed_32[ 3]++;
+				seed_32[ 4]++; seed_32[ 5]++; seed_32[ 6]++; seed_32[ 7]++;
+				seed_32[ 8]++; seed_32[ 9]++; seed_32[10]++; seed_32[11]++;
+				seed_32[12]++; seed_32[13]++; seed_32[14]++; seed_32[15]++;
 			}
 			buffer[j] = '#';
 			printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
@@ -128,9 +132,11 @@ static uint64_t benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t dif
 	} else {
 		for(uint64_t i=0;i<ITERATIONS;i++){
 			mash_full(seed, dataset);
-			temp[0] ^= seed_32[8]; temp[1] ^= seed_32[9]; nonce++;
-			(*seed_32)++; seed_32[1]++; seed_32[2]++; seed_32[3]++;
-			seed_32[4]++; seed_32[5]++; seed_32[6]++; seed_32[7]++;
+			temp[0] ^= seed_32[12]; temp[1] ^= seed_32[13]; nonce++;
+			(*seed_32)++;  seed_32[ 1]++; seed_32[ 2]++; seed_32[ 3]++;
+			seed_32[ 4]++; seed_32[ 5]++; seed_32[ 6]++; seed_32[ 7]++;
+			seed_32[ 8]++; seed_32[ 9]++; seed_32[10]++; seed_32[11]++;
+			seed_32[12]++; seed_32[13]++; seed_32[14]++; seed_32[15]++;
 		}
 	}
 	free(dataset);
@@ -157,7 +163,7 @@ static uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64
 			for(uint64_t i=0;i<ITERATIONS<<20;i++){
 				uint8_t a = mash_light(seed_32, diff);
 				temp ^= a; nonce++;
-				crc32i(&seed_32[8]); crc32i(&seed_32[9]); crc32i(&seed_32[10]);
+				crc32i(&seed_32[12]); crc32i(&seed_32[13]);
 			}
 			buffer[j] = '#';
 			printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
@@ -167,7 +173,7 @@ static uint64_t benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64
 		for(uint64_t i=0;i<iterations;i++){
 			uint8_t a = mash_light(seed_32, diff);
 			temp ^= a; nonce++;
-			crc32i(&seed_32[8]); crc32i(&seed_32[9]); crc32i(&seed_32[10]);
+			crc32i(&seed_32[12]); crc32i(&seed_32[13]);
 		}
 	}
 	uint32_t end_time = (uint32_t)time(NULL);
@@ -185,9 +191,9 @@ int main(int argc, char *argv[]){
 	uint8_t   iterShifts   = argc>2?atoi(argv[2]):20;
 	uint8_t   diffShifts   = argc>3?atoi(argv[3]):20;
 	uint32_t  seed         = argc>4?atoi(argv[4]):0x89ABCDEF;
-	uint32_t  seed32_0[16] = {0};
+	uint32_t  seed32_0[20] = {0};
 	uint64_t* seed64_0     = (uint64_t*)seed32_0;
-	uint32_t  seed32_1[16] = {0};
+	uint32_t  seed32_1[20] = {0};
 	uint64_t* seed64_1     = (uint64_t*)seed32_1;
 	uint64_t  iterations   = 1;
 	uint64_t  difficulty   = 1;
@@ -198,7 +204,7 @@ int main(int argc, char *argv[]){
 	for(uint8_t i=0; i<iterShifts; i++) iterations<<=1;
 	for(uint8_t i=0; i<diffShifts; i++) difficulty<<=1;
 	nonce+=rand();
-	for(uint8_t i=0;i<8;i++) seed32_0[i] = seed32_1[i] = rand();
+	for(uint8_t i=0;i<16;i++) seed32_0[i] = seed32_1[i] = rand();
 	printf("\e[?25l"); // Hide cursor
 	printf("Parameters\n");
 	printf("\tProgressbar:  %s\n", printing?"yes":"no");
