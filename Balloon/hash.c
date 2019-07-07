@@ -248,8 +248,10 @@ void balloon(uint8_t* data, uint8_t* out){
 	uint32_t* cache_32     = (uint32_t*)cache_64;
 	uint32_t  mask         = (SIZE/4)-1;
 	uint32_t  prevItem[16] = {0};
-	uint32_t  j_2          = 0;
 	uint32_t  j_4          = 0;
+#ifdef USE_CRC
+	uint32_t  j_2          = 0;
+#endif
 	crc32p(data_32,       cache_32    ); crc32p(&data_32[ 1], &cache_32[ 2]);
 #if INPUT_SIZE > 1
 	crc32p(&data_32[ 2], &cache_32[ 4]); crc32p(&data_32[ 3], &cache_32[ 6]);
@@ -330,7 +332,7 @@ void balloon(uint8_t* data, uint8_t* out){
 		crc32p(&cache_32[j+44], &cache_32[j+60]); crc32p(&cache_32[j+45], &cache_32[j+61]);
 		crc32p(&cache_32[j+46], &cache_32[j+62]); crc32p(&cache_32[j+47], &cache_32[j+63]);
 #else
-	for(uint32_t j_2=32; j<SIZE/8; j+=32){
+	for(uint32_t j_2=32; j_2<SIZE/8; j_2+=32){
 		j_4 = j_2<<3;
 		cache_64[j_2+ 8] = cache_64[j_2+16] = cache_64[j_2+24] = cache_64[j_2   ];
 		cache_64[j_2+ 9] = cache_64[j_2+17] = cache_64[j_2+25] = cache_64[j_2+ 1];
