@@ -4,6 +4,7 @@
 
 
 #include <stdint.h>
+#include <stdlib.h>
 #include "config.h"
 
 
@@ -226,7 +227,13 @@ static inline void aes(uint8_t* state, const uint8_t* key)
 
 // Input will always be 64 byte, output will be 32 byte
 void balloon(const uint8_t* data, uint8_t* out){
-	uint64_t  cache_64[SIZE/8] = {0};
+#ifndef USE_CRC
+	uint32_t  size         = SIZE>>3;
+	uint64_t  cache_64[SIZE>>3] = {0};
+#else
+	uint32_t  size         = SIZE>>2;
+	uint64_t  cache_64[SIZE>>3] = {0};
+#endif
 	uint64_t* out_64       = (uint64_t*)out;
 	const uint32_t* data_32      = (const uint32_t*)data;
 	uint8_t*  cache        = (uint8_t*)cache_64;
@@ -289,7 +296,8 @@ void balloon(const uint8_t* data, uint8_t* out){
 	aes(&cache[208], &cache[160]); aes(&cache[224], &cache[176]); aes(&cache[240], &cache[192]);
 	
 #ifdef USE_CRC
-	for(uint32_t j=64; j<SIZE/4; j+=64){
+	size-=64;
+	for(uint32_t j=0; j<size; j+=64){
 		j_2 = j>>1;
 		j_4 = j<<2;
 		crc32p(cache_32[j   ], cache_32[j+16]); crc32p(cache_32[j+ 1], cache_32[j+17]);
@@ -317,7 +325,8 @@ void balloon(const uint8_t* data, uint8_t* out){
 		crc32p(cache_32[j+44], cache_32[j+60]); crc32p(cache_32[j+45], cache_32[j+61]);
 		crc32p(cache_32[j+46], cache_32[j+62]); crc32p(cache_32[j+47], cache_32[j+63]);
 #else
-	for(uint32_t j_2=32; j_2<SIZE/8; j_2+=32){
+	size-=32;
+	for(uint32_t j_2=0; j_2<size; j_2+=32){
 		j_4 = j_2<<3;
 		cache_64[j_2+ 8] = cache_64[j_2+16] = cache_64[j_2+24] = cache_64[j_2   ];
 		cache_64[j_2+ 9] = cache_64[j_2+17] = cache_64[j_2+25] = cache_64[j_2+ 1];
