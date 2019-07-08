@@ -1,5 +1,0 @@
-Calculate dataset based on seed, where seed is the hash of the header, including nonce
-Solve birthday problem for (32bit-block) dataset and return the values
-The more values, the higher the rating, the higher the values, the higher the rating. 4*0000 > 3*FFFF
-
-dataset generated with hashimoto
