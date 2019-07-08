@@ -12,6 +12,26 @@ Thanks to the underlying design of the birthday paradox, an ASIC for this algori
 
 Using this design, equihashimoto is botnet resistant, has heavy ASIC resistance and low dataset generation times while being extremely fast verifyable, provably assymetric and provably secure.
 
+```
+Parameters
+	Progressbar:  yes
+	Iterations
+		Full:  1024
+		Light:  68719476736
+	Seed:  89abcdef
+	Difficulty:  4294967296
+Mining
+        Calculation of 1024 solutions took:  3710s                              
+	Hashrate is approximately:  5 s/sol
+	Found 649 solutions for 1024 nonces. Rate: 63%
+	Result:  a19231ee,715c0c64
+Validation
+        Calculation of 67108864 hashes took:  80s                               
+	Hashrate is approximately:  838860.8 H/s
+	Result:  0000000000000000
+
+```
+
 ###ToDo
 - [ ] **General Optimisations**
 - [ ] Merge stacked seed CRCing into code
