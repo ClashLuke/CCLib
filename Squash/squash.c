@@ -237,14 +237,3 @@ void squash(uint8_t* data, uint8_t* out){
 	aes(&out[16], &data[16]);
 	return;
 }
-
-int main(){
-	uint64_t data64[8] = {0};
-	uint8_t* data      = (uint8_t*)data64;
-	uint32_t ctr       = 1UL<<31;
-	do{
-		squash(data, data); 
-	}while(--ctr);
-	printf("Res: %016jx\n",*data64);
-
-}
