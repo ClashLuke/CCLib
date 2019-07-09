@@ -123,7 +123,7 @@ static void benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficu
 		for(uint8_t j=0; j<64; j++){
 			for(uint64_t i=0;i<iterations;i++){
 				prev=seed_32[16];
-				mash_full(seed, dataset);
+				bidash_full(seed, dataset);
 				if(seed_32[16]!=prev){
 					temp[0] ^= seed_32[16]; temp[1] ^= seed_32[17]; nonce++;
 					cnt++;
@@ -140,7 +140,7 @@ static void benchmark_mine(uint64_t* seed_64, uint8_t printing, uint64_t difficu
 		printf("\r%*s\r",80,"");
 	} else {
 		for(uint64_t i=0;i<ITERATIONS;i++){
-			mash_full(seed, dataset);
+			bidash_full(seed, dataset);
 			temp[0] ^= seed_32[16]; temp[1] ^= seed_32[17]; nonce++;
 			(*seed_32)++;  seed_32[ 1]++; seed_32[ 2]++; seed_32[ 3]++;
 			seed_32[ 4]++; seed_32[ 5]++; seed_32[ 6]++; seed_32[ 7]++;
@@ -170,7 +170,7 @@ static void benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t d
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 		for(uint8_t j=0; j<64; j++){
 			for(uint64_t i=0;i<ITERATIONS<<10;i++){
-				uint8_t a = mash_light(seed_32, diff);
+				uint8_t a = bidash_light(seed_32, diff);
 				temp ^= a; nonce++;
 				crc32i(&seed_32[12]); crc32i(&seed_32[13]);
 			}
@@ -180,7 +180,7 @@ static void benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t d
 		printf("\r%*s\r",80,"");
 	} else {
 		for(uint64_t i=0;i<iterations;i++){
-			uint8_t a = mash_light(seed_32, diff);
+			uint8_t a = bidash_light(seed_32, diff);
 			temp ^= a; nonce++;
 			crc32i(&seed_32[12]); crc32i(&seed_32[13]);
 		}

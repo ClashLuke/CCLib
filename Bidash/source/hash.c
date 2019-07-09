@@ -9,7 +9,7 @@
 #include "config.h"
 
 
-void mash_full(uint8_t* data, uint8_t* dataset){
+void bidash_full(uint8_t* data, uint8_t* dataset){
 	uint8_t   cache0[BLOCK+16] = {0};
 	uint8_t   cache1[BLOCK+8] = {0};
 	uint64_t  item      = *(uint64_t*)&data[64];  
