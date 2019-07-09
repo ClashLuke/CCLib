@@ -12,6 +12,8 @@ Thanks to the underlying design of the birthday paradox, an ASIC for this algori
 
 Using this design, bidash is botnet resistant, has heavy ASIC resistance and low dataset generation times while being extremely fast verifyable, provably assymetric and provably secure.
 
+Difficulty works perfectly fine. Diff * 2 = Time * 2. Minimum recommended difficulty: 2^32. 
+
 ```
 Parameters
 	Progressbar:  yes
