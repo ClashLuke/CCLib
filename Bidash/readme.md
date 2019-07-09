@@ -14,6 +14,8 @@ Using this design, bidash is botnet resistant, has heavy ASIC resistance and low
 
 Difficulty works perfectly fine. Diff * 2 = Time * 2. Minimum recommended difficulty: 2^32. 
 
+GPUs can't mine, because a CPU finishes one nonce in 1s (dataset generation) + 3s (calculation) but a GPU needs 5+ seconds to generate the dataset itself. When copying the dataset generated on CPU to GPU, 1+ second is needed only for the process of copying it. The GPU would then have up to 2s to check all items in the dataset in parallel, find a solution and broadcast it back to the CPU. This appears to be very unlikely.
+
 ```
 Parameters
 	Progressbar:  yes
