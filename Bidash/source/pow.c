@@ -710,66 +710,126 @@ static const uint32_t crc32c_table[256] = {
 	mix[508] += mix[381]; mix[509] += mix[382];\
 	mix[510] += mix[383]; mix[511] += *mix;
 
-uint32_t calcItem32(uint8_t* seed, uint32_t i){
+uint8_t bidash_light(uint32_t* data){
 	uint64_t  mix[512];
+	uint8_t* data8    = (uint8_t*)data;
+	uint64_t item2    = calcItem64(data8, data[17]);
+	uint64_t item     = *(uint64_t*)&data[18];
+	uint64_t diff     = *(uint64_t*)&data[20];
+	uint64_t i        = data[16];
 	uint32_t* seed_32 = (uint32_t*)seed;
-	uint8_t*  mix8_0 = (uint8_t*)mix;
-	uint8_t*  mix8_1 = (uint8_t*)&mix[2];
-	uint8_t*  mix8_2 = (uint8_t*)&mix[4];
-	uint8_t*  mix8_3 = (uint8_t*)&mix[6];
-	uint32_t* mix32  = (uint32_t*)mix;
-	uint32_t  out0   = 0; 
-	uint32_t  out1   = 0; 
-	const uint8_t pos     = i&0x3;
-	const uint8_t pos4096 = (i&0xfff)>>2;
+	uint8_t*  mix8_0  = (uint8_t*)mix;
+	uint8_t*  mix8_1  = (uint8_t*)&mix[2];
+	uint8_t*  mix8_2  = (uint8_t*)&mix[4];
+	uint8_t*  mix8_3  = (uint8_t*)&mix[6];
+	uint32_t* mix32   = (uint32_t*)mix;
+	uint64_t  out0    = 0; 
+	uint64_t  out1    = 0; 
+	uint64_t  out2    = 0; 
+	uint64_t  out3    = 0; 
+	uint8_t pos       = i&0x7;
+	uint8_t pos4096   = (i&0xfff)>>3;
 	const uint8_t* seed1 = &seed[16];
+	i&=0xffffe000UL;
 	ITEM_CALCULATION()
-	if(pos4096<1023){
-		out0 = mix32[pos4096];
-		out1 = mix32[1+pos4096];
-	}else{
-		out0 = mix32[1023];
+	if(pos4096<510){
+		out0 = mix[pos4096];
+		out1 = out3 = mix[1+pos4096];
 		if(pos){
-			i++;
+			for(uint8_t j=0; j<  pos; j++) (out0)>>=8;
+			for(uint8_t j=0; j<8-pos; j++) (out1)<<=8;
+			if(((out0|out1) ^ item) < diff){
+				out2 = mix[2+pos4096];
+				for(uint8_t j=0; j<  pos; j++) (out3)>>=8;
+				for(uint8_t j=0; j<8-pos; j++) (out2)<<=8;
+				item ^= (out2|out3);
+			}else{
+				return 0;
+			}
+		}else{
+			if((out0 ^ item) < diff){
+				item ^= out1;
+			}else{
+				return 0;
+			}
+		}
+	}else if(pos4096=510){
+		out0 = mix[510];
+		out1 = out3 = mix[511];
+		if(pos){	
+			for(uint8_t j=0; j<  pos; j++) (out0)>>=8;
+			for(uint8_t j=0; j<8-pos; j++) (out1)<<=8;
+			if(((out0|out1) ^ item) < diff){
+				i+=4096;
+				ITEM_CALCULATION()
+				out2 = *mix;
+				for(uint8_t j=0; j<  pos; j++) (out3)>>=8;
+				for(uint8_t j=0; j<8-pos; j++) (out2)<<=8;
+				item ^= (out2|out3);
+			}else{
+				return 0;
+			}
+		}else{
+			if((out0 ^ item) < diff){
+				item ^= out1;
+			}else{
+				return 0;
+			}
+		}
+	} else {
+		out0 = mix[511];
+		if(pos){
+			i+=4096;
 			ITEM_CALCULATION()
-			out1 = *mix32;
+			out1 = out3 = *mix;
+			for(uint8_t j=0; j<  pos; j++) (out0)>>=8;
+			for(uint8_t j=0; j<8-pos; j++) (out1)<<=8;
+			if(((out0|out1) ^ item) < diff){
+				out2 = mix[2];
+				for(uint8_t j=0; j<  pos; j++) (out3)>>=8;
+				for(uint8_t j=0; j<8-pos; j++) (out2)<<=8;
+				item^=(out2|out3);
+			}else{
+				return 0;
+			}
+		}else{
+			if((out0^item)<diff){
+				i+=4096;
+				ITEM_CALCULATION()
+				item^=*mix;
+			}else{
+				return 0;
+			}
 		}
 	}
-	for(uint8_t j=0; j<  pos; j++) (out0)>>=8;
-	for(uint8_t j=0; j<4-pos; j++) (out1)<<=8;
-	out0 |= out1;
-	return out0;
-}
-
-uint64_t calcItem64(uint8_t* seed, uint32_t i){
-	uint64_t  mix[512];
-	uint32_t* seed_32 = (uint32_t*)seed;
-	uint8_t*  mix8_0 = (uint8_t*)mix;
-	uint8_t*  mix8_1 = (uint8_t*)&mix[2];
-	uint8_t*  mix8_2 = (uint8_t*)&mix[4];
-	uint8_t*  mix8_3 = (uint8_t*)&mix[6];
-	uint32_t* mix32  = (uint32_t*)mix;
-	uint64_t  out0   = 0; 
-	uint64_t  out1   = 0; 
-	const uint8_t pos     = i&0x7;
-	const uint8_t pos4096 = (i&0xfff)>>3;
-	const uint8_t* seed1 = &seed[16];
+	i = data[17];
+	pos     = i&0x7;
+	pos4096 = (i&0xfff)>>3;
+	i&=0xffffe000UL;
 	ITEM_CALCULATION()
 	if(pos4096<511){
 		out0 = mix[pos4096];
-		out1 = mix[1+pos4096];
+		if(pos){
+			out1 = mix[1+pos4096];
+			for(uint8_t j=0; j<  pos; j++) (out0)>>=8;
+			for(uint8_t j=0; j<8-pos; j++) (out1)<<=8;
+			return ((out0|out1)^item)<diff;
+		}else{
+			return (out0^item)<diff;
+		}
 	}else{
 		out0 = mix[511];
 		if(pos){
-			i++;
+			i+=4096;
 			ITEM_CALCULATION()
-			out1 = *mix32;
+			out1 = *mix;
+			for(uint8_t j=0; j<  pos; j++) (out0)>>=8;
+			for(uint8_t j=0; j<8-pos; j++) (out1)<<=8;
+			return ((out0|out1)^item)<diff;
+		}else{
+			return (out0^item)<diff;
 		}
 	}
-	for(uint8_t j=0; j<  pos; j++) (out0)>>=8;
-	for(uint8_t j=0; j<8-pos; j++) (out1)<<=8;
-	out0 |= out1;
-	return out0;
 }
 
 void calcDataset(uint8_t* seed, uint8_t* out){
@@ -780,9 +840,9 @@ void calcDataset(uint8_t* seed, uint8_t* out){
 	uint8_t*  mix8_3   = (uint8_t*)&mix[6];
 	uint32_t* mix32    = (uint32_t*)mix;
 	uint32_t* seed_32  = (uint32_t*)seed;
-	uint32_t  max      = (ITEMS>>9);
+	uint32_t  max      = ITEMS;
 	const uint8_t* seed1 = &seed[16];
-	for(uint32_t i=0;i<max;i+=8){
+	for(uint32_t i=0;i<max;i+=4096){
 	ITEM_CALCULATION()
 	memcpy(out, mix, 4096);
 	out+=0x1000;
