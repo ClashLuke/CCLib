@@ -50,4 +50,6 @@ Validation
 - [ ] Explain new approach properly
 - [ ] Add references
 - [ ] Add proper benchmark
+- [ ] Improve GPU part
+- [ ] Explain difficulty minimum of 2^32
 
