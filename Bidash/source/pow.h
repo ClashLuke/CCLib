@@ -10,7 +10,7 @@ uint32_t calcItem32(uint8_t* seed, uint32_t itemNumber);
 uint64_t calcItem64(uint8_t* seed, uint32_t i);
 void calcDataset(uint8_t* seed, uint8_t* out);
 void get_seedhash(uint64_t block_number, uint8_t* seed);
-uint8_t bidash_light(uint32_t* data, uint64_t difficulty);
+uint8_t bidash_light(uint32_t* data);
 
 
 #endif

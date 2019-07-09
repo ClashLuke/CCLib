@@ -166,11 +166,12 @@ static void benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t d
 	const uint64_t  diff         = 0xFFFFFFFFFFFFFFFF/difficulty;
 	for(uint16_t i=0;i<64;i++) buffer[i]=' ';
 	current_time = (uint32_t)time(NULL);
+	seed_64[10] = diff; 
 	if(printing){
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 		for(uint8_t j=0; j<64; j++){
 			for(uint64_t i=0;i<ITERATIONS<<10;i++){
-				uint8_t a = bidash_light(seed_32, diff);
+				uint8_t a = bidash_light(seed_32);
 				temp ^= a; nonce++;
 				crc32i(&seed_32[12]); crc32i(&seed_32[13]);
 			}
@@ -180,7 +181,7 @@ static void benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t d
 		printf("\r%*s\r",80,"");
 	} else {
 		for(uint64_t i=0;i<iterations;i++){
-			uint8_t a = bidash_light(seed_32, diff);
+			uint8_t a = bidash_light(seed_32);
 			temp ^= a; nonce++;
 			crc32i(&seed_32[12]); crc32i(&seed_32[13]);
 		}
@@ -199,9 +200,9 @@ int main(int argc, char *argv[]){
 	uint8_t   iterShifts   = argc>2?atoi(argv[2]):20;
 	uint8_t   diffShifts   = argc>3?atoi(argv[3]):20;
 	uint32_t  seed         = argc>4?atoi(argv[4]):0x89ABCDEF;
-	uint32_t  seed32_0[20] = {0};
+	uint32_t  seed32_0[22] = {0};
 	uint64_t* seed64_0     = (uint64_t*)seed32_0;
-	uint32_t  seed32_1[20] = {0};
+	uint32_t  seed32_1[22] = {0};
 	uint64_t* seed64_1     = (uint64_t*)seed32_1;
 	uint64_t  iterations   = 1;
 	uint64_t  difficulty   = 1;
