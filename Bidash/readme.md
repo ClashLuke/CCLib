@@ -1,3 +1,31 @@
+## Bidash
+A bi-assymetric hash combining the birthday problem with dagger.
+
+**Contents**
+
+- [General](#General)
+	- [Concept](#Concept)
+	- [Speed](#Speed)
+	- [Difficulty](#Difficulty)
+- [Security](#Security)
+	- [Dataset](#Dataset)
+	- [Birthday-Paradox](#Birthday-Paradox)
+	- [Memory](#Memory)
+	- [Time-Memory-Tradeoff](#Time-Memory-Tradeoff)
+- [Comparision](#Comparision)
+	- [Equihash](#Equihash)
+	- [Dagger](#Dagger)
+	- [Balloon](#Balloon)
+- [Resistance](#Resistance)
+	- [ASIC](#ASIC)
+	- [FPGA](#FPGA)
+	- [GPU](#GPU)
+- [ToDo](#ToDo)
+
+### General
+#### Concept
+Bidash is a bi-assymetric hash algorithm combining the research of the [birthday problem](#Birthday-Paradox) and [dagger](https://webcache.googleusercontent.com/search?q=cache:bmDsAGmmcG8J:www.hashcash.org/papers/dagger.html+).
+
 In bidash, the most important thing is memory-dependency. Say `m` is the variable determining the memory intensity (for the purpose of accurate and recreatable calculations, m is measured in bytes). Unfortunately with a background of the equihash and the birthday paradox, the time complexity `t` for the algorithm to find a solution, assuming that there are no memory optimisations and a complete randomness, is equal to `2*m*(m-1)` CPU cycles in a best-case scenario. This best-case scenario assumes that all memory is on-cache and checks are performed in one CPU cycle. Considering that a minimum of 4 GiB (2^32 bytes) are recommended to achieve strong ASIC and botnet resistance, the minimum time spent calculating one nonce, assuming that there are no memory optimisations possible for the algorithm, is `t = 2*m*(m-1) = 2^65-2^33` CPU cycles. Converting CPU cycles to seconds, on a normal 4GiHz CPU with one active thread, the average best-case execution time for the algorithm to create one subnonce to one nonce is 272 years. (Further reading: [A generalized Birthday Problem](https://link.springer.com/content/pdf/10.1007%2F3-540-45708-9_19.pdf), [Lattice Problem](https://cseweb.ucsd.edu/~daniele/papers/SVP.pdf))
 
 Therefore a different approach has to be used, which skips a lot of work yet requires the entire dataset to be existent.
