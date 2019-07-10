@@ -64,7 +64,6 @@ Mining
 ###ToDo
 - [ ] **General Optimisations**
 - [ ] Add dataset item calculation optimisation
-- [ ] Implement cn_slow\_hash AES code
 - [ ] **Readme**
 - [ ] Add "the lower the memory the lower the chance of finding a solution (exponentially)"-text
 - [ ] Explain where the expontial growth of time complexity comes from (when reducing the dataset size linearly)
