@@ -36,7 +36,3 @@ void bidash_full(uint8_t* data, uint8_t* dataset){
 		}
 	}
 }
-
-
-
-
