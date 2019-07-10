@@ -710,12 +710,13 @@ static const uint32_t crc32c_table[256] = {
 	mix[508] += mix[381]; mix[509] += mix[382];\
 	mix[510] += mix[383]; mix[511] += *mix;
 
-uint8_t bidash_light(uint32_t* seed_32){
+uint8_t bidash_verify(uint32_t* seed_32){
 	uint64_t  mix[512];
 	uint32_t  seed2[16];
 	uint64_t  item    = *(uint64_t*)&seed_32[18];
 	uint64_t  diff    = *(uint64_t*)&seed_32[20];
-	uint64_t  i       = seed_32[16];
+	uint32_t  i       = seed_32[16];
+	uint32_t  i0      = seed_32[17];
 	uint8_t*  seed    = (uint8_t*)seed_32;
 	uint8_t*  mix8_0  = (uint8_t*)mix;
 	uint8_t*  mix8_1  = (uint8_t*)&mix[2];
@@ -806,7 +807,7 @@ uint8_t bidash_light(uint32_t* seed_32){
 		}
 	}
 	memcpy(seed_32, seed2, 64);
-	i = seed_32[17];
+	i = i0;
 	pos     = i&0x7;
 	pos4096 = (i&0xfff)>>3;
 	i&=0xffffe000UL;
@@ -847,9 +848,8 @@ void calcDataset(uint8_t* seed, uint8_t* out){
 	uint8_t*  mix8_3   = (uint8_t*)&mix[6];
 	uint32_t* mix32    = (uint32_t*)mix;
 	uint32_t* seed_32  = (uint32_t*)seed;
-	uint32_t  max      = ITEMS;
 	const uint8_t* seed1 = &seed[16];
-	for(uint64_t i=0;i<max;i+=4096){
+	for(uint64_t i=0;i<ITEMS;i+=4096){
 	ITEM_CALCULATION()
 	memcpy(out, mix, 4096);
 	out+=0x1000;

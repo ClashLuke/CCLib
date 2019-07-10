@@ -171,7 +171,7 @@ static void benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t d
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 		for(uint8_t j=0; j<64; j++){
 			for(uint64_t i=0;i<ITERATIONS<<10;i++){
-				uint8_t a = bidash_light(seed_32);
+				uint8_t a = bidash_verify(seed_32);
 				temp ^= a; nonce++;
 				crc32i(&seed_32[12]); crc32i(&seed_32[13]);
 			}
@@ -181,13 +181,13 @@ static void benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t d
 		printf("\r%*s\r",80,"");
 	} else {
 		for(uint64_t i=0;i<iterations;i++){
-			uint8_t a = bidash_light(seed_32);
+			uint8_t a = bidash_verify(seed_32);
 			temp ^= a; nonce++;
 			crc32i(&seed_32[12]); crc32i(&seed_32[13]);
 		}
 	}
 	uint32_t end_time = (uint32_t)time(NULL);
-	printf("\tCalculation of %lu hashes took:  %us\n",iterations, end_time-current_time);
+	printf("\tValidation of %lu hashes took:  %us\n",iterations, end_time-current_time);
 	uint64_t out = (10*iterations)/(end_time-current_time);
 	printf("\tHashrate is approximately:  %lu.%lu H/s\n",out/10,out%10);
 	printf("\tResult:  %016jx\n",temp);
