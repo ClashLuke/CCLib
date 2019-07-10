@@ -1397,7 +1397,7 @@ void bidash_light(uint8_t* seed){
 	ITEM_CALCULATION()
 	for(uint64_t j=0; j<ITEMS; j+=4096){
 		for(uint16_t a=0; a<4096; a++){
-			if((item ^ *(uint64_t*)&cache0[a]) < diff){
+			if(!((*item32) ^ *(uint32_t*)&cache0[a])){
 				item ^= *(uint64_t*)&cache0[4+a];
 				i = j+a+1;
 				mix = cache1_1;
