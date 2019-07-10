@@ -63,9 +63,7 @@ Mining
 
 ###ToDo
 - [ ] **General Optimisations**
-- [ ] Merge stacked seed CRCing into code
 - [ ] Add dataset item calculation optimisation
-- [ ] Get rid of CRCing of seed
 - [ ] Implement cn_slow\_hash AES code
 - [ ] **Readme**
 - [ ] Add "the lower the memory the lower the chance of finding a solution (exponentially)"-text
