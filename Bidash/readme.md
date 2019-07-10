@@ -51,16 +51,13 @@ Parameters
 		Full:  1024
 		Light:  68719476736
 	Seed:  89abcdef
-	Difficulty:  4294967296
+	Difficulty:  68719476736
 Mining
-        Calculation of 1024 solutions took:  3710s                              
-	Hashrate is approximately:  5 s/sol
-	Found 649 solutions for 1024 nonces. Rate: 63%
-	Result:  a19231ee,715c0c64
-Validation
-        Calculation of 67108864 hashes took:  80s                               
-	Hashrate is approximately:  838860.8 H/s
-	Result:  0000000000000000
+        Calculation of 1024 solutions took:  4252s                              
+	Hashrate is approximately:  607 s/sol
+	Found 7 solutions for 1024 nonces. Rate: 0%
+	Result:  a7b3906a,d1cc6688
+
 
 ```
 
