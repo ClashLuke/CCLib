@@ -24,7 +24,16 @@ A bi-assymetric hash combining the birthday problem with dagger.
 
 ### General
 #### Concept
-Bidash is a bi-assymetric hash algorithm combining the research of the [birthday problem](#Birthday-Paradox) and [dagger](https://webcache.googleusercontent.com/search?q=cache:bmDsAGmmcG8J:www.hashcash.org/papers/dagger.html+).
+Bidash is a bi-assymetric hash algorithm combining the research of the [birthday problem](#Birthday-Paradox) and [ethash](https://github.com/ethereum/wiki/wiki/Ethash).
+
+The birthday problem is used as a rate limitation for an exterior hash algorithm used to hash the block header, so that the hashrate is dependent on the speed of finding a solution to the birthday paradox instead of the speed of finding a solution to a hash as seen in most cryptocurrencies. With that in mind, bidash also does not rely on a hash-based difficulty but instead has its own difficulty mechanism. After finding one solution to the birthday paradox on a 32bit level, where one birthday is equal to the first half of the nonce, another item has to be found which meets `abs(item-nonce)<difficulty`. To ensure that a solution other than the first one has to be found, the nonce is mixed with the the 64bit behind solution to the birthday paradox. Those items being calculated similar to ethereums ethash allows a validator to calculate only the two required items and check for equality, without forcing them to calculate the entire dataset. Additionally, thanks to the speed-assymetry of the birthday problem, a validator also has a higher hashrate (validation rate) than a miner. 
+
+### Speed
+The previously mentioned speed of the algorithm is variable for the miner, thanks to the embedded [difficulty](#Difficulty), but constant for a validator at approximately eight million validations per second (8MH/s). 
+
+
+
+
 
 In bidash, the most important thing is memory-dependency. Say `m` is the variable determining the memory intensity (for the purpose of accurate and recreatable calculations, m is measured in bytes). Unfortunately with a background of the equihash and the birthday paradox, the time complexity `t` for the algorithm to find a solution, assuming that there are no memory optimisations and a complete randomness, is equal to `2*m*(m-1)` CPU cycles in a best-case scenario. This best-case scenario assumes that all memory is on-cache and checks are performed in one CPU cycle. Considering that a minimum of 4 GiB (2^32 bytes) are recommended to achieve strong ASIC and botnet resistance, the minimum time spent calculating one nonce, assuming that there are no memory optimisations possible for the algorithm, is `t = 2*m*(m-1) = 2^65-2^33` CPU cycles. Converting CPU cycles to seconds, on a normal 4GiHz CPU with one active thread, the average best-case execution time for the algorithm to create one subnonce to one nonce is 272 years. (Further reading: [A generalized Birthday Problem](https://link.springer.com/content/pdf/10.1007%2F3-540-45708-9_19.pdf), [Lattice Problem](https://cseweb.ucsd.edu/~daniele/papers/SVP.pdf))
 

@@ -1388,7 +1388,6 @@ void bidash_light(uint8_t* seed){
 	uint32_t  i         = 0;
 	uint64_t* cache0_1  = (uint64_t*)&cache0[4096];
 	uint64_t* cache1_1  = (uint64_t*)&cache1[4096];
-	uint16_t  var       = 0;
 	const uint64_t diff = *(uint64_t*)&seed[72];
 	const uint8_t* seed1 = &seed[16];
 	ITEM_CALCULATION()
@@ -1399,31 +1398,19 @@ void bidash_light(uint8_t* seed){
 		for(uint16_t a=0; a<4096; a++){
 			if(!((*item32) ^ *(uint32_t*)&cache0[a])){
 				item ^= *(uint64_t*)&cache0[4+a];
-				i = j+a+1;
+				i = 0;
 				mix = cache1_1;
 				ITEM_CALCULATION()
-				memcpy(cache1, cache0, 4096);
-				var=i&0xfff;
-				for(;var<0x1000;var++){
-					if((item ^ *(uint64_t*)&cache1[var]) < diff){
-						*item32   = j+a;
-						item32[1] = i+var;
-						return;
-					}
-				}
-				i+=0x1000;
-				i-=var;
-				for(uint64_t k=i; k<ITEMS; k+=4096){
+				for(; i<ITEMS; i+=4096){
 					memcpy(cache1, cache1_1, 4096);
 					ITEM_CALCULATION()
 					for(uint16_t b=0; b<4096; b++){
 						if((item ^ *(uint64_t*)&cache1[b]) < diff){
 							*item32   = j+a;
-							item32[1] = k+b;
+							item32[1] = i+b;
 							return;
 						}
 					}
-					i+=0x1000;
 				}
 				item ^= *(uint64_t*)&cache0[4+a];
 			}

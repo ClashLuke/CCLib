@@ -19,9 +19,9 @@ void bidash_full(uint8_t* data, uint8_t* dataset){
 	for(uint64_t j=0; j<ITEMS; j+=BLOCK){
 		memcpy((void*)cache0, (void*)&dataset[j], BLOCK+12);
 		for(uint32_t a=0; a<BLOCK; a++){
-			if(!((*item32) ^ *(uint32_t*)&cache0[a])){
+			if((*item32) == *(uint32_t*)&cache0[a]){
 				item ^= *(uint64_t*)&cache0[4+a];	
-				for(uint64_t k=j+a+1; k<ITEMS; k+=BLOCK){
+				for(uint64_t k=0; k<ITEMS; k+=BLOCK){
 					memcpy(cache1, &dataset[k], BLOCK+8);
 					for(uint32_t b=0; b<BLOCK; b++){
 						if((item ^ *(uint64_t*)&cache1[b]) < diff){
