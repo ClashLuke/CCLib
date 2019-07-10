@@ -255,6 +255,8 @@ int main(int argc, char *argv[]){
 	uint64_t* seed64_0     = (uint64_t*)seed32_0;
 	uint32_t  seed32_1[22] = {0};
 	uint64_t* seed64_1     = (uint64_t*)seed32_1;
+	uint32_t  seed32_2[22] = {0};
+	uint64_t* seed64_2     = (uint64_t*)seed32_1;
 	uint64_t  iterations   = 1;
 	uint64_t  difficulty   = 1;
 	uint64_t  nonce        = 0;
@@ -264,7 +266,7 @@ int main(int argc, char *argv[]){
 	for(uint8_t i=0; i<iterShifts; i++) iterations<<=1;
 	for(uint8_t i=0; i<diffShifts; i++) difficulty<<=1;
 	nonce+=rand();
-	for(uint8_t i=0;i<18;i++) seed32_0[i] = seed32_1[i] = rand();
+	for(uint8_t i=0;i<18;i++) seed32_0[i] = seed32_1[i] = seed32_2[i] = rand();
 	printf("\e[?25l"); // Hide cursor
 	printf("Parameters\n");
 	printf("\tProgressbar:  %s\n", printing?"yes":"no");
@@ -273,8 +275,10 @@ int main(int argc, char *argv[]){
 	printf("\tDifficulty:  %lu\n", difficulty);
 	printf("Mining\n");
 	benchmark_mine(seed64_0, printing, difficulty, iterations, nonce);
+	printf("Light\n");
+	benchmark_light(seed64_1, printing, difficulty, iterations, nonce);
 	printf("Validation\n");
-	benchmark_validation(seed64_1, printing, difficulty, iterations, nonce);
+	benchmark_validation(seed64_2, printing, difficulty, iterations, nonce);
 	printf("\e[?25h");
 	return 1;
 }
