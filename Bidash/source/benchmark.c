@@ -213,7 +213,7 @@ static void benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t d
 	uint32_t* seed_32      = (uint32_t*)seed_64;
 	uint32_t  current_time = (uint32_t)time(NULL);
 	char      buffer[65]   = {0};
-	const uint64_t  iterations   = ITERATIONS<<16;
+	const uint64_t  iterations   = ITERATIONS<<10;
 	const uint64_t  diff         = 0xFFFFFFFFFFFFFFFF/difficulty;
 	for(uint16_t i=0;i<64;i++) buffer[i]=' ';
 	current_time = (uint32_t)time(NULL);
@@ -221,7 +221,7 @@ static void benchmark_validation(uint64_t* seed_64, uint8_t printing, uint64_t d
 	if(printing){
 		printf("\rBenchmarking: [%s]",buffer); fflush(stdout);
 		for(uint8_t j=0; j<64; j++){
-			for(uint64_t i=0;i<ITERATIONS<<10;i++){
+			for(uint64_t i=0;i<ITERATIONS<<4;i++){
 				uint8_t a = bidash_verify(seed_32);
 				temp ^= a; nonce++;
 				crc32i(&seed_32[12]); crc32i(&seed_32[13]);
@@ -270,7 +270,7 @@ int main(int argc, char *argv[]){
 	printf("\e[?25l"); // Hide cursor
 	printf("Parameters\n");
 	printf("\tProgressbar:  %s\n", printing?"yes":"no");
-	printf("\tIterations\n\t\tFull:  %lu\n\t\tLight:  %lu\n", iterations, iterations<<26);
+	printf("\tIterations\n\t\tFull/Light:  %lu\n\t\tVerify:  %lu\n", iterations, iterations<<10);
 	printf("\tSeed:  %08x\n", seed);
 	printf("\tDifficulty:  %lu\n", difficulty);
 	printf("Mining\n");
