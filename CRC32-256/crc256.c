@@ -2,6 +2,7 @@
 //
 // Please see the included LICENSE file for more information.
 
+
 #include <stdint.h>
 // Comment these to improve performance but remove the feature associated with it
 //#define MIXING     // Mix CRC32s, when enabled, every bit of the output is dependent on every bit of the input
@@ -125,13 +126,13 @@ void crc256(uint8_t* in, uint32_t len, uint8_t* out){
 	uint64_t* tmp_64_3 = (uint64_t*)&temp[24];
 
 	uint32_t* tmp_32_0 = (uint32_t*)temp;
-	uint32_t* tmp_32_1 = (uint32_t*)&temp[8];
-	uint32_t* tmp_32_2 = (uint32_t*)&temp[16];
-	uint32_t* tmp_32_3 = (uint32_t*)&temp[24];
-	uint32_t* tmp_32_4 = (uint32_t*)temp;
-	uint32_t* tmp_32_5 = (uint32_t*)&temp[8];
-	uint32_t* tmp_32_6 = (uint32_t*)&temp[16];
-	uint32_t* tmp_32_7 = (uint32_t*)&temp[24];
+	uint32_t* tmp_32_1 = (uint32_t*)&temp[4];
+	uint32_t* tmp_32_2 = (uint32_t*)&temp[8];
+	uint32_t* tmp_32_3 = (uint32_t*)&temp[12];
+	uint32_t* tmp_32_4 = (uint32_t*)&temp[16];
+	uint32_t* tmp_32_5 = (uint32_t*)&temp[20];
+	uint32_t* tmp_32_6 = (uint32_t*)&temp[24];
+	uint32_t* tmp_32_7 = (uint32_t*)&temp[28];
 	#ifdef MIXING
 	uint32_t* out_32_0 = (uint32_t*)&out[ 2];
 	uint32_t* out_32_1 = (uint32_t*)&out[ 6];
@@ -210,38 +211,55 @@ void crc256(uint8_t* in, uint32_t len, uint8_t* out){
 #include <stdio.h>
 #include <time.h>
 
-#define SIZE_64     536870912  // 1<<29 * 8 byte
+#define SIZE_64     1073741824UL  // 1<<29 * 8 byte
 #define SIZE_256    SIZE_64>>2 // 1<<27
-#define SIZE_32_32  SIZE_64>>4 // 1<<25
-#define LOG_S_32_32 25         // Log2(SIZE_32_32)
-#define ITERATIONS  8192       // 1<<13, approximately 10 minutes on E2-1225v2
+#define ITERATIONS  3       // 1<<13, approximately 10 minutes on E2-1225v2
 #define CPS         3.2        // Cycles per second, default: 3.2GHz
 
 int main(){
-	uint32_t* cache    = (uint32_t*)calloc(SIZE_64,8);
+	uint64_t* cache_64 = calloc(SIZE_64,8);
+	if(!cache_64){
+		printf("Invalid memory allocation, exiting\n");
+		exit(-1);
+	}
+	uint32_t* cache    = (uint32_t*)cache_64;
 	uint8_t*  cache_8  = (uint8_t*)cache;
-	uint64_t* cache_64 = (uint64_t*)cache;
 	uint32_t  stime    = 0;
 	uint32_t  etime    = 0;
+	uint32_t  genTime  = 0;
 	double    rate     = 0;
-	uint64_t* out_64   = (uint64_t*)cache;
+	uint64_t  out_64[4]= {0};
+	uint8_t*  out_8    = (uint8_t*)out_64;
 
-	cache_64[0] = 0x8ccc5467f6bd9249; cache_64[1] = 0xddaadef338d9fdc7;
+	cache_64[0] = 0x8c0ec567f6bd90ad; cache_64[1] = 0xddaadef338d9fdc0;
 	cache_64[2] = 0x39720ddd40fd8a32; cache_64[3] = 0x8473643dec63477e;
-	for(uint32_t x=0;x<32;x++)
-		for(uint32_t i=32;i<SIZE_32_32;i++) cache[i+(x<<LOG_S_32_32)] = (cache[i-32+(x<<LOG_S_32_32)]<<x)^i^crc32r(cache[i-32+(x<<LOG_S_32_32)]);
-
 	stime = (uint32_t)time(NULL);
-	for(uint32_t j=0;j<ITERATIONS;j++) crc256(cache_8, SIZE_256, cache_8);
+	for(uint16_t i=0; i<32768; i++){
+		for(uint32_t x=8;x<SIZE_64<<1;x++){
+			cache[x] = x^crc32r(cache[x-8]);
+			cache_64[0] ^= cache_64[SIZE_64-1]; cache_64[1] ^= cache_64[SIZE_64-2];
+			cache_64[2] ^= cache_64[SIZE_64-3]; cache_64[3] ^= cache_64[SIZE_64-4];
+
+		}
+	}
 	etime = (uint32_t)time(NULL);
-	etime = etime-stime;
+	genTime = stime-etime;
+	stime = (uint32_t)time(NULL);
+	for(uint32_t j=0;j<ITERATIONS;j++){
+		for(uint32_t x=8;x<SIZE_64<<1;x++) cache[x] = x^crc32r(cache[x-8]);
+		crc256(cache_8, SIZE_256, out_8);
+		cache_64[0] ^= out_64[0]; cache_64[1] ^= out_64[1];
+		cache_64[2] ^= out_64[2]; cache_64[3] ^= out_64[3];
+	}
+	etime = (uint32_t)time(NULL);
+	etime = etime-stime-(genTime*(double)ITERATIONS/32768);
 	rate  = (double)ITERATIONS/etime;
 	rate  = rate*SIZE_64*8/1000000000; // GB/s
 	printf("CRC256 calculation took %us\n",etime);
 	printf("Processing %fGB/s\n",rate);
 	printf("\tHash uses %f cycles per byte\n",(double)CPS/rate);
 	printf("\tHash processes %f bytes per cycle\n",(double)rate/CPS);
-	printf("CRC256 Result: %016jx.%016jx.%016jx.%016jx\n",out_64[0],out_64[1],out_64[2],out_64[3]);
+	printf("CRC256 Result: %016jx.%016jx.%016jx.%016jx.%016jx\n",out_64[0],out_64[1],out_64[2],out_64[4],out_64[5]);
 }
 
 #endif

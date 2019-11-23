@@ -3,9 +3,10 @@
 // Please see the included LICENSE file for more information.
 
 
-#ifndef AES_H
-#define AES_H
+#ifndef BALLOON_H
+#define BALLOON_H
 
-void aesSingleRound(uint8_t* state, uint8_t* key);
+
+void balloon(uint8_t* data, uint8_t* out);
 
 #endif

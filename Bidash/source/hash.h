@@ -3,9 +3,9 @@
 // Please see the included LICENSE file for more information.
 
 
-#ifndef AES_H
-#define AES_H
+#ifndef MASH_H
+#define MASH_H
 
-void aesSingleRound(uint8_t* state, uint8_t* key);
+void bidash_full(uint8_t* data, uint8_t* dataset);
 
 #endif
